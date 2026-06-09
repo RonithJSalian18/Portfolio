@@ -65,7 +65,7 @@ export function Hero() {
               backgroundSize: '200% 200%',
             }}
           >
-            Hi, I&apos;m Ronith
+            Hi, I&apos;m Ronith J Salian
           </motion.h1>
 
           {/* Subtitle */}
@@ -135,23 +135,26 @@ export function Hero() {
             animate="visible"
           >
             {[
-              { icon: 'GitHub', href: 'https://github.com' },
-              { icon: 'LinkedIn', href: 'https://linkedin.com' },
-              { icon: 'Twitter', href: 'https://twitter.com' },
+              { icon: 'GH', href: 'https://github.com/RonithSalian18', label: 'GitHub' },
+              { icon: 'LI', href: 'https://linkedin.com/in/ronith-j-salian-093b76288/', label: 'LinkedIn' },
+              { icon: 'LC', href: 'https://leetcode.com/ronith_salian', label: 'LeetCode' },
+              { icon: 'EM', href: 'mailto:ronithjsalian01@gmail.com', label: 'Email' },
             ].map((social, index) => (
               <motion.a
                 key={social.icon}
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 rounded-xl glass-card flex items-center justify-center hover:text-cyan transition-colors"
+                className="w-14 h-14 rounded-xl glass-card flex items-center justify-center hover:text-cyan transition-colors group"
                 whileHover={{ scale: 1.1, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
+                title={social.label}
               >
-                <span className="text-sm font-semibold">{social.icon.slice(0, 2)}</span>
+                <span className="text-xs font-bold text-cyan">{social.icon}</span>
+                <span className="absolute -bottom-10 text-xs text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{social.label}</span>
               </motion.a>
             ))}
           </motion.div>

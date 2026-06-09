@@ -9,17 +9,18 @@ const footerLinks = [
     links: [
       { label: 'Home', href: '#hero' },
       { label: 'About', href: '#about' },
+      { label: 'Skills', href: '#skills' },
       { label: 'Projects', href: '#projects' },
       { label: 'Contact', href: '#contact' },
     ],
   },
   {
-    category: 'Social',
+    category: 'Connect',
     links: [
-      { label: 'GitHub', href: 'https://github.com' },
-      { label: 'LinkedIn', href: 'https://linkedin.com' },
-      { label: 'Twitter', href: 'https://twitter.com' },
-      { label: 'Email', href: 'mailto:hello@ronith.dev' },
+      { label: 'GitHub', href: 'https://github.com/RonithSalian18' },
+      { label: 'LinkedIn', href: 'https://linkedin.com/in/ronith-j-salian-093b76288/' },
+      { label: 'LeetCode', href: 'https://leetcode.com/ronith_salian' },
+      { label: 'Email', href: 'mailto:ronithjsalian01@gmail.com' },
     ],
   },
 ]
@@ -40,10 +41,10 @@ export function Footer() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-2xl font-bold text-gradient">Ronith</h3>
-            <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              Full-stack developer building beautiful, scalable web applications with modern
-              technologies.
+            <h3 className="text-2xl font-bold text-gradient">Ronith J Salian</h3>
+            <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
+              BTech student and aspiring software engineer passionate about full-stack development, 
+              machine learning, and solving algorithmic challenges.
             </p>
           </motion.div>
 
@@ -97,8 +98,8 @@ export function Footer() {
           viewport={{ once: true }}
         >
           {/* Copyright */}
-          <p className="text-gray-400 text-sm">
-            &copy; {currentYear} Ronith. All rights reserved.
+          <p className="text-text-secondary text-sm">
+            &copy; {currentYear} Ronith J Salian. All rights reserved.
           </p>
 
           {/* Credits */}

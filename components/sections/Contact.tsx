@@ -73,11 +73,11 @@ export function Contact() {
             variants={scrollRevealVariants}
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">Let&apos;s </span>
-              <span className="text-gradient">Connect</span>
+              <span className="text-white">Get in </span>
+              <span className="text-gradient">Touch</span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Have a question or want to work together? I&apos;d love to hear from you!
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Interested in collaborating or have a project in mind? Feel free to reach out! I&apos;m always excited to discuss new opportunities.
             </p>
           </motion.div>
 
@@ -93,26 +93,26 @@ export function Contact() {
                   {
                     icon: '📧',
                     label: 'Email',
-                    value: 'hello@ronith.dev',
-                    href: 'mailto:hello@ronith.dev',
+                    value: 'ronithjsalian01@gmail.com',
+                    href: 'mailto:ronithjsalian01@gmail.com',
+                  },
+                  {
+                    icon: '📱',
+                    label: 'Phone',
+                    value: '+91 76193 40723',
+                    href: 'tel:+917619340723',
                   },
                   {
                     icon: '🔗',
                     label: 'LinkedIn',
-                    value: 'linkedin.com/in/ronith',
-                    href: 'https://linkedin.com',
+                    value: 'ronith-j-salian',
+                    href: 'https://linkedin.com/in/ronith-j-salian-093b76288/',
                   },
                   {
                     icon: '🐙',
                     label: 'GitHub',
-                    value: 'github.com/ronith',
-                    href: 'https://github.com',
-                  },
-                  {
-                    icon: '🐦',
-                    label: 'Twitter',
-                    value: '@ronith_dev',
-                    href: 'https://twitter.com',
+                    value: 'RonithSalian18',
+                    href: 'https://github.com/RonithSalian18',
                   },
                 ].map((contact, index) => (
                   <motion.a

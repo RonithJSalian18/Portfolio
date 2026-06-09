@@ -11,34 +11,34 @@ import {
 
 const skillCategories = [
   {
-    category: 'Frontend',
-    skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
+    category: 'Languages',
+    skills: ['Python', 'JavaScript', 'TypeScript', 'C++', 'C', 'Java'],
     color: 'from-cyan',
+  },
+  {
+    category: 'Frontend',
+    skills: ['React', 'Next.js', 'Tailwind CSS', 'Framer Motion', 'shadcn/ui'],
+    color: 'from-electric-blue',
   },
   {
     category: 'Backend',
-    skills: ['Node.js', 'Express', 'Python', 'PostgreSQL', 'MongoDB'],
-    color: 'from-electric-blue',
-  },
-  {
-    category: 'Databases',
-    skills: ['PostgreSQL', 'MongoDB', 'Redis', 'Firebase', 'Prisma ORM'],
+    skills: ['Node.js', 'Express.js', 'Python', 'REST APIs', 'WebSockets'],
     color: 'from-purple',
   },
   {
-    category: 'Tools & DevOps',
-    skills: ['Git', 'Docker', 'GitHub', 'Vercel', 'AWS'],
+    category: 'Databases & ORM',
+    skills: ['PostgreSQL', 'MongoDB', 'Prisma ORM', 'Database Design'],
+    color: 'from-pink',
+  },
+  {
+    category: 'DevOps & Tools',
+    skills: ['Docker', 'GitHub', 'Vercel', 'Git', 'Command Line'],
     color: 'from-cyan',
   },
   {
-    category: 'Data Science',
-    skills: ['Python', 'Pandas', 'NumPy', 'Matplotlib', 'Tableau'],
+    category: 'Specializations',
+    skills: ['DSA', 'Problem Solving', 'System Design', 'LTE RAN', 'Wireless Protocols'],
     color: 'from-electric-blue',
-  },
-  {
-    category: 'Other',
-    skills: ['Problem Solving', 'System Design', 'Agile', 'REST APIs', 'GraphQL'],
-    color: 'from-purple',
   },
 ]
 
@@ -67,12 +67,12 @@ export function Skills() {
             variants={scrollRevealVariants}
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">My </span>
-              <span className="text-gradient">Skills</span>
+              <span className="text-white">Technical </span>
+              <span className="text-gradient">Expertise</span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              A comprehensive toolkit of technologies and expertise gained through continuous learning
-              and practical application.
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Full-stack development toolkit with expertise in modern web technologies, 
+              databases, DevOps, and algorithmic problem solving.
             </p>
           </motion.div>
 

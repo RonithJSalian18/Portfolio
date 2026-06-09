@@ -13,25 +13,25 @@ const aboutItems = [
   {
     title: 'Education',
     items: [
-      'Bachelor of Technology in Computer Science',
-      'GPA: 3.8/4.0',
-      'Active learner and problem solver',
+      'BTech in Information Science & Engineering',
+      'NMAM Institute of Technology, Nitte',
+      'CGPA: 8.64/10',
     ],
   },
   {
-    title: 'Interests',
+    title: 'Core Interests',
     items: [
-      'Full-stack web development',
-      'System design and architecture',
-      'Open source contributions',
+      'Machine Learning & AI',
+      'Data Structures & Algorithms',
+      'Full-stack Web Development',
     ],
   },
   {
-    title: 'Goals',
+    title: 'Passions',
     items: [
-      'Build scalable, impactful products',
-      'Master backend technologies',
-      'Contribute to cutting-edge projects',
+      'Building scalable solutions',
+      'Competitive Problem Solving',
+      'Open-source contributions',
     ],
   },
 ]
@@ -62,11 +62,11 @@ export function About() {
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
               <span className="text-white">About </span>
-              <span className="text-gradient">Me</span>
+              <span className="text-gradient">Ronith</span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              A passionate computer science student dedicated to building elegant solutions
-              to complex problems through clean, scalable code.
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Aspiring software engineer with strong interest in Machine Learning, Data Structures, Algorithms, 
+              and Software Development. Passionate about building efficient, scalable, and intelligent solutions.
             </p>
           </motion.div>
 
@@ -99,16 +99,17 @@ export function About() {
             variants={scrollRevealVariants}
           >
             <GlassCard className="p-8 md:p-12">
-              <p className="text-gray-300 text-lg leading-relaxed mb-4">
-                I&apos;m a third-year Computer Science student with a passion for full-stack
-                development and system design. My journey in tech started with curiosity about
-                how things work, and it has evolved into a deep commitment to building
-                meaningful software solutions.
+              <p className="text-text-secondary text-lg leading-relaxed mb-4">
+                I&apos;m a BTech student in Information Science & Engineering at NMAM Institute of Technology, 
+                Nitte, with a CGPA of 8.64. My passion lies in full-stack development, machine learning, and 
+                solving complex algorithmic problems. I recently interned at Sasken Technologies, working on 
+                LTE RAN protocols and wireless systems.
               </p>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                Beyond coding, I believe in continuous learning, contributing to open-source
-                projects, and creating products that make a real impact. I&apos;m always excited
-                to collaborate with talented individuals and tackle challenging problems.
+              <p className="text-text-secondary text-lg leading-relaxed">
+                I&apos;m committed to continuous learning, problem-solving excellence, and building innovative 
+                software solutions. With skills in Python, JavaScript, TypeScript, React, Next.js, and modern 
+                DevOps tools, I strive to create impactful applications. I&apos;m always eager to collaborate 
+                on challenging projects and contribute to the developer community.
               </p>
             </GlassCard>
           </motion.div>

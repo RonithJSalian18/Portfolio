@@ -19,38 +19,38 @@ interface TimelineItem {
 
 const timelineItems: TimelineItem[] = [
   {
-    period: '2024 - Present',
-    title: 'Full Stack Development Internship',
-    organization: 'Tech Startup XYZ',
-    description: 'Building scalable web applications using Next.js and cloud technologies. Led optimization efforts improving performance by 40%.',
-    type: 'internship',
-  },
-  {
-    period: '2023 - 2024',
-    title: 'Teaching Assistant',
-    organization: 'University CS Department',
-    description: 'Assisted in teaching Data Structures and Algorithms. Mentored 50+ students and conducted weekly lab sessions.',
-    type: 'achievement',
-  },
-  {
-    period: '2022 - Present',
-    title: 'Bachelor of Technology',
-    organization: 'Computer Science',
-    description: 'Pursuing B.Tech in Computer Science with focus on full-stack development, system design, and algorithms.',
+    period: 'July 2023 - Present',
+    title: 'BTech in Information Science & Engineering',
+    organization: 'NMAM Institute of Technology, Nitte',
+    description: 'Pursuing Bachelor of Technology with CGPA 8.64. Focus on full-stack development, machine learning, and problem-solving excellence.',
     type: 'education',
   },
   {
-    period: '2023',
-    title: 'Web Development Internship',
-    organization: 'Digital Agency',
-    description: 'Developed responsive web applications using React and TypeScript. Improved site load times by 35%.',
+    period: 'June 2025 - July 2025',
+    title: 'LTE RAN Internship',
+    organization: 'Sasken Technologies',
+    description: 'Gained practical experience in wireless protocols, LTE RAN debugging, and telecom workflows. Strengthened technical and analytical skills in network protocols.',
     type: 'internship',
   },
   {
-    period: '2021 - 2022',
-    title: 'Competitive Programmer',
-    organization: 'CodeChef',
-    description: 'Achieved 4-star rating on CodeChef. Ranked top 500 in multiple contests.',
+    period: 'Sep 2023 - Mar 2024',
+    title: 'Lost and Found Web Application',
+    organization: 'NMAMIT Student Project',
+    description: 'Developed a web application for students to post and search for lost/found items. Implemented image upload and responsive interface.',
+    type: 'achievement',
+  },
+  {
+    period: 'HackLoop Event',
+    title: 'StudyBuddy - AI PDF Q&A Application',
+    organization: 'Hackathon Project',
+    description: 'Built an AI-powered application enabling students to upload PDFs and ask context-based questions. Implemented NLP for summarization and real-time responses.',
+    type: 'achievement',
+  },
+  {
+    period: '328+ Problems Solved',
+    title: 'Competitive Programming & DSA',
+    organization: 'LeetCode & Problem-Solving',
+    description: 'Consistently solving algorithmic problems across various difficulty levels. LeetCode Rank: 408K with 246 active days and max streak of 33 days.',
     type: 'achievement',
   },
 ]
@@ -86,11 +86,11 @@ export function Experience() {
             variants={scrollRevealVariants}
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">Experience & </span>
-              <span className="text-gradient">Education</span>
+              <span className="text-white">Journey & </span>
+              <span className="text-gradient">Milestones</span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              A journey of growth, learning, and professional development.
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Education, internships, and achievements showcasing growth and commitment to excellence.
             </p>
           </motion.div>
 
