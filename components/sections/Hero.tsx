@@ -55,18 +55,20 @@ export function Hero() {
           initial="hidden"
           animate="visible"
         >
-          {/* Main heading */}
+          {/* Main heading with glow effect */}
           <motion.h1
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight"
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight text-gradient glow-text"
             variants={heroHeadingVariants}
+            style={{
+              backgroundSize: '200% 200%',
+            }}
           >
-            <span className="text-white">Hi, I&apos;m </span>
-            <span className="text-gradient">Ronith</span>
+            Hi, I&apos;m Ronith
           </motion.h1>
 
           {/* Subtitle */}
           <motion.h2
-            className="text-xl sm:text-2xl md:text-3xl text-gray-400 max-w-2xl"
+            className="text-xl sm:text-2xl md:text-3xl text-text-secondary max-w-2xl font-light"
             variants={heroSubtitleVariants}
           >
             Computer Science Student & Full Stack Developer
@@ -78,11 +80,11 @@ export function Hero() {
             variants={fadeUpVariants}
           >
             <p className="text-2xl sm:text-3xl md:text-4xl font-semibold">
-              <span className="text-gray-300">I&apos;m a </span>
-              <span className="text-gradient min-w-[200px] sm:min-w-[250px]">
+              <span className="text-text-secondary">I&apos;m a </span>
+              <span className="text-gradient glow-text min-w-[200px] sm:min-w-[250px]">
                 {displayedText}
                 <motion.span
-                  className="inline-block w-1 h-8 sm:h-10 md:h-12 ml-2 bg-gradient-to-b from-cyan to-purple"
+                  className="inline-block w-1 h-8 sm:h-10 md:h-12 ml-2 bg-gradient-to-b from-cyan via-electric-blue to-purple"
                   animate={{ opacity: [1, 0] }}
                   transition={{ duration: 0.8, repeat: Infinity }}
                 />

@@ -10,15 +10,18 @@ const config = {
   theme: {
     extend: {
       colors: {
-        background: '#0f0f1e',
+        background: '#060816',
         foreground: '#ffffff',
-        'glass-border': 'rgba(255, 255, 255, 0.2)',
-        'glass-bg': 'rgba(255, 255, 255, 0.1)',
-        cyan: '#00d4ff',
-        'electric-blue': '#0066ff',
-        purple: '#a855f7',
-        'charcoal': '#1a1a2e',
-        'dark-bg': '#0f0f1e',
+        'glass-border': 'rgba(255, 255, 255, 0.1)',
+        'glass-bg': 'rgba(255, 255, 255, 0.05)',
+        cyan: '#06b6d4',
+        'electric-blue': '#3b82f6',
+        purple: '#8b5cf6',
+        'soft-pink': '#ec4899',
+        'dark-bg': '#060816',
+        'navy-dark': '#0b1020',
+        'text-secondary': '#94a3b8',
+        'text-muted': '#64748b',
       },
       backgroundColor: {
         'dark-bg': '#0f0f1e',
@@ -32,10 +35,12 @@ const config = {
         '2xl': '60px',
       },
       boxShadow: {
-        glow: '0 0 20px rgba(0, 212, 255, 0.3)',
-        'glow-purple': '0 0 20px rgba(168, 85, 247, 0.3)',
-        'glow-blue': '0 0 20px rgba(0, 102, 255, 0.3)',
-        'glass': '0 8px 32px rgba(0, 0, 0, 0.3)',
+        glow: '0 0 30px rgba(6, 182, 212, 0.4)',
+        'glow-purple': '0 0 30px rgba(139, 92, 246, 0.4)',
+        'glow-blue': '0 0 30px rgba(59, 130, 246, 0.4)',
+        'glow-pink': '0 0 30px rgba(236, 72, 153, 0.3)',
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.5)',
+        'inner-glow': 'inset 0 0 20px rgba(6, 182, 212, 0.2)',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

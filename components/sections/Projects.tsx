@@ -128,25 +128,25 @@ function ProjectCard({ project, onViewDetails, index }: ProjectCardProps) {
       <GlassCard className="h-full p-6 md:p-8 cursor-pointer hover:shadow-glow-purple group flex flex-col">
         {/* Category badge */}
         <div className="mb-4">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan/20 text-cyan">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-electric-blue/20 text-electric-blue border border-electric-blue/30">
             {project.category}
           </span>
         </div>
 
         {/* Project title */}
-        <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-cyan transition-colors">
+        <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-gradient transition-all">
           {project.title}
         </h3>
 
         {/* Description */}
-        <p className="text-gray-400 text-sm mb-6 flex-grow">{project.description}</p>
+        <p className="text-text-secondary text-sm mb-6 flex-grow">{project.description}</p>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-6">
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300 hover:bg-white/10 transition-colors"
+              className="px-2 py-1 rounded-md bg-electric-blue/10 text-xs text-electric-blue border border-electric-blue/20 hover:border-cyan/50 hover:bg-cyan/10 transition-all"
             >
               {tag}
             </span>
@@ -156,7 +156,7 @@ function ProjectCard({ project, onViewDetails, index }: ProjectCardProps) {
         {/* View details button */}
         <motion.button
           onClick={() => onViewDetails(project)}
-          className="w-full py-2 px-4 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition-colors"
+          className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-electric-blue/20 to-cyan/20 text-white font-medium hover:from-electric-blue/40 hover:to-cyan/40 border border-cyan/30 transition-all group-hover:shadow-glow"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
