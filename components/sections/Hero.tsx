@@ -59,6 +59,8 @@ export function Hero() {
           <motion.h1
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight text-gradient glow-text"
             variants={heroHeadingVariants}
+            initial="hidden"
+            animate="visible"
             style={{
               backgroundSize: '200% 200%',
             }}
@@ -70,6 +72,8 @@ export function Hero() {
           <motion.h2
             className="text-xl sm:text-2xl md:text-3xl text-text-secondary max-w-2xl font-light"
             variants={heroSubtitleVariants}
+            initial="hidden"
+            animate="visible"
           >
             Computer Science Student & Full Stack Developer
           </motion.h2>
@@ -78,6 +82,8 @@ export function Hero() {
           <motion.div
             className="h-16 sm:h-20 md:h-24 flex items-center justify-center"
             variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
           >
             <p className="text-2xl sm:text-3xl md:text-4xl font-semibold">
               <span className="text-text-secondary">I&apos;m a </span>
@@ -96,6 +102,8 @@ export function Hero() {
           <motion.div
             className="flex flex-col sm:flex-row gap-4 mt-8"
             variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
           >
             <motion.a
               href="#projects"
@@ -123,6 +131,8 @@ export function Hero() {
           <motion.div
             className="flex gap-6 mt-12"
             variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
           >
             {[
               { icon: 'GitHub', href: 'https://github.com' },
