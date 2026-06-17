@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-bg-space: #020617;
+  --color-bg-nebula: #0F172A;
+  --color-bg-void: #111827;
+
+  --color-accent-cyan: #00E5FF;
+  --color-accent-purple: #7C3AED;
+  --color-accent-pink: #FF4ECD;
+  --color-accent-green: #00FFB2;
+
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted: #94A3B8;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-bg-space text-text-primary antialiased overflow-x-hidden;
+    /* Create a grid-like texture for the command center feel */
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: -1px -1px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-neon-cyan {
+    @apply text-accent-cyan;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 20px rgba(0, 229, 255, 0.3);
+  }
+
+  .text-neon-purple {
+    @apply text-accent-purple;
+    text-shadow: 0 0 10px rgba(124, 58, 237, 0.5), 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+
+  .holographic-panel {
+    @apply bg-bg-nebula/40 backdrop-blur-xl border border-accent-cyan/20;
+    box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .holographic-panel:hover {
+    @apply border-accent-cyan/50;
+    box-shadow: inset 0 0 30px rgba(0, 229, 255, 0.1), 0 10px 40px rgba(0, 229, 255, 0.15);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-bg-space;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-accent-cyan/30 rounded-full border border-accent-cyan/10;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent-cyan/70;
+}
+
+/* Selection */
+::selection {
+  @apply bg-accent-cyan/30 text-white;
 }
