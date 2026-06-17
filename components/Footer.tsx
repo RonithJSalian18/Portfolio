@@ -67,7 +67,7 @@ export default function Footer() {
               {[
                 { icon: FaGithub, href: "https://github.com/RonithJSalian18", label: "GitHub", color: "hover:border-white hover:text-white hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)]" },
                 { icon: FaLinkedin, href: "https://linkedin.com/", label: "LinkedIn", color: "hover:border-[#0077b5] hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:shadow-[0_0_15px_rgba(0,119,181,0.4)]" },
-                { icon: SiLeetcode, href: "https://leetcode.com/ronith_salian", label: "LeetCode", color: "hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/10 hover:shadow-[0_0_15px_rgba(234,179,8,0.4)]" },
+                { icon: SiLeetcode, href: "https://leetcode.com/u/ronith_salian/", label: "LeetCode", color: "hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/10 hover:shadow-[0_0_15px_rgba(234,179,8,0.4)]" },
                 { icon: Mail, href: "mailto:ronith@example.com", label: "Email", color: "hover:border-accent-pink hover:text-accent-pink hover:bg-accent-pink/10 hover:shadow-[0_0_15px_rgba(255,78,205,0.4)]" },
               ].map((social, i) => (
                 <motion.a

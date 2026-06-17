@@ -91,7 +91,7 @@ export default function Hero() {
               {[
                 { icon: FaGithub, href: "https://github.com/RonithJSalian18", glow: "hover:text-accent-purple hover:border-accent-purple hover:shadow-[0_0_25px_rgba(124,58,237,0.7)]" },
                 { icon: FaLinkedin, href: "https://linkedin.com/", glow: "hover:text-accent-cyan hover:border-accent-cyan hover:shadow-[0_0_25px_rgba(0,229,255,0.7)]" },
-                { icon: SiLeetcode, href: "https://leetcode.com/", glow: "hover:text-yellow-400 hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.7)]" },
+                { icon: SiLeetcode, href: "https://leetcode.com/u/ronith_salian/", glow: "hover:text-yellow-400 hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.7)]" },
                 { icon: Mail, href: "mailto:email@example.com", glow: "hover:text-accent-pink hover:border-accent-pink hover:shadow-[0_0_25px_rgba(255,78,205,0.7)]" }
               ].map((social, i) => (
                 <a 
