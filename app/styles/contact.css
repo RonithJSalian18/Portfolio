@@ -1,0 +1,311 @@
+@layer components {
+  .contact-grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .contact-grid {
+      grid-template-columns: 1fr 1.05fr;
+    }
+  }
+
+  /* Lighthouse scene: same sky as the hero, beam faint by day and sweeping at night */
+  .lighthouse-scene {
+    position: relative;
+    height: clamp(220px, 26vw, 290px);
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+    background: linear-gradient(to bottom, var(--sky-top), var(--sky-mid) 60%, var(--sky-low));
+    transition:
+      --sky-top 1.5s ease,
+      --sky-mid 1.5s ease,
+      --sky-low 1.5s ease;
+  }
+
+  .lh-stars {
+    position: absolute;
+    inset: 0;
+    opacity: var(--stars);
+    transition: opacity 1.4s ease;
+    background-image:
+      radial-gradient(1.2px 1.2px at 10% 20%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 30% 8%, #fff 50%, transparent 55%),
+      radial-gradient(1.4px 1.4px at 78% 16%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 88% 38%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 18% 44%, #fff 50%, transparent 55%);
+    background-size: 220px 220px;
+  }
+
+  .lighthouse-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .lh-beam {
+    transform-box: view-box;
+    transform-origin: 160px 70px;
+    opacity: var(--lamp);
+    transition: opacity 1.4s ease;
+    animation: sweep 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes sweep {
+    from {
+      transform: rotate(-9deg);
+    }
+    to {
+      transform: rotate(9deg);
+    }
+  }
+
+  .beam-stop {
+    stop-color: #fff3bf;
+    stop-opacity: 0.85;
+  }
+
+  .beam-stop-fade {
+    stop-color: #fff3bf;
+    stop-opacity: 0;
+  }
+
+  .lh-rock {
+    fill: var(--rock-dark);
+  }
+
+  .lh-tower {
+    fill: #f7f2e8;
+  }
+
+  .lh-stripes rect {
+    fill: #e2553b;
+  }
+
+  .lh-door {
+    fill: #6b4b2e;
+  }
+
+  .lh-deck,
+  .lh-roof {
+    fill: #2f3b4c;
+  }
+
+  .lh-room {
+    fill: #d9ecf4;
+    stroke: #2f3b4c;
+    stroke-width: 2;
+  }
+
+  .lh-lamp {
+    fill: #f2cf6b;
+  }
+
+  [data-theme='dark'] .lh-tower {
+    fill: #c9cdd8;
+  }
+
+  [data-theme='dark'] .lh-stripes rect {
+    fill: #b8452f;
+  }
+
+  [data-theme='dark'] .lh-room {
+    fill: #ffe9a6;
+  }
+
+  [data-theme='dark'] .lh-lamp {
+    fill: #fff6c9;
+    filter: drop-shadow(0 0 6px #ffe28a);
+  }
+
+  .lh-sea {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 20%;
+  }
+
+  .lh-wave-back {
+    --period: 110px;
+    --fill: var(--sea-near);
+    --speed: 14s;
+    top: 0;
+    animation-direction: reverse;
+  }
+
+  .lh-wave-front {
+    --period: 160px;
+    --fill: var(--sea-shallow);
+    --speed: 10s;
+    top: 30%;
+  }
+
+  .channels {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .channel {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .channel:hover {
+    transform: translateY(-2px);
+  }
+
+  .channel-icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 0.9rem 1.1rem 0.8rem 1.2rem;
+    background: color-mix(in srgb, var(--sea-shallow) 35%, transparent);
+    color: var(--sea-ink);
+  }
+
+  .channel-text {
+    display: grid;
+    min-width: 0;
+  }
+
+  .channel-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .channel-value {
+    overflow-wrap: anywhere;
+    font-weight: 600;
+  }
+
+  .contact-form {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    overflow: hidden;
+    padding: clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2rem) 0;
+  }
+
+  .form-title {
+    font-size: var(--text-h3);
+    font-weight: 700;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .field label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.8rem;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface-solid);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.8;
+  }
+
+  .field input:focus-visible,
+  .field textarea:focus-visible {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 30%, transparent);
+  }
+
+  .form-submit {
+    justify-self: start;
+  }
+
+  /* A strip of sea along the bottom of the form, where the bottle is tossed */
+  .form-sea {
+    position: relative;
+    height: 4.25rem;
+    margin-inline: calc(-1 * clamp(1.4rem, 3vw, 2rem));
+    overflow: hidden;
+  }
+
+  .form-wave {
+    --period: 180px;
+    --fill: var(--sea-shallow);
+    --speed: 12s;
+    top: 1.4rem;
+  }
+
+  .tossed-bottle {
+    position: absolute;
+    left: clamp(1.4rem, 3vw, 2rem);
+    top: 0.4rem;
+    width: 3.2rem;
+    animation: toss 2.2s cubic-bezier(0.25, 0.6, 0.35, 1) forwards;
+  }
+
+  .cork-mini {
+    fill: #b9854f;
+  }
+
+  @keyframes toss {
+    0% {
+      transform: translate(0, 0) rotate(-25deg);
+    }
+    30% {
+      transform: translate(5rem, -0.6rem) rotate(20deg);
+    }
+    55% {
+      transform: translate(9rem, 1.3rem) rotate(8deg);
+    }
+    100% {
+      transform: translate(22rem, 1.1rem) rotate(-6deg);
+      opacity: 0;
+    }
+  }
+
+  .form-status {
+    min-height: 1px;
+    margin-top: -1rem;
+    margin-inline: calc(-1 * clamp(1.4rem, 3vw, 2rem));
+    padding: 0 clamp(1.4rem, 3vw, 2rem);
+    font-size: 0.92rem;
+    background: var(--sea-shallow);
+    color: var(--on-shallow);
+  }
+
+  .form-status:not(:empty) {
+    padding-block: 0 1rem;
+  }
+
+  .form-status a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}

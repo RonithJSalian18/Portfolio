@@ -60,6 +60,13 @@
   --sand-print: rgba(112, 80, 34, 0.3);
   --grain: rgba(105, 75, 28, 0.16);
 
+  /* Words pressed into wet sand */
+  --etched: #4a3519;
+  --etch-light: rgba(255, 255, 255, 0.5);
+  --etch-dark: rgba(70, 45, 10, 0.18);
+  --etch-sheen: rgba(255, 255, 255, 0.35);
+  --etch-shadow: rgba(80, 55, 20, 0.22);
+
   /* Tide pools */
   --rock: #b8ad9a;
   --rock-dark: #8f846f;
@@ -78,6 +85,7 @@
   --ink-soft: #33475d;
   --on-sea: #ffffff;
   --on-sea-soft: rgba(255, 255, 255, 0.88);
+  --on-shallow: #062a2e;
 
   /* Accents (the *-ink variants are dark enough for text on sand) */
   --coral: #ff7a5c;
@@ -126,6 +134,12 @@
   --sand-print: rgba(0, 0, 0, 0.42);
   --grain: rgba(255, 255, 255, 0.07);
 
+  --etched: #e6dcc8;
+  --etch-light: rgba(0, 0, 0, 0.45);
+  --etch-dark: rgba(255, 255, 255, 0.06);
+  --etch-sheen: rgba(170, 190, 255, 0.07);
+  --etch-shadow: rgba(0, 0, 0, 0.45);
+
   --rock: #3b3e54;
   --rock-dark: #2b2d40;
   --pool: rgba(16, 61, 102, 0.55);
@@ -142,6 +156,7 @@
   --ink-soft: #b0bbd0;
   --on-sea: #eaf0f9;
   --on-sea-soft: rgba(234, 240, 249, 0.84);
+  --on-shallow: #eaf0f9;
 
   --coral: #ff8a70;
   --on-coral: #2b0c04;
