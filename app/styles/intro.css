@@ -1,0 +1,112 @@
+/*
+ * Intro states on <html data-intro>: "play" (decided before paint, static cover shows while the intro
+ * chunk loads), "running" (canvas is drawing), "done" / "skip" (site only).
+ */
+
+.intro-cover {
+  display: none;
+}
+
+html[data-intro='play'] .intro-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: block;
+  background:
+    radial-gradient(1.5px 1.5px at 18% 24%, #fff 50%, transparent 55%),
+    radial-gradient(1px 1px at 72% 18%, #fff 50%, transparent 55%),
+    radial-gradient(1.5px 1.5px at 44% 76%, #cfe3ff 50%, transparent 55%),
+    radial-gradient(1px 1px at 86% 64%, #fff 50%, transparent 55%),
+    radial-gradient(1px 1px at 8% 70%, #fff 50%, transparent 55%),
+    #05060f;
+  background-size: 360px 360px, 360px 360px, 360px 360px, 360px 360px, 360px 360px, auto;
+}
+
+html[data-intro='play'],
+html[data-intro='running'] {
+  overflow: hidden;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+  cursor: pointer;
+  transition: opacity 0.35s ease;
+}
+
+.intro.is-leaving {
+  opacity: 0;
+}
+
+/* Nearest-neighbor upscaling keeps every pixel a crisp square */
+.intro-canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.intro-hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.4rem, env(safe-area-inset-bottom));
+  translate: -50% 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(5, 6, 15, 0.55);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: hint-in 0.6s ease 1.2s both;
+}
+
+.intro[data-phase='dive'] .intro-hint {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+    translate: -50% 6px;
+  }
+}
+
+.intro-skip {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  padding: 0.6rem 1.15rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(5, 6, 15, 0.6);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.intro-skip:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.intro-skip:focus-visible {
+  outline: 3px solid #6ff0e2;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .intro-hint {
+    font-size: 0.8rem;
+  }
+}

@@ -1,5 +1,6 @@
 import { CrabProgress } from '@/components/CrabProgress'
 import { Navbar } from '@/components/Navbar'
+import { IntroGate } from '@/components/intro/IntroGate'
 import { RevealObserver } from '@/components/RevealObserver'
 import { WaveDivider } from '@/components/WaveDivider'
 import { About } from '@/components/sections/About'
@@ -16,6 +17,7 @@ import { Skills } from '@/components/sections/Skills'
 export default function Home() {
   return (
     <>
+      <IntroGate />
       <div id="site">
         <a href="#main" className="skip-link">
           Skip to content

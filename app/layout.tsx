@@ -43,8 +43,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-// Runs before first paint: picks the saved theme (or the system one) so the page never flashes the wrong palette.
-const bootScript = `(function(){var d=document.documentElement,t='light';try{var s=localStorage.getItem('theme');t=s==='dark'||s==='light'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){}d.setAttribute('data-theme',t);d.style.colorScheme=t;d.classList.add('js')})()`
+// Runs before first paint:
+// - picks the saved theme (or the system one) so the page never flashes the wrong palette
+// - decides whether the intro plays: once per session, never when the URL targets a section
+// - flags phones / low-end devices for the lighter intro and starts fetching the right Earth texture
+const bootScript = `(function(){var d=document.documentElement,t='light';try{var s=localStorage.getItem('theme');t=s==='dark'||s==='light'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){}d.setAttribute('data-theme',t);d.style.colorScheme=t;d.classList.add('js');var i='play';try{if(sessionStorage.getItem('intro-played'))i='skip'}catch(e){}if(location.hash&&location.hash!=='#hero')i='skip';d.setAttribute('data-intro',i);if(i==='play'){var n=navigator,c=n.connection,l=(n.hardwareConcurrency||8)<=4||(n.deviceMemory||8)<=4||!!(c&&c.saveData)||matchMedia('(pointer: coarse)').matches||Math.min(innerWidth,innerHeight)<600;d.setAttribute('data-intro-lite',l?'1':'0');var p=document.createElement('link');p.rel='preload';p.as='image';p.type='image/webp';p.href=l?'/intro/earth-1024.webp':'/intro/earth-2048.webp';document.head.appendChild(p)}})()`
 
 export default function RootLayout({
   children,
@@ -57,6 +60,8 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       <body>
+        {/* Shown only while the intro chunk loads (see styles/intro.css), so the site never flashes first */}
+        <div className="intro-cover" aria-hidden="true" />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
