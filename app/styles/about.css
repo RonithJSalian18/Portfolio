@@ -1,0 +1,129 @@
+@layer components {
+  .about-grid {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .about-grid {
+      grid-template-columns: 1.15fr 1fr;
+    }
+  }
+
+  .about-story {
+    display: grid;
+    gap: 1.1rem;
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    font-weight: 300;
+  }
+
+  .about-story p:first-child {
+    font-weight: 400;
+  }
+
+  .about-cards {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .about-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem 1.35rem;
+    transition: transform 0.25s ease;
+  }
+
+  .about-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .about-icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 1rem 1.2rem 0.9rem 1.3rem;
+    background: color-mix(in srgb, var(--sea-shallow) 35%, transparent);
+    color: var(--sea-ink);
+  }
+
+  .about-icon svg {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+
+  .about-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .about-card ul {
+    margin-top: 0.4rem;
+    display: grid;
+    gap: 0.2rem;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .about-card li::before {
+    content: '';
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: 0 0.55rem 0.15rem 0;
+    border-radius: 50% 50% 50% 0;
+    rotate: -45deg;
+    background: var(--coral);
+  }
+
+  .about-starfish {
+    position: absolute;
+    right: clamp(0.5rem, 4vw, 4rem);
+    bottom: clamp(1rem, 3vw, 2.5rem);
+    width: clamp(48px, 6vw, 76px);
+    rotate: 18deg;
+    pointer-events: none;
+  }
+
+  .about-pebbles {
+    position: absolute;
+    left: clamp(0.5rem, 4vw, 4rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    width: clamp(70px, 8vw, 110px);
+    pointer-events: none;
+  }
+
+  .starfish-body {
+    fill: #f08c67;
+    stroke: #f08c67;
+  }
+
+  .starfish-dots {
+    fill: #ffd2bd;
+  }
+
+  [data-theme='dark'] .starfish-body {
+    fill: #b8664f;
+    stroke: #b8664f;
+  }
+
+  [data-theme='dark'] .starfish-dots {
+    fill: #e7a58c;
+  }
+
+  .pebble-a {
+    fill: var(--rock);
+  }
+
+  .pebble-b {
+    fill: var(--rock-dark);
+  }
+
+  .pebble-c {
+    fill: var(--pebble-shade);
+  }
+}

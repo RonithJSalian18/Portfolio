@@ -67,6 +67,7 @@
   --pool-edge: rgba(23, 150, 170, 0.35);
   --pebble: #f6f2ea;
   --pebble-shade: #ddd4c4;
+  --pebble-hi: color-mix(in srgb, #fff 55%, var(--pebble));
 
   /* Surfaces and text */
   --surface: rgba(255, 251, 242, 0.8);
@@ -131,6 +132,7 @@
   --pool-edge: rgba(99, 245, 230, 0.28);
   --pebble: #363b54;
   --pebble-shade: #2a2e45;
+  --pebble-hi: color-mix(in srgb, #fff 10%, var(--pebble));
 
   --surface: rgba(31, 33, 56, 0.8);
   --surface-solid: #1f2138;

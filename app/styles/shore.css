@@ -9,6 +9,10 @@
     transition: background-color 0.9s ease;
   }
 
+  .divider.grain::before {
+    z-index: 2;
+  }
+
   .divider-wave,
   .divider-foam {
     position: absolute;
@@ -131,8 +135,16 @@
       height: 21px;
     }
 
+    /* On phones the crab only shows while scrolling, so it never sits on top of text you're reading */
     .crab {
       translate: calc(var(--progress, 0) * (100cqw - 28px)) 0;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.9s;
+    }
+
+    .crab-track[data-moving] .crab {
+      opacity: 1;
+      transition-delay: 0s;
     }
   }
 

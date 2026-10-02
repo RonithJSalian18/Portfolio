@@ -1,0 +1,420 @@
+@layer components {
+  .bottles {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  @media (min-width: 820px) {
+    .bottles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .bottles > li {
+    display: flex;
+  }
+
+  .bottle-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  [data-glass='cobalt'] {
+    --glass: #2f6fd6;
+  }
+
+  [data-glass='seafoam'] {
+    --glass: #2a9d82;
+  }
+
+  [data-glass='amber'] {
+    --glass: #c98a23;
+  }
+
+  [data-glass='aqua'] {
+    --glass: #2aa9c4;
+  }
+
+  [data-theme='dark'] [data-glass='cobalt'] {
+    --glass: #7aa6ff;
+  }
+
+  [data-theme='dark'] [data-glass='seafoam'] {
+    --glass: #5fe0bf;
+  }
+
+  [data-theme='dark'] [data-glass='amber'] {
+    --glass: #ffc15e;
+  }
+
+  [data-theme='dark'] [data-glass='aqua'] {
+    --glass: #6fe3f5;
+  }
+
+  /* The bottle washed up where the sea meets the sand */
+  .bottle-art {
+    position: relative;
+    aspect-ratio: 16 / 6.5;
+    overflow: hidden;
+    background: linear-gradient(to bottom, var(--sea-near), var(--sea-shallow));
+  }
+
+  .bottle-shore {
+    position: absolute;
+    inset: 32% auto 0 0;
+    width: calc(100% + 160px);
+    --period: 160px;
+    background: var(--sand-4);
+    mask: var(--tide-shape) 0 0 / 160px auto repeat-x;
+    animation: wave-drift 16s linear infinite;
+  }
+
+  .bottle-shore::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--foam);
+    mask: var(--tide-line) 0 0 / 160px auto repeat-x;
+    opacity: 0.9;
+  }
+
+  .bottle-svg {
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    width: min(74%, 330px);
+    translate: -50% -50%;
+    rotate: -7deg;
+    overflow: visible;
+    filter: drop-shadow(0 8px 6px rgba(50, 35, 10, 0.28));
+    transition: rotate 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+
+  .bottle-card:hover .bottle-svg,
+  .bottle-card:focus-within .bottle-svg {
+    rotate: -3deg;
+  }
+
+  .glass-fill {
+    fill: var(--glass);
+    fill-opacity: 0.3;
+  }
+
+  .glass-edge {
+    fill: none;
+    stroke: var(--glass);
+    stroke-width: 2.5;
+  }
+
+  .paper {
+    fill: var(--parchment);
+    stroke: var(--parchment-edge);
+    stroke-width: 1.5;
+  }
+
+  .paper-curl {
+    fill: none;
+    stroke: var(--parchment-edge);
+    stroke-width: 1.5;
+  }
+
+  .ribbon {
+    fill: var(--coral);
+  }
+
+  .shine {
+    fill: none;
+    stroke: #fff;
+    stroke-opacity: 0.7;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .shine-soft {
+    stroke-opacity: 0.35;
+  }
+
+  .letter-roll {
+    transition: transform 0.5s ease;
+  }
+
+  .cork {
+    transform-box: fill-box;
+    transform-origin: 20% 50%;
+    transition:
+      transform 0.45s cubic-bezier(0.3, 1.6, 0.5, 1),
+      opacity 0.3s ease;
+  }
+
+  .cork rect {
+    fill: #b9854f;
+  }
+
+  .cork path {
+    fill: none;
+    stroke: #8a5c32;
+    stroke-width: 1.4;
+  }
+
+  /* Hover loosens the cork and nudges the letter; uncorking pops it off */
+  .bottle-card:hover .cork,
+  .bottle-card:focus-within .cork {
+    transform: translate(12px, -7px) rotate(30deg);
+  }
+
+  .bottle-card:hover .letter-roll,
+  .bottle-card:focus-within .letter-roll {
+    transform: translateX(10px);
+  }
+
+  .bottle-card[data-uncorked] .cork {
+    transform: translate(46px, -34px) rotate(170deg);
+    opacity: 0;
+  }
+
+  .bottle-card[data-uncorked] .letter-roll {
+    transform: translateX(46px);
+  }
+
+  .bottle-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.35rem 1.5rem 1.6rem;
+  }
+
+  .bottle-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sea-ink);
+  }
+
+  .bottle-flag {
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--coral-ink) 50%, transparent);
+    color: var(--coral-ink);
+    letter-spacing: 0.1em;
+  }
+
+  .bottle-title {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    font-weight: 700;
+  }
+
+  .bottle-tagline {
+    font-weight: 500;
+  }
+
+  .bottle-desc {
+    color: var(--ink-soft);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+  }
+
+  .tags li {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--sand-4) 50%, transparent);
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+
+  .bottle-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+  }
+
+  .btn-sm {
+    min-height: 2.6rem;
+    padding: 0.5rem 1.05rem;
+    font-size: 0.88rem;
+  }
+
+  /* The letter: a parchment dialog. It keeps light "paper" tokens even at night. */
+  .letter {
+    --ink: var(--parchment-ink);
+    --ink-soft: #4a3b22;
+    --sea-ink: #06606a;
+    --coral-ink: #a8381b;
+    --focus: #06606a;
+    --border: rgba(90, 64, 24, 0.22);
+    --border-strong: rgba(90, 64, 24, 0.4);
+    --surface: rgba(255, 251, 242, 0.85);
+    --surface-solid: #fffaf0;
+    --sand-4: #e5cfa3;
+    color-scheme: light;
+    width: min(42rem, calc(100vw - 1.5rem));
+    max-width: none;
+    max-height: min(88svh, 54rem);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .letter::backdrop {
+    background: rgba(3, 18, 36, 0.58);
+    backdrop-filter: blur(3px);
+  }
+
+  .letter-paper {
+    position: relative;
+    display: flex;
+    max-height: inherit;
+    border-radius: 0.9rem;
+    background:
+      radial-gradient(120% 80% at 10% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+      radial-gradient(90% 70% at 100% 100%, rgba(170, 120, 50, 0.16), transparent 60%),
+      var(--parchment);
+    box-shadow: 0 30px 70px -25px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Rolled top and bottom edges of the scroll */
+  .letter-paper::before,
+  .letter-paper::after {
+    content: '';
+    position: absolute;
+    left: -0.4rem;
+    right: -0.4rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, #f3e2bd, #d9c194 55%, #f0ddb4);
+    box-shadow: 0 4px 8px -4px rgba(60, 40, 10, 0.4);
+  }
+
+  .letter-paper::before {
+    top: -0.5rem;
+  }
+
+  .letter-paper::after {
+    bottom: -0.5rem;
+  }
+
+  .letter[open] .letter-paper {
+    animation: unroll 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  @keyframes unroll {
+    from {
+      clip-path: inset(0 -1rem 92% -1rem);
+      transform: translateY(-10px);
+    }
+    to {
+      clip-path: inset(-1rem -1rem -1rem -1rem);
+      transform: none;
+    }
+  }
+
+  .letter-scroll {
+    overflow-y: auto;
+    padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.25rem, 5vw, 2.75rem);
+    overscroll-behavior: contain;
+  }
+
+  .letter-close {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-solid);
+  }
+
+  .letter-kicker {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sea-ink);
+  }
+
+  .letter-title {
+    margin-top: 0.35rem;
+    padding-right: 2.5rem;
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    font-weight: 800;
+  }
+
+  .letter-tagline {
+    margin-top: 0.35rem;
+    font-weight: 500;
+    color: var(--coral-ink);
+  }
+
+  .letter-text {
+    margin-top: 1rem;
+  }
+
+  .letter-heading {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .letter-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+
+  .letter-list li {
+    position: relative;
+    padding-left: 1.4rem;
+  }
+
+  .letter-list li::before {
+    content: '';
+    position: absolute;
+    left: 0.15rem;
+    top: 0.62em;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50% 50% 50% 0;
+    rotate: -45deg;
+    background: var(--coral);
+  }
+
+  .letter .tags {
+    margin-top: 0.6rem;
+  }
+
+  .letter-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+  }
+
+  html:has(.letter[open]) {
+    overflow: hidden;
+  }
+}

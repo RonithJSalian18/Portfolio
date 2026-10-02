@@ -14,7 +14,7 @@ export function WaveDivider({ from, to, variant = 'tide' }: WaveDividerProps) {
   const style = { '--from': `var(--${from})`, '--to': `var(--${to})` } as CSSProperties
 
   return (
-    <div className={`divider divider-${variant}`} style={style} aria-hidden="true">
+    <div className={`divider divider-${variant} grain`} style={style} aria-hidden="true">
       {variant === 'surf' && <div className="divider-back" />}
       <div className="divider-wave" />
       <div className="divider-glow">
