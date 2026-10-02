@@ -1,0 +1,167 @@
+@layer components {
+  /* Tide-line divider: the next section's sand washes up over this one with a line of foam */
+  .divider {
+    position: relative;
+    height: clamp(52px, 5vw, 76px);
+    margin-block: -1px;
+    overflow: hidden;
+    background: var(--from);
+    transition: background-color 0.9s ease;
+  }
+
+  .divider-wave,
+  .divider-foam {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(100% + var(--period));
+    mask: var(--shape) 0 2px / var(--period) auto repeat-x;
+    animation: wave-drift var(--speed) linear infinite;
+    will-change: transform;
+  }
+
+  .divider-wave {
+    --period: 480px;
+    --shape: var(--tide-shape);
+    --speed: 40s;
+    background: var(--to);
+    transition: background-color 0.9s ease;
+  }
+
+  .divider-foam {
+    --period: 480px;
+    --shape: var(--tide-line);
+    --speed: 40s;
+    background: var(--foam);
+    opacity: 0.75;
+  }
+
+  .divider-glow {
+    position: absolute;
+    inset: 0;
+    filter: drop-shadow(0 0 4px var(--wave-glow));
+  }
+
+  /* Surf: two breaking waves before the open sea in the footer */
+  .divider-surf {
+    height: clamp(64px, 7vw, 104px);
+  }
+
+  .divider-surf .divider-wave {
+    --period: 360px;
+    --shape: var(--wave-shape);
+    --speed: 24s;
+  }
+
+  .divider-surf .divider-foam {
+    --period: 360px;
+    --shape: var(--wave-line);
+    --speed: 24s;
+  }
+
+  .divider-back {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(100% + var(--period));
+    --period: 300px;
+    --speed: 30s;
+    background: color-mix(in srgb, var(--to) 55%, var(--from));
+    mask: var(--wave-shape) 0 -10px / var(--period) auto repeat-x;
+    animation: wave-drift var(--speed) linear infinite reverse;
+  }
+
+  /* Scroll progress: a crab that scuttles along the screen edge */
+  .crab-track {
+    position: fixed;
+    z-index: 45;
+    pointer-events: none;
+    container-type: size;
+  }
+
+  .crab {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 21px;
+    color: var(--coral);
+  }
+
+  .crab svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .crab-eye {
+    fill: var(--ink);
+  }
+
+  .crab-pincer {
+    stroke: var(--sand-1);
+  }
+
+  /* Legs swing around the body's center */
+  .crab-leg {
+    transform-box: view-box;
+    transform-origin: 20px 18px;
+  }
+
+  .crab-track[data-moving] .crab-legs-a {
+    animation: scuttle 0.22s steps(2) infinite;
+  }
+
+  .crab-track[data-moving] .crab-legs-b {
+    animation: scuttle 0.22s steps(2) infinite reverse;
+  }
+
+  @keyframes scuttle {
+    from {
+      rotate: -14deg;
+    }
+    to {
+      rotate: 14deg;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .crab-track {
+      left: 0.75rem;
+      right: 4.25rem;
+      bottom: 0.45rem;
+      height: 21px;
+    }
+
+    .crab {
+      translate: calc(var(--progress, 0) * (100cqw - 28px)) 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .crab-track {
+      right: 0.5rem;
+      top: 5rem;
+      bottom: 5.5rem;
+      width: 28px;
+    }
+
+    /* Faint dotted trail the crab leaves behind it */
+    .crab-track::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: calc(var(--progress, 0) * 100%);
+      translate: -50% 0;
+      background: radial-gradient(circle, var(--sand-print) 45%, transparent 50%) 0 0 / 2px 9px repeat-y;
+    }
+
+    .crab {
+      translate: 0 calc(var(--progress, 0) * (100cqh - 21px));
+    }
+
+    .crab svg {
+      rotate: -90deg;
+    }
+  }
+}

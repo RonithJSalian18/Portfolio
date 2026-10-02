@@ -1,0 +1,537 @@
+/*
+ * Hero: sky (stars, clouds, sun, moon) over a sea of parallax wave layers and a sand bank.
+ * Wave shapes are SVG masks over a token-colored fill, so they recolor with the theme.
+ */
+
+:root {
+  /* One wave period: crest at the top, filled below. 200 units wide; scaled per layer via --period. */
+  --wave-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 1000'%3E%3Cpath d='M0 12C30 2 70 2 100 12S170 22 200 12V1000H0z'/%3E%3C/svg%3E");
+  --wave-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30'%3E%3Cpath d='M0 12C30 2 70 2 100 12S170 22 200 12' fill='none' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E");
+  --tide-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 1000'%3E%3Cpath d='M0 12C30 6 70 6 100 12S170 18 200 12V1000H0z'/%3E%3C/svg%3E");
+  --tide-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30'%3E%3Cpath d='M0 12C30 6 70 6 100 12S170 18 200 12' fill='none' stroke='%23000' stroke-width='2.2'/%3E%3C/svg%3E");
+}
+
+@layer components {
+  .hero {
+    --scene-h: clamp(210px, 36svh, 400px);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .hero-sky {
+    position: absolute;
+    inset: 0 0 var(--scene-h) 0;
+    z-index: -1;
+    background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-low) 100%);
+    transition:
+      --sky-top 1.5s ease,
+      --sky-mid 1.5s ease,
+      --sky-low 1.5s ease;
+  }
+
+  /* Stars: two tiled layers of different sizes so the repeat is hard to spot; the second one twinkles */
+  .hero-stars,
+  .hero-stars::after {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.3px 1.3px at 8% 14%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 27% 41%, #fff 50%, transparent 55%),
+      radial-gradient(1.6px 1.6px at 46% 9%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 63% 33%, #fff 50%, transparent 55%),
+      radial-gradient(1.3px 1.3px at 81% 58%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 92% 19%, #fff 50%, transparent 55%),
+      radial-gradient(1px 1px at 37% 71%, #fff 50%, transparent 55%),
+      radial-gradient(1.2px 1.2px at 14% 86%, #fff 50%, transparent 55%);
+    background-size: 260px 260px;
+  }
+
+  .hero-stars {
+    opacity: var(--stars);
+    transition: opacity 1.4s ease;
+  }
+
+  .hero-stars::after {
+    content: '';
+    background-size: 410px 410px;
+    background-position: 120px 60px;
+    animation: twinkle 3.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes twinkle {
+    from {
+      opacity: 0.2;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .hero-clouds {
+    position: absolute;
+    inset: 0;
+    opacity: calc(var(--clouds) * 0.75);
+    transition: opacity 1.2s ease;
+  }
+
+  .cloud {
+    position: absolute;
+    left: -14rem;
+    height: 1.7rem;
+    border-radius: 999px;
+    background: var(--cloud);
+    animation: cloud-drift linear infinite;
+  }
+
+  .cloud::before,
+  .cloud::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: inherit;
+  }
+
+  .cloud::before {
+    width: 46%;
+    aspect-ratio: 1;
+    left: 14%;
+    bottom: 30%;
+  }
+
+  .cloud::after {
+    width: 32%;
+    aspect-ratio: 1;
+    left: 50%;
+    bottom: 26%;
+  }
+
+  .cloud-1 {
+    top: 20%;
+    width: 9rem;
+    animation-duration: 95s;
+    animation-delay: -38s;
+  }
+
+  .cloud-2 {
+    top: 9%;
+    width: 6rem;
+    opacity: 0.75;
+    animation-duration: 130s;
+    animation-delay: -90s;
+  }
+
+  .cloud-3 {
+    top: 34%;
+    width: 11rem;
+    opacity: 0.6;
+    animation-duration: 160s;
+    animation-delay: -12s;
+  }
+
+  @keyframes cloud-drift {
+    to {
+      translate: calc(100vw + 28rem) 0;
+    }
+  }
+
+  /* Sun and moon share the sky's box; 100cqh moves them below the horizon, behind the sea */
+  .celestial {
+    position: absolute;
+    inset: 0;
+    container-type: size;
+    translate: 0 calc(var(--hero-scroll, 0) * 0.35px);
+  }
+
+  .sun,
+  .moon {
+    position: absolute;
+    width: clamp(56px, 7vw, 100px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    translate: -50% 0;
+    transition: transform 1.5s cubic-bezier(0.55, 0.05, 0.35, 1);
+  }
+
+  .sun {
+    left: 82%;
+    top: 13%;
+    background: radial-gradient(circle at 42% 38%, var(--sun-core), var(--sun) 64%);
+    box-shadow:
+      0 0 0 12px color-mix(in srgb, var(--sun) 22%, transparent),
+      0 0 90px 30px var(--sun-glow);
+    transition-delay: 0.3s;
+  }
+
+  .moon {
+    left: 18%;
+    top: 11%;
+    background: radial-gradient(circle at 34% 32%, #fff 0%, var(--moon) 48%, var(--moon-shade) 100%);
+    box-shadow: 0 0 60px 16px var(--moon-glow);
+    transform: translateY(calc(100cqh + 90px));
+  }
+
+  .moon::before,
+  .moon::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--moon-shade) 75%, transparent);
+  }
+
+  .moon::before {
+    width: 22%;
+    aspect-ratio: 1;
+    left: 56%;
+    top: 26%;
+  }
+
+  .moon::after {
+    width: 14%;
+    aspect-ratio: 1;
+    left: 28%;
+    top: 60%;
+  }
+
+  [data-theme='dark'] .sun {
+    transform: translateY(calc(100cqh + 90px));
+    transition-delay: 0s;
+  }
+
+  [data-theme='dark'] .moon {
+    transform: none;
+    transition-delay: 0.3s;
+  }
+
+  /* Warm glow on the horizon while the sun sets (or rises) */
+  .hero-dusk {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(120% 55% at 50% 100%, rgba(255, 118, 74, 0.6), rgba(255, 176, 92, 0.2) 45%, transparent 72%);
+  }
+
+  .theme-switching .hero-dusk {
+    animation: dusk 1.8s ease;
+  }
+
+  @keyframes dusk {
+    40% {
+      opacity: 1;
+    }
+  }
+
+  .hero-content {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: calc(4rem + clamp(1.25rem, 4vh, 3rem)) clamp(1rem, 4vw, 2.5rem) clamp(1.75rem, 5vh, 3rem);
+    text-align: center;
+    translate: 0 calc(var(--hero-scroll, 0) * 0.22px);
+  }
+
+  .hero-hello {
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-name {
+    margin-top: 0.3rem;
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+    letter-spacing: var(--text-display--letter-spacing);
+  }
+
+  .hero-name:focus {
+    outline: none;
+  }
+
+  .hero-role {
+    margin-top: 0.85rem;
+    font-size: clamp(1.15rem, 1rem + 0.8vw, 1.6rem);
+    font-weight: 600;
+  }
+
+  .hero-tagline {
+    max-width: 34rem;
+    margin-top: 0.45rem;
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    font-weight: 300;
+  }
+
+  .hero-roles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
+    max-width: 42rem;
+    margin-top: 1.1rem;
+  }
+
+  .hero-roles li {
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-solid) 58%, transparent);
+    backdrop-filter: blur(4px);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .hero-socials {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+  }
+
+  .hero-socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-solid) 58%, transparent);
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .hero-socials a:hover {
+    transform: translateY(-3px);
+    background: var(--surface-solid);
+  }
+
+  .hero-socials svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  /* Sea and sand */
+  .hero-scene {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    height: var(--scene-h);
+  }
+
+  .hero-scene::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--sea-far), var(--sea-mid));
+  }
+
+  .reflection {
+    position: absolute;
+    top: 0;
+    height: 48%;
+    width: clamp(46px, 8vw, 120px);
+    translate: -50% 0;
+    background: repeating-linear-gradient(to bottom, var(--glint) 0 2px, transparent 2px 8px);
+    mask-image: radial-gradient(50% 100% at 50% 0%, #000 25%, transparent 100%);
+    transition: opacity 1.4s ease;
+    animation: shimmer 2.6s ease-in-out infinite alternate;
+  }
+
+  .reflection-sun {
+    left: 82%;
+    opacity: calc((1 - var(--stars)) * 0.75);
+  }
+
+  .reflection-moon {
+    left: 18%;
+    opacity: calc(var(--stars) * 0.85);
+  }
+
+  @keyframes shimmer {
+    from {
+      transform: scaleX(0.7);
+    }
+    to {
+      transform: scaleX(1.1);
+    }
+  }
+
+  /* Each layer lags behind the scroll by its depth (set from JS as --hero-scroll) */
+  .layer {
+    position: absolute;
+    inset: auto 0 0 0;
+    translate: 0 calc(var(--hero-scroll, 0) * var(--depth, 0) * 1px);
+  }
+
+  .layer-far {
+    top: 7%;
+    --depth: 0.14;
+  }
+
+  .layer-mid {
+    top: 22%;
+    --depth: 0.09;
+  }
+
+  .layer-near {
+    top: 38%;
+    --depth: 0.05;
+  }
+
+  .layer-shore {
+    top: 56%;
+    --depth: 0.02;
+  }
+
+  .layer-sand {
+    top: 68%;
+  }
+
+  .wave {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(100% + var(--period));
+    background: var(--fill);
+    mask: var(--shape, var(--wave-shape)) 0 0 / var(--period) auto repeat-x;
+    animation: wave-drift var(--speed, 30s) linear infinite;
+    will-change: transform;
+    transition: background-color 1.2s ease;
+  }
+
+  @keyframes wave-drift {
+    to {
+      transform: translateX(calc(-1 * var(--period)));
+    }
+  }
+
+  .wave-far {
+    --period: 150px;
+    --fill: var(--sea-mid);
+    --speed: 46s;
+  }
+
+  .wave-mid {
+    --period: 240px;
+    --fill: var(--sea-near);
+    --speed: 32s;
+    animation-direction: reverse;
+  }
+
+  .wave-near {
+    --period: 380px;
+    --fill: var(--sea-shallow);
+    --speed: 22s;
+  }
+
+  /* Foam on the near wave; at night it glows like bioluminescence */
+  .wave-glow {
+    position: absolute;
+    inset: 0;
+    filter: drop-shadow(0 0 5px var(--wave-glow));
+    transition: filter 1.2s ease;
+  }
+
+  .wave-edge {
+    --period: 380px;
+    --speed: 22s;
+    --shape: var(--wave-line);
+    --fill: var(--wave-edge);
+  }
+
+  .wave-shore {
+    --period: 560px;
+    --fill: var(--sand-wet);
+    --shape: var(--tide-shape);
+    --speed: 0s;
+    animation: swash 7s ease-in-out infinite alternate;
+  }
+
+  .wave-shore-foam {
+    --period: 560px;
+    --fill: var(--foam);
+    --shape: var(--tide-line);
+    animation: swash 7s ease-in-out infinite alternate;
+    opacity: 0.85;
+  }
+
+  @keyframes swash {
+    from {
+      transform: translate(0, 0);
+    }
+    to {
+      transform: translate(-40px, -7px);
+    }
+  }
+
+  .wave-sand {
+    --period: 1100px;
+    --fill: var(--sand-1);
+    --shape: var(--tide-shape);
+    animation: none;
+  }
+
+  /* Phones: tuck the sun/moon just under the navbar and keep the beach in the first screen */
+  @media (max-width: 640px) {
+    .hero {
+      --scene-h: clamp(170px, 29svh, 300px);
+    }
+
+    .sun,
+    .moon {
+      top: calc(4rem + 0.5rem);
+      width: 44px;
+    }
+
+    .sun {
+      left: 86%;
+    }
+
+    .moon {
+      left: 14%;
+    }
+
+    .reflection-sun {
+      left: 86%;
+    }
+
+    .reflection-moon {
+      left: 14%;
+    }
+
+    .hero-content {
+      padding-top: calc(4rem + 1.25rem);
+    }
+
+    .hero-roles {
+      gap: 0.35rem;
+      margin-top: 0.9rem;
+    }
+
+    .hero-roles li {
+      padding: 0.22rem 0.65rem;
+      font-size: 0.75rem;
+    }
+
+    .hero-actions {
+      margin-top: 1.25rem;
+    }
+
+    .hero-socials {
+      margin-top: 1rem;
+    }
+  }
+}

@@ -46,7 +46,7 @@
   --sea-shallow: #6fd9cf;
   --sea-deep: #0b6a80;
   --foam: #f6fdfc;
-  --wave-edge: rgba(255, 255, 255, 0.95);
+  --wave-edge: rgba(255, 255, 255, 0.8);
   --wave-glow: rgba(255, 255, 255, 0);
   --glint: rgba(255, 246, 205, 0.95);
 
@@ -116,12 +116,12 @@
   --wave-glow: rgba(99, 245, 230, 0.85);
   --glint: rgba(214, 226, 255, 0.9);
 
-  --sand-1: #282739;
-  --sand-2: #252436;
-  --sand-3: #222133;
-  --sand-4: #1f1e30;
-  --sand-5: #1c1b2d;
-  --sand-wet: #19182a;
+  --sand-1: #2c2a3e;
+  --sand-2: #29273b;
+  --sand-3: #262438;
+  --sand-4: #232135;
+  --sand-5: #201e32;
+  --sand-wet: #1d1b2f;
   --sand-print: rgba(0, 0, 0, 0.42);
   --grain: rgba(255, 255, 255, 0.07);
 
