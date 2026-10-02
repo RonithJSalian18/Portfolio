@@ -2,121 +2,92 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { GlassCard } from '@/components/GlassCard'
+import { GlassCard, type GlowColor } from '@/components/GlassCard'
+import { SectionHeader } from '@/components/SectionHeader'
 import {
   staggerContainerVariants,
-  scrollRevealVariants,
   fadeUpVariants,
 } from '@/lib/animations'
 
+const quotes: { text: string; author: string; lesson: string; glow: GlowColor; accent: string }[] = [
+  {
+    text: 'Do. Or do not. There is no try.',
+    author: 'Yoda',
+    lesson: 'Ship it properly, or not at all. Half-finished features help no one.',
+    glow: 'yoda',
+    accent: 'text-yoda',
+  },
+  {
+    text: 'The greatest teacher, failure is.',
+    author: 'Yoda',
+    lesson: 'Every failing test and red build is a lesson in disguise.',
+    glow: 'jedi',
+    accent: 'text-jedi',
+  },
+  {
+    text: 'Your focus determines your reality.',
+    author: 'Qui-Gon Jinn',
+    lesson: 'Deep work beats multitasking: one problem, fully solved.',
+    glow: 'gold',
+    accent: 'text-gold',
+  },
+  {
+    text: "In my experience, there's no such thing as luck.",
+    author: 'Obi-Wan Kenobi',
+    lesson: 'Consistency, not luck, is what 328+ solved problems are made of.',
+    glow: 'mace',
+    accent: 'text-mace',
+  },
+]
+
 export function TechQuotes() {
   const { ref, inView } = useInView({
-    threshold: 0.2,
+    threshold: 0.15,
     triggerOnce: true,
   })
-
-  const quotes = [
-    {
-      text: 'Stay hungry, stay foolish.',
-      author: 'Steve Jobs',
-      icon: '💡',
-      color: 'from-cyan to-electric-blue',
-    },
-    {
-      text: 'Programs must be written for people to read.',
-      author: 'Harold Abelson',
-      icon: '📖',
-      color: 'from-electric-blue to-purple',
-    },
-    {
-      text: 'Code is like humor. When you have to explain it, it\'s bad.',
-      author: 'Cory House',
-      icon: '😄',
-      color: 'from-purple to-pink',
-    },
-    {
-      text: 'The best way to predict the future is to invent it.',
-      author: 'Alan Kay',
-      icon: '🚀',
-      color: 'from-pink to-cyan',
-    },
-  ]
 
   return (
     <section className="section-container relative" ref={ref}>
       <div className="section-content">
-        {/* Section title */}
         <motion.div
-          className="text-center mb-20"
-          variants={scrollRevealVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          <h2 className="text-gradient glow-text mb-4">
-            Inspiration & Philosophy
-          </h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Timeless wisdom that guides my approach to software development and problem-solving.
-          </p>
-        </motion.div>
-
-        {/* Quotes grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          className="space-y-16"
           variants={staggerContainerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
         >
-          {quotes.map((quote, index) => (
-            <motion.div
-              key={index}
-              variants={fadeUpVariants}
-              whileHover={{ y: -4 }}
-              className="group"
-            >
-              <GlassCard className={`h-full p-8 relative overflow-hidden flex flex-col justify-between`}>
-                {/* Animated gradient background on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${quote.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+          <SectionHeader
+            kicker="Jedi Archives"
+            title="Wisdom of the"
+            highlight="Jedi"
+            description="Timeless words from a galaxy far, far away that shape how I approach software and problem-solving."
+          />
 
-                {/* Quote icon */}
-                <motion.div
-                  className="text-5xl mb-6 drop-shadow-lg"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
-                  {quote.icon}
-                </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {quotes.map((quote) => (
+              <motion.div key={quote.text} variants={fadeUpVariants} className="group">
+                <GlassCard className="h-full p-8 flex flex-col justify-between" glowColor={quote.glow}>
+                  <blockquote className="relative z-10">
+                    <span className={`font-display text-5xl leading-none ${quote.accent}`} aria-hidden="true">
+                      &ldquo;
+                    </span>
+                    <p className="text-xl md:text-2xl font-semibold text-white mb-5 leading-relaxed">
+                      {quote.text}
+                    </p>
+                    <footer className="font-mono text-xs uppercase tracking-[0.25em] text-text-muted">
+                      &mdash; <cite className="not-italic">{quote.author}</cite>
+                    </footer>
+                  </blockquote>
 
-                {/* Quote text */}
-                <blockquote className="relative z-10">
-                  <p className="text-xl md:text-2xl font-semibold text-white mb-6 leading-relaxed">
-                    "{quote.text}"
+                  <p className="mt-6 pt-5 border-t border-white/10 text-sm text-text-secondary">
+                    <span className={`font-mono text-[11px] uppercase tracking-[0.25em] mr-2 ${quote.accent}`}>
+                      In code:
+                    </span>
+                    {quote.lesson}
                   </p>
-
-                  <footer className="text-text-secondary text-sm">
-                    — <cite className="not-italic font-medium">{quote.author}</cite>
-                  </footer>
-                </blockquote>
-
-                {/* Decorative gradient line */}
-                <motion.div
-                  className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${quote.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}
-                />
-              </GlassCard>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Call to action */}
-        <motion.div
-          className="mt-20 text-center"
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          <p className="text-text-secondary text-lg">
-            These principles drive my commitment to building quality software and solving challenging problems.
-          </p>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>

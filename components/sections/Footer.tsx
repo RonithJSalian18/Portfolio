@@ -1,39 +1,47 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { ArrowUp } from 'lucide-react'
+import { socialLinks } from '@/lib/site'
 
 const footerLinks = [
   {
     category: 'Navigation',
     links: [
       { label: 'Home', href: '#hero' },
-      { label: 'About', href: '#about' },
-      { label: 'Skills', href: '#skills' },
-      { label: 'Projects', href: '#projects' },
-      { label: 'Contact', href: '#contact' },
+      { label: 'Origin', href: '#about' },
+      { label: 'Arsenal', href: '#skills' },
+      { label: 'Missions', href: '#projects' },
+      { label: 'Comms', href: '#contact' },
     ],
   },
   {
     category: 'Connect',
     links: [
-      { label: 'GitHub', href: 'https://github.com/RonithSalian18' },
-      { label: 'LinkedIn', href: 'https://linkedin.com/in/ronith-j-salian-093b76288/' },
-      { label: 'LeetCode', href: 'https://leetcode.com/ronith_salian' },
-      { label: 'Email', href: 'mailto:ronithjsalian01@gmail.com' },
+      { label: 'GitHub', href: socialLinks.github },
+      { label: 'LinkedIn', href: socialLinks.linkedin },
+      { label: 'LeetCode', href: socialLinks.leetcode },
+      { label: 'Email', href: socialLinks.email },
     ],
   },
 ]
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 600)
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <footer className="relative z-10 border-t border-white/10 bg-dark-bg/50 backdrop-blur-sm">
+    <footer className="relative z-10 border-t border-jedi/15 bg-space/60 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        {/* Main footer content */}
         <div className="grid md:grid-cols-3 gap-8 mb-12 md:mb-16">
-          {/* Brand section */}
           <motion.div
             className="space-y-4"
             initial={{ opacity: 0, y: 20 }}
@@ -41,14 +49,13 @@ export function Footer() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-2xl font-bold text-gradient">Ronith J Salian</h3>
+            <h3 className="font-display uppercase tracking-[0.15em] text-gradient !text-2xl">Ronith J Salian</h3>
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
-              BTech student and aspiring software engineer passionate about full-stack development, 
-              machine learning, and solving algorithmic challenges.
+              BTech student and aspiring software engineer passionate about full-stack development,
+              AI systems, and solving algorithmic challenges.
             </p>
           </motion.div>
 
-          {/* Quick links */}
           {footerLinks.map((section, index) => (
             <motion.div
               key={section.category}
@@ -58,7 +65,7 @@ export function Footer() {
               transition={{ duration: 0.5, delay: (index + 1) * 0.1 }}
               viewport={{ once: true }}
             >
-              <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+              <h4 className="font-mono text-xs font-semibold text-gold uppercase tracking-[0.3em]">
                 {section.category}
               </h4>
               <ul className="space-y-2">
@@ -68,7 +75,7 @@ export function Footer() {
                       href={link.href}
                       target={link.href.startsWith('http') ? '_blank' : undefined}
                       rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                      className="text-gray-400 hover:text-cyan transition-colors text-sm"
+                      className="inline-block text-text-secondary hover:text-jedi transition-colors text-sm"
                       whileHover={{ x: 5 }}
                     >
                       {link.label}
@@ -80,16 +87,15 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Divider */}
+        {/* Lightsaber divider */}
         <motion.div
-          className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8"
+          className="h-px bg-gradient-to-r from-transparent via-jedi to-transparent mb-8 shadow-saber"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         />
 
-        {/* Bottom footer */}
         <motion.div
           className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left"
           initial={{ opacity: 0, y: 20 }}
@@ -97,43 +103,31 @@ export function Footer() {
           transition={{ duration: 0.5, delay: 0.3 }}
           viewport={{ once: true }}
         >
-          {/* Copyright */}
-          <p className="text-text-secondary text-sm">
+          <p className="text-text-secondary !text-sm">
             &copy; {currentYear} Ronith J Salian. All rights reserved.
           </p>
-
-          {/* Credits */}
-          <p className="text-gray-500 text-xs">
-            Crafted with{' '}
-            <motion.span
-              className="inline-block"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              💙
-            </motion.span>{' '}
-            using Next.js & Framer Motion
+          <p className="font-display uppercase tracking-[0.25em] !text-xs text-gold">
+            May the Force be with you
           </p>
         </motion.div>
       </div>
 
-      {/* Scroll to top button */}
-      <motion.button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 w-12 h-12 rounded-full bg-gradient-to-r from-cyan to-electric-blue flex items-center justify-center text-white shadow-lg hover:shadow-glow opacity-0 pointer-events-none"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        transition={{ duration: 0.3 }}
-        viewport={{ once: false }}
-        style={{ pointerEvents: 'auto' }}
-        onScroll={() => {
-          // This is just for display, the button's visibility is handled by whileInView
-        }}
-      >
-        ↑
-      </motion.button>
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full border border-jedi bg-space/80 text-jedi flex items-center justify-center shadow-saber hover:text-white"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Back to top"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </footer>
   )
 }

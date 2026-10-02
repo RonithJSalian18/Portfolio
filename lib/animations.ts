@@ -180,15 +180,13 @@ export const buttonHoverVariants: Variants = {
   },
 }
 
-// Card hover animation
+// Card hover animation (the glow itself comes from .glass-card:hover so it can follow the saber color)
 export const cardHoverVariants: Variants = {
   initial: {
     y: 0,
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
   },
   hover: {
-    y: -8,
-    boxShadow: '0 20px 50px rgba(0, 212, 255, 0.2)',
+    y: -6,
     transition: {
       duration: 0.4,
       ease: 'easeOut',

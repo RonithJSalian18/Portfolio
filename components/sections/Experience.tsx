@@ -2,19 +2,21 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { GlassCard } from '@/components/GlassCard'
+import { GlassCard, type GlowColor } from '@/components/GlassCard'
+import { SectionHeader } from '@/components/SectionHeader'
 import {
   staggerContainerVariants,
-  scrollRevealVariants,
   staggerItemVariants,
 } from '@/lib/animations'
+
+type TimelineType = 'education' | 'internship' | 'hackathon' | 'achievement'
 
 interface TimelineItem {
   period: string
   title: string
   organization: string
   description: string
-  type: 'education' | 'internship' | 'achievement'
+  type: TimelineType
 }
 
 const timelineItems: TimelineItem[] = [
@@ -33,17 +35,24 @@ const timelineItems: TimelineItem[] = [
     type: 'internship',
   },
   {
+    period: 'Innoversite',
+    title: 'Innoversite Hackathon',
+    organization: 'Hackathon Participant',
+    description: 'Took part in the Innoversite Hackathon, collaborating with a team under tight deadlines to ideate, build, and pitch a working prototype.',
+    type: 'hackathon',
+  },
+  {
+    period: 'HackLoop 2024',
+    title: 'StudyBuddy - AI PDF Q&A Application',
+    organization: 'HackLoop Hackathon',
+    description: 'Built an AI-powered application enabling students to upload PDFs and ask context-based questions. Implemented NLP for summarization and real-time responses.',
+    type: 'hackathon',
+  },
+  {
     period: 'Sep 2023 - Mar 2024',
     title: 'Lost and Found Web Application',
     organization: 'NMAMIT Student Project',
     description: 'Developed a web application for students to post and search for lost/found items. Implemented image upload and responsive interface.',
-    type: 'achievement',
-  },
-  {
-    period: 'HackLoop Event',
-    title: 'StudyBuddy - AI PDF Q&A Application',
-    organization: 'Hackathon Project',
-    description: 'Built an AI-powered application enabling students to upload PDFs and ask context-based questions. Implemented NLP for summarization and real-time responses.',
     type: 'achievement',
   },
   {
@@ -55,16 +64,17 @@ const timelineItems: TimelineItem[] = [
   },
 ]
 
-const typeColors = {
-  education: { bg: 'from-cyan', text: 'text-cyan' },
-  internship: { bg: 'from-purple', text: 'text-purple' },
-  achievement: { bg: 'from-electric-blue', text: 'text-electric-blue' },
+const typeStyles: Record<TimelineType, { label: string; glow: GlowColor; dot: string; text: string }> = {
+  education: { label: 'Jedi Academy', glow: 'jedi', dot: 'bg-jedi', text: 'text-jedi' },
+  internship: { label: 'Field Training', glow: 'gold', dot: 'bg-gold', text: 'text-gold' },
+  hackathon: { label: 'Hackathon', glow: 'yoda', dot: 'bg-yoda', text: 'text-yoda' },
+  achievement: { label: 'Achievement', glow: 'mace', dot: 'bg-mace', text: 'text-mace' },
 }
 
 export function Experience() {
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.2,
+    threshold: 0.1,
   })
 
   return (
@@ -80,74 +90,55 @@ export function Experience() {
           animate={inView ? 'visible' : 'hidden'}
           className="space-y-12"
         >
-          {/* Section title */}
-          <motion.div
-            className="text-center space-y-4"
-            variants={scrollRevealVariants}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">Journey & </span>
-              <span className="text-gradient">Milestones</span>
-            </h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Education, internships, and achievements showcasing growth and commitment to excellence.
-            </p>
-          </motion.div>
+          <SectionHeader
+            kicker="Episode V"
+            title="The"
+            highlight="Saga"
+            description="Education, internships, hackathons, and achievements: the journey across the galaxy so far."
+          />
 
           {/* Timeline */}
           <div className="relative space-y-8">
-            {/* Vertical line */}
+            {/* Vertical lightsaber line */}
             <motion.div
-              className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan via-purple to-electric-blue"
-              scaleY={inView ? 1 : 0}
+              className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-jedi shadow-saber"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: inView ? 1 : 0 }}
               transition={{ duration: 1.2, delay: 0.2 }}
               style={{ transformOrigin: 'top' }}
             />
 
-            {/* Timeline items */}
             {timelineItems.map((item, index) => {
               const isLeft = index % 2 === 0
-              const colors = typeColors[item.type]
+              const style = typeStyles[item.type]
 
               return (
                 <motion.div
                   key={`${item.period}-${item.title}`}
                   className={`relative flex ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-6 md:gap-12`}
                   variants={staggerItemVariants}
-                  custom={index}
                 >
-                  {/* Timeline dot */}
+                  {/* Timeline node */}
                   <motion.div
-                    className={`absolute left-0 md:left-1/2 top-6 w-8 h-8 md:w-10 md:h-10 rounded-full border-4 border-dark-bg flex items-center justify-center transform md:-translate-x-1/2 flex-shrink-0 bg-gradient-to-br ${colors.bg} to-cyan`}
-                    whileHover={{ scale: 1.2 }}
+                    className={`absolute left-4 md:left-1/2 top-8 w-4 h-4 -translate-x-1/2 rounded-full ring-4 ring-space ${style.dot} ${style.text}`}
+                    style={{ boxShadow: '0 0 14px currentColor' }}
                     initial={{ scale: 0 }}
                     animate={inView ? { scale: 1 } : { scale: 0 }}
                     transition={{ delay: 0.3 + index * 0.1 }}
                   />
 
-                  {/* Content */}
-                  <div className={`w-full md:w-1/2 pt-6 md:pt-0 pl-12 md:pl-0`}>
-                    <GlassCard className="p-6 md:p-8 h-full hover:shadow-glow-blue">
-                      {/* Type badge */}
-                      <div className="mb-4">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/10 ${colors.text}`}
-                        >
-                          {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                  <div className="w-full md:w-1/2 pl-12 md:pl-0">
+                    <GlassCard className="p-6 md:p-8 h-full" glowColor={style.glow}>
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <span className={`font-mono text-[11px] uppercase tracking-[0.25em] ${style.text}`}>
+                          {style.label}
                         </span>
+                        <span className="font-mono text-xs text-text-muted">{item.period}</span>
                       </div>
 
-                      {/* Period */}
-                      <p className="text-sm text-gray-400 mb-2">{item.period}</p>
-
-                      {/* Title */}
-                      <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
-
-                      {/* Organization */}
-                      <p className="text-cyan font-semibold mb-4">{item.organization}</p>
-
-                      {/* Description */}
-                      <p className="text-gray-300 leading-relaxed">{item.description}</p>
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{item.title}</h3>
+                      <p className="text-gold/90 font-medium mb-4">{item.organization}</p>
+                      <p className="text-text-secondary leading-relaxed">{item.description}</p>
                     </GlassCard>
                   </div>
                 </motion.div>

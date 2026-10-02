@@ -40,7 +40,7 @@ export default function Home() {
       <LoadingScreen isLoading={isLoading} />
 
       {/* Main content - only visible after loading completes */}
-      <main className={`relative w-full overflow-hidden bg-dark-bg transition-opacity duration-500 ${isLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <main className={`relative w-full overflow-hidden bg-space transition-opacity duration-500 ${isLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         {/* Background effects */}
         <BackgroundEffects />
 

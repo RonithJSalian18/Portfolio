@@ -114,7 +114,6 @@ export function Services() {
                 >
                   <GlassCard
                     className={`h-full p-6 md:p-8 group ${colors.glow} border-2 ${colors.border}`}
-                    glowColor={service.color}
                   >
                     {/* Icon */}
                     <motion.div

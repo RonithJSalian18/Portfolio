@@ -3,17 +3,30 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
+import { Mail, Phone } from 'lucide-react'
 import { GlassCard } from '@/components/GlassCard'
+import { SectionHeader } from '@/components/SectionHeader'
+import { GithubIcon, LinkedinIcon } from '@/components/SocialIcons'
+import { EMAIL, socialLinks } from '@/lib/site'
 import {
   staggerContainerVariants,
-  scrollRevealVariants,
   fadeUpVariants,
 } from '@/lib/animations'
+
+const channels = [
+  { Icon: Mail, label: 'Email', value: EMAIL, href: socialLinks.email },
+  { Icon: Phone, label: 'Phone', value: '+91 76193 40723', href: 'tel:+917619340723' },
+  { Icon: LinkedinIcon, label: 'LinkedIn', value: 'ronith-j-salian', href: socialLinks.linkedin },
+  { Icon: GithubIcon, label: 'GitHub', value: 'RonithJSalian18', href: socialLinks.github },
+]
+
+const inputClass =
+  'w-full px-4 py-2.5 rounded-lg bg-space/60 border border-white/15 text-white placeholder-text-muted focus:outline-none focus:border-jedi focus:ring-2 focus:ring-jedi/25 transition-all'
 
 export function Contact() {
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.2,
+    threshold: 0.15,
   })
 
   const [formData, setFormData] = useState({
@@ -21,9 +34,7 @@ export function Contact() {
     email: '',
     message: '',
   })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [transmitted, setTransmitted] = useState(false)
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -35,23 +46,14 @@ export function Contact() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // There is no backend, so hand the message to the visitor's mail client, pre-filled.
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      setSubmitStatus('success')
-      setFormData({ name: '', email: '', message: '' })
-
-      setTimeout(() => setSubmitStatus('idle'), 3000)
-    } catch (error) {
-      setSubmitStatus('error')
-      setTimeout(() => setSubmitStatus('idle'), 3000)
-    } finally {
-      setIsSubmitting(false)
-    }
+    const subject = `Portfolio transmission from ${formData.name}`
+    const body = `${formData.message}\n\n— ${formData.name} (${formData.email})`
+    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    setTransmitted(true)
+    setTimeout(() => setTransmitted(false), 6000)
   }
 
   return (
@@ -67,180 +69,106 @@ export function Contact() {
           animate={inView ? 'visible' : 'hidden'}
           className="space-y-12"
         >
-          {/* Section title */}
-          <motion.div
-            className="text-center space-y-4"
-            variants={scrollRevealVariants}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">Get in </span>
-              <span className="text-gradient">Touch</span>
-            </h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Interested in collaborating or have a project in mind? Feel free to reach out! I&apos;m always excited to discuss new opportunities.
-            </p>
-          </motion.div>
+          <SectionHeader
+            kicker="Episode VII"
+            title="Open a Comm"
+            highlight="Channel"
+            description="Interested in collaborating or have a mission in mind? Send a transmission. I'm always excited to discuss new opportunities."
+          />
 
-          {/* Contact content */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Contact info */}
-            <motion.div
-              className="space-y-6"
-              variants={fadeUpVariants}
-            >
-              <div className="space-y-4">
-                {[
-                  {
-                    icon: '📧',
-                    label: 'Email',
-                    value: 'ronithjsalian01@gmail.com',
-                    href: 'mailto:ronithjsalian01@gmail.com',
-                  },
-                  {
-                    icon: '📱',
-                    label: 'Phone',
-                    value: '+91 76193 40723',
-                    href: 'tel:+917619340723',
-                  },
-                  {
-                    icon: '🔗',
-                    label: 'LinkedIn',
-                    value: 'ronith-j-salian',
-                    href: 'https://linkedin.com/in/ronith-j-salian-093b76288/',
-                  },
-                  {
-                    icon: '🐙',
-                    label: 'GitHub',
-                    value: 'RonithSalian18',
-                    href: 'https://github.com/RonithSalian18',
-                  },
-                ].map((contact, index) => (
-                  <motion.a
-                    key={contact.label}
-                    href={contact.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="glass-card p-4 flex items-center gap-4 hover:shadow-glow-cyan"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                    whileHover={{ x: 10 }}
-                  >
-                    <span className="text-2xl">{contact.icon}</span>
-                    <div>
-                      <p className="text-sm text-gray-400">{contact.label}</p>
-                      <p className="text-white font-semibold">{contact.value}</p>
-                    </div>
-                  </motion.a>
-                ))}
-              </div>
+            {/* Comm channels */}
+            <motion.div className="space-y-4" variants={fadeUpVariants}>
+              {channels.map(({ Icon, label, value, href }, index) => (
+                <motion.a
+                  key={label}
+                  href={href}
+                  target={href.startsWith('http') ? '_blank' : undefined}
+                  rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="glass-card glow-jedi p-4 flex items-center gap-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                  transition={{ delay: 0.2 + index * 0.1 }}
+                  whileHover={{ x: 10 }}
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-jedi/10 text-jedi">
+                    <Icon className="w-5 h-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-text-muted">{label}</p>
+                    <p className="text-white font-semibold truncate">{value}</p>
+                  </div>
+                </motion.a>
+              ))}
             </motion.div>
 
-            {/* Contact form */}
+            {/* Transmission form */}
             <motion.div variants={fadeUpVariants}>
-              <GlassCard className="p-8 h-full">
+              <GlassCard className="p-8 h-full" hover={false} glowColor="gold">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name input */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0 }}
-                    animate={inView ? { opacity: 1 } : { opacity: 0 }}
-                    transition={{ delay: 0.1 }}
-                  >
-                    <label htmlFor="name" className="text-sm font-semibold text-gray-300">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="font-mono text-xs uppercase tracking-[0.25em] text-text-secondary">
                       Name
                     </label>
-                    <motion.input
+                    <input
                       id="name"
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-cyan focus:ring-2 focus:ring-cyan/20 transition-all"
-                      placeholder="Your name"
-                      whileFocus={{ scale: 1.02 }}
+                      className={inputClass}
+                      placeholder="Luke Skywalker"
                     />
-                  </motion.div>
+                  </div>
 
-                  {/* Email input */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0 }}
-                    animate={inView ? { opacity: 1 } : { opacity: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <label htmlFor="email" className="text-sm font-semibold text-gray-300">
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="font-mono text-xs uppercase tracking-[0.25em] text-text-secondary">
                       Email
                     </label>
-                    <motion.input
+                    <input
                       id="email"
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-cyan focus:ring-2 focus:ring-cyan/20 transition-all"
-                      placeholder="your@email.com"
-                      whileFocus={{ scale: 1.02 }}
+                      className={inputClass}
+                      placeholder="luke@rebellion.org"
                     />
-                  </motion.div>
+                  </div>
 
-                  {/* Message textarea */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0 }}
-                    animate={inView ? { opacity: 1 } : { opacity: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <label htmlFor="message" className="text-sm font-semibold text-gray-300">
+                  <div className="space-y-2">
+                    <label htmlFor="message" className="font-mono text-xs uppercase tracking-[0.25em] text-text-secondary">
                       Message
                     </label>
-                    <motion.textarea
+                    <textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       required
                       rows={5}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-cyan focus:ring-2 focus:ring-cyan/20 transition-all resize-none"
-                      placeholder="Your message..."
-                      whileFocus={{ scale: 1.02 }}
+                      className={`${inputClass} resize-none`}
+                      placeholder="Help me, Ronith. You're my only hope..."
                     />
-                  </motion.div>
+                  </div>
 
-                  {/* Submit button */}
-                  <motion.button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full glass-button-primary font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                    whileHover={!isSubmitting ? { scale: 1.05 } : undefined}
-                    whileTap={!isSubmitting ? { scale: 0.95 } : undefined}
-                  >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
-                  </motion.button>
+                  <button type="submit" className="w-full glass-button-primary py-3">
+                    Send Transmission
+                  </button>
 
-                  {/* Status message */}
                   <AnimatePresence>
-                    {submitStatus === 'success' && (
-                      <motion.div
-                        className="p-3 rounded-lg bg-green-500/20 border border-green-500/50 text-green-400 text-sm"
+                    {transmitted && (
+                      <motion.p
+                        className="p-3 rounded-lg bg-yoda/10 border border-yoda/40 text-yoda !text-sm"
+                        role="status"
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                       >
-                        Message sent successfully! I&apos;ll get back to you soon.
-                      </motion.div>
-                    )}
-                    {submitStatus === 'error' && (
-                      <motion.div
-                        className="p-3 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400 text-sm"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                      >
-                        Something went wrong. Please try again.
-                      </motion.div>
+                        Transmission ready. Your email app should open with the message filled in; hit send there.
+                      </motion.p>
                     )}
                   </AnimatePresence>
                 </form>

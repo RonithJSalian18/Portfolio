@@ -2,50 +2,67 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { GlassCard } from '@/components/GlassCard'
+import { GlassCard, type GlowColor } from '@/components/GlassCard'
+import { SectionHeader } from '@/components/SectionHeader'
 import {
   staggerContainerVariants,
   scrollRevealVariants,
   staggerItemVariants,
 } from '@/lib/animations'
 
-const skillCategories = [
+// Saber colors as RGB triplets, fed to the `--saber` variable used by .saber-blade
+const SABER_RGB: Record<GlowColor, string> = {
+  jedi: '76, 201, 255',
+  sith: '255, 59, 59',
+  yoda: '93, 255, 122',
+  mace: '179, 107, 255',
+  gold: '255, 232, 31',
+}
+
+const skillCategories: { category: string; skills: string[]; saber: GlowColor }[] = [
   {
     category: 'Languages',
     skills: ['Python', 'JavaScript', 'TypeScript', 'C++', 'C', 'Java'],
-    color: 'from-cyan',
+    saber: 'jedi',
   },
   {
     category: 'Frontend',
     skills: ['React', 'Next.js', 'Tailwind CSS', 'Framer Motion', 'shadcn/ui'],
-    color: 'from-electric-blue',
+    saber: 'yoda',
   },
   {
     category: 'Backend',
-    skills: ['Node.js', 'Express.js', 'Python', 'REST APIs', 'WebSockets'],
-    color: 'from-purple',
+    skills: ['FastAPI', 'Node.js', 'Express.js', 'REST APIs', 'WebSockets'],
+    saber: 'mace',
   },
   {
-    category: 'Databases & ORM',
-    skills: ['PostgreSQL', 'MongoDB', 'Prisma ORM', 'Database Design'],
-    color: 'from-pink',
+    category: 'AI & Agents',
+    skills: ['LangGraph', 'LangChain', 'RAG Pipelines', 'Groq / Llama 3.1', 'Google Gemini', 'HuggingFace'],
+    saber: 'sith',
+  },
+  {
+    category: 'Databases',
+    skills: ['PostgreSQL', 'Supabase + pgvector', 'MongoDB', 'Prisma ORM', 'Database Design'],
+    saber: 'gold',
   },
   {
     category: 'DevOps & Tools',
-    skills: ['Docker', 'GitHub', 'Vercel', 'Git', 'Command Line'],
-    color: 'from-cyan',
+    skills: ['Docker', 'Git & GitHub', 'Vercel', 'Render', 'Command Line'],
+    saber: 'jedi',
   },
-  {
-    category: 'Specializations',
-    skills: ['DSA', 'Problem Solving', 'System Design', 'LTE RAN', 'Wireless Protocols'],
-    color: 'from-electric-blue',
-  },
+]
+
+const proficiency: { skill: string; level: number; saber: GlowColor }[] = [
+  { skill: 'Frontend Development', level: 90, saber: 'jedi' },
+  { skill: 'Backend Development', level: 85, saber: 'yoda' },
+  { skill: 'Database Design', level: 80, saber: 'mace' },
+  { skill: 'Problem Solving', level: 92, saber: 'sith' },
 ]
 
 export function Skills() {
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.2,
+    threshold: 0.15,
   })
 
   return (
@@ -61,20 +78,12 @@ export function Skills() {
           animate={inView ? 'visible' : 'hidden'}
           className="space-y-12"
         >
-          {/* Section title */}
-          <motion.div
-            className="text-center space-y-4"
-            variants={scrollRevealVariants}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">Technical </span>
-              <span className="text-gradient">Expertise</span>
-            </h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Full-stack development toolkit with expertise in modern web technologies, 
-              databases, DevOps, and algorithmic problem solving.
-            </p>
-          </motion.div>
+          <SectionHeader
+            kicker="Episode III"
+            title="The Force"
+            highlight="Arsenal"
+            description="The tools I wield across modern web development, AI agents, databases, DevOps, and algorithmic problem solving."
+          />
 
           {/* Skills grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -84,74 +93,64 @@ export function Skills() {
                 variants={staggerItemVariants}
                 custom={index}
               >
-                <GlassCard
-                  className="h-full p-6 md:p-8 hover:shadow-glow-blue group"
-                  glowColor="blue"
-                >
-                  {/* Category header */}
+                <GlassCard className="h-full p-6 md:p-8 group" glowColor={category.saber}>
+                  {/* Category header with a mini lightsaber */}
                   <div className="flex items-center gap-3 mb-6">
-                    <div
-                      className={`h-1 w-12 rounded-full bg-gradient-to-r ${category.color} to-cyan`}
-                    />
-                    <h3 className="text-xl font-bold text-white">{category.category}</h3>
+                    <div className="flex items-center">
+                      <div className="saber-hilt !w-5 !h-2" />
+                      <div
+                        className="saber-blade w-10 transition-all duration-500 group-hover:w-16"
+                        style={{ ['--saber' as string]: SABER_RGB[category.saber] }}
+                      />
+                    </div>
+                    <h3 className="font-display text-base uppercase tracking-widest text-text-primary">
+                      {category.category}
+                    </h3>
                   </div>
 
-                  {/* Skills list with hover effects */}
-                  <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
                     {category.skills.map((skill, i) => (
-                      <motion.div
+                      <motion.span
                         key={skill}
-                        className="flex items-center gap-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-                        transition={{ delay: 0.1 * i }}
+                        className="px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-sm text-text-secondary group-hover:text-white group-hover:border-white/20 transition-colors"
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+                        transition={{ delay: 0.05 * i }}
                       >
-                        <motion.span
-                          className={`w-2 h-2 rounded-full bg-gradient-to-r ${category.color} to-cyan`}
-                          whileHover={{ scale: 1.5 }}
-                        />
-                        <span className="text-gray-300 group-hover:text-white transition-colors">
-                          {skill}
-                        </span>
-                      </motion.div>
+                        {skill}
+                      </motion.span>
                     ))}
                   </div>
-
-                  {/* Decorative glow element on hover */}
-                  <motion.div
-                    className={`absolute -inset-1 rounded-3xl bg-gradient-to-r ${category.color} to-cyan opacity-0 blur group-hover:opacity-20 transition-opacity duration-300 -z-10`}
-                  />
                 </GlassCard>
               </motion.div>
             ))}
           </div>
 
-          {/* Proficiency summary */}
+          {/* Proficiency, as lightsabers */}
           <motion.div
             className="max-w-2xl mx-auto"
             variants={scrollRevealVariants}
           >
-            <GlassCard className="p-8 md:p-12">
-              <h3 className="text-2xl font-bold text-white mb-4">Proficiency Summary</h3>
-              <div className="space-y-6">
-                {[
-                  { skill: 'Frontend Development', level: 90 },
-                  { skill: 'Backend Development', level: 85 },
-                  { skill: 'Database Design', level: 80 },
-                  { skill: 'Problem Solving', level: 92 },
-                ].map((item) => (
+            <GlassCard className="p-8 md:p-12" glowColor="gold" hover={false}>
+              <h3 className="font-display text-lg uppercase tracking-widest text-gold mb-8">Midi-chlorian Count</h3>
+              <div className="space-y-7">
+                {proficiency.map((item) => (
                   <div key={item.skill}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-300">{item.skill}</span>
-                      <span className="text-cyan font-semibold">{item.level}%</span>
+                    <div className="flex justify-between mb-3">
+                      <span className="text-text-secondary">{item.skill}</span>
+                      <span className="font-mono text-sm text-white">{item.level}%</span>
                     </div>
-                    <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-cyan to-electric-blue"
-                        initial={{ width: 0 }}
-                        animate={inView ? { width: `${item.level}%` } : { width: 0 }}
-                        transition={{ duration: 1.5, delay: 0.2 }}
-                      />
+                    <div className="flex items-center">
+                      <div className="saber-hilt" />
+                      <div className="flex-1">
+                        <motion.div
+                          className="saber-blade"
+                          style={{ ['--saber' as string]: SABER_RGB[item.saber] }}
+                          initial={{ width: 0 }}
+                          animate={inView ? { width: `${item.level}%` } : { width: 0 }}
+                          transition={{ duration: 1.4, delay: 0.3, ease: 'easeOut' }}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}

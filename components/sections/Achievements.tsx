@@ -2,230 +2,174 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { GlassCard } from '@/components/GlassCard'
+import { Medal, Rocket, Trophy } from 'lucide-react'
+import { GlassCard, type GlowColor } from '@/components/GlassCard'
+import { SectionHeader } from '@/components/SectionHeader'
 import {
   staggerContainerVariants,
-  scrollRevealVariants,
   fadeUpVariants,
 } from '@/lib/animations'
 
+const stats: { label: string; value: string; glow: GlowColor; text: string }[] = [
+  { label: 'Problems Solved', value: '328+', glow: 'jedi', text: 'text-jedi' },
+  { label: 'LeetCode Rank', value: '408K', glow: 'gold', text: 'text-gold' },
+  { label: 'Active Days', value: '246', glow: 'yoda', text: 'text-yoda' },
+  { label: 'Max Streak', value: '33', glow: 'sith', text: 'text-sith' },
+]
+
+// Easy / Medium / Hard map onto Yoda green, crawl gold and Sith red
+const problemStats = [
+  { category: 'Easy', solved: 207, total: 949, text: 'text-yoda', saber: '93, 255, 122' },
+  { category: 'Medium', solved: 120, total: 2066, text: 'text-gold', saber: '255, 232, 31' },
+  { category: 'Hard', solved: 1, total: 942, text: 'text-sith', saber: '255, 59, 59' },
+]
+
+const medals = [
+  {
+    Icon: Medal,
+    title: '100 Days Badge 2026',
+    detail: 'Consistent daily problem-solving streak on LeetCode',
+    glow: 'gold' as GlowColor,
+    text: 'text-gold',
+  },
+  {
+    Icon: Rocket,
+    title: 'Innoversite Hackathon',
+    detail: 'Participant: built and pitched a prototype against the clock',
+    glow: 'yoda' as GlowColor,
+    text: 'text-yoda',
+  },
+  {
+    Icon: Trophy,
+    title: 'HackLoop 2024',
+    detail: 'Participant: shipped StudyBuddy, an AI PDF Q&A app',
+    glow: 'jedi' as GlowColor,
+    text: 'text-jedi',
+  },
+]
+
 export function Achievements() {
   const { ref, inView } = useInView({
-    threshold: 0.2,
+    threshold: 0.1,
     triggerOnce: true,
   })
-
-  const stats = [
-    {
-      label: 'Problems Solved',
-      value: '328+',
-      color: 'from-cyan to-electric-blue',
-    },
-    {
-      label: 'LeetCode Rank',
-      value: '408K',
-      color: 'from-electric-blue to-purple',
-    },
-    {
-      label: 'Active Days',
-      value: '246',
-      color: 'from-purple to-pink',
-    },
-    {
-      label: 'Max Streak',
-      value: '33',
-      color: 'from-pink to-cyan',
-    },
-  ]
-
-  const problemStats = [
-    { category: 'Easy', solved: 207, total: 949, color: 'text-green-400' },
-    { category: 'Medium', solved: 120, total: 2066, color: 'text-yellow-400' },
-    { category: 'Hard', solved: 1, total: 942, color: 'text-red-400' },
-  ]
 
   return (
     <section id="achievements" className="section-container relative" ref={ref}>
       <div className="section-content">
-        {/* Section title */}
         <motion.div
-          className="text-center mb-20"
-          variants={scrollRevealVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          <h2 className="text-gradient glow-text mb-4">
-            Coding Journey & Achievements
-          </h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Consistent problem-solving on LeetCode showcasing dedication to Data Structures, Algorithms, and Software Development excellence.
-          </p>
-        </motion.div>
-
-        {/* Main stats grid */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+          className="space-y-16"
           variants={staggerContainerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
         >
-          {stats.map((stat) => (
-            <motion.div
-              key={stat.label}
-              variants={fadeUpVariants}
-              className="group"
-            >
-              <GlassCard className={`h-full flex flex-col items-center justify-center py-8 relative overflow-hidden`}>
-                {/* Animated gradient background on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+          <SectionHeader
+            kicker="Episode VI"
+            title="Hall of"
+            highlight="Honors"
+            description="Medals earned in battle: consistent problem-solving on LeetCode and time spent in the hackathon trenches."
+          />
 
+          {/* Medals */}
+          <motion.div className="grid gap-6 md:grid-cols-3" variants={fadeUpVariants}>
+            {medals.map(({ Icon, title, detail, glow, text }) => (
+              <GlassCard key={title} className="p-8 flex flex-col items-center text-center" glowColor={glow}>
                 <motion.div
-                  className={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-3`}
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  className={`mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-current/40 bg-white/5 ${text}`}
+                  style={{ boxShadow: '0 0 24px currentColor' }}
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  {stat.value}
+                  <Icon className="h-7 w-7" />
                 </motion.div>
+                <p className="font-display text-sm uppercase tracking-widest text-white">{title}</p>
+                <p className="text-text-muted text-sm mt-3">{detail}</p>
+              </GlassCard>
+            ))}
+          </motion.div>
 
-                <p className="text-text-secondary font-medium text-center">
+          {/* Main stats grid */}
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            variants={fadeUpVariants}
+          >
+            {stats.map((stat) => (
+              <GlassCard
+                key={stat.label}
+                className="h-full flex flex-col items-center justify-center py-8"
+                glowColor={stat.glow}
+              >
+                <div className={`font-display text-4xl md:text-5xl font-black mb-3 ${stat.text}`} style={{ textShadow: '0 0 20px currentColor' }}>
+                  {stat.value}
+                </div>
+                <p className="font-mono text-xs uppercase tracking-[0.25em] text-text-secondary text-center">
                   {stat.label}
                 </p>
               </GlassCard>
-            </motion.div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
 
-        {/* Problem solving breakdown */}
-        <motion.div
-          className="mb-16"
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          <h3 className="text-2xl font-bold mb-8 text-center">
-            Problem Solving by Difficulty
-          </h3>
+          {/* Problem solving breakdown */}
+          <motion.div variants={fadeUpVariants}>
+            <h3 className="font-display uppercase tracking-widest text-center text-gold !text-xl mb-8">
+              Problems by Difficulty
+            </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {problemStats.map((problem) => {
-              const percentage = (problem.solved / problem.total) * 100
-              return (
-                <motion.div
-                  key={problem.category}
-                  whileHover={{ scale: 1.02 }}
-                  className="group"
-                >
-                  <GlassCard className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {problemStats.map((problem) => {
+                const percentage = (problem.solved / problem.total) * 100
+                return (
+                  <GlassCard key={problem.category} className="p-6" hover={false}>
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className={`text-lg font-bold ${problem.color}`}>
+                      <h4 className={`font-display uppercase tracking-widest ${problem.text}`}>
                         {problem.category}
                       </h4>
-                      <span className="text-sm text-text-muted">
+                      <span className="font-mono text-sm text-text-muted">
                         {problem.solved}/{problem.total}
                       </span>
                     </div>
 
-                    {/* Progress bar */}
-                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        className={`h-full bg-gradient-to-r ${problem.color === 'text-green-400' ? 'from-green-400 to-emerald-500' : problem.color === 'text-yellow-400' ? 'from-yellow-400 to-amber-500' : 'from-red-400 to-rose-500'}`}
-                        initial={{ width: 0 }}
-                        animate={inView ? { width: `${percentage}%` } : { width: 0 }}
-                        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-                      />
+                    <div className="flex items-center">
+                      <div className="saber-hilt !w-6" />
+                      <div className="flex-1 h-1.5 rounded-r-full bg-white/5">
+                        <motion.div
+                          className="saber-blade !h-1.5"
+                          style={{ ['--saber' as string]: problem.saber }}
+                          initial={{ width: 0 }}
+                          animate={inView ? { width: `${Math.max(percentage, 1.5)}%` } : { width: 0 }}
+                          transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+                        />
+                      </div>
                     </div>
 
                     <p className="text-sm text-text-muted mt-3">
-                      {percentage.toFixed(1)}% Complete
+                      {percentage.toFixed(1)}% of all {problem.category.toLowerCase()} problems
                     </p>
                   </GlassCard>
-                </motion.div>
-              )
-            })}
-          </div>
-        </motion.div>
-
-        {/* LeetCode submissions activity */}
-        <motion.div
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          <GlassCard className="p-8">
-            <h3 className="text-2xl font-bold mb-6">Coding Activity</h3>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-gradient mb-1">723+</p>
-                <p className="text-text-secondary text-sm">Submissions (Last Year)</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-cyan mb-1">246</p>
-                <p className="text-text-secondary text-sm">Active Days</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-electric-blue mb-1">33</p>
-                <p className="text-text-secondary text-sm">Max Streak</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-purple mb-1">408K</p>
-                <p className="text-text-secondary text-sm">Global Rank</p>
-              </div>
+                )
+              })}
             </div>
+          </motion.div>
 
-            {/* Heatmap visualization */}
-            <div className="space-y-2">
-              <p className="text-sm text-text-muted mb-4">
-                Contribution activity showcasing consistent daily problem-solving and commitment to coding excellence.
-              </p>
-
-              {/* Simplified activity grid */}
-              <div className="grid grid-cols-13 md:grid-cols-26 gap-1">
-                {Array.from({ length: 365 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className={`w-2 h-2 rounded-xs ${
-                      Math.random() > 0.4
-                        ? 'bg-gradient-to-br from-cyan to-electric-blue'
-                        : 'bg-white/5'
-                    }`}
-                    whileHover={{ scale: 1.5 }}
-                  />
+          {/* Activity summary */}
+          <motion.div variants={fadeUpVariants}>
+            <GlassCard className="p-8" hover={false} glowColor="mace">
+              <h3 className="font-display uppercase tracking-widest !text-xl mb-8">Coding Activity</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { value: '723+', label: 'Submissions (Last Year)', text: 'text-gold' },
+                  { value: '246', label: 'Active Days', text: 'text-yoda' },
+                  { value: '33', label: 'Max Streak', text: 'text-jedi' },
+                  { value: '408K', label: 'Global Rank', text: 'text-mace' },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <p className={`font-display text-3xl font-bold mb-1 ${item.text}`}>{item.value}</p>
+                    <p className="text-text-secondary text-sm">{item.label}</p>
+                  </div>
                 ))}
               </div>
-            </div>
-          </GlassCard>
-        </motion.div>
-
-        {/* Badges */}
-        <motion.div
-          className="mt-16"
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          <h3 className="text-2xl font-bold mb-8 text-center">Achievements</h3>
-
-          <div className="flex flex-wrap justify-center gap-6">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group"
-            >
-              <GlassCard className="p-8 flex flex-col items-center">
-                <motion.div
-                  className="text-5xl mb-4"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-                >
-                  🏅
-                </motion.div>
-                <p className="font-semibold text-center">100 Days Badge 2026</p>
-                <p className="text-text-muted text-sm mt-2">
-                  Consistent daily problem-solving streak
-                </p>
-              </GlassCard>
-            </motion.div>
-          </div>
+            </GlassCard>
+          </motion.div>
         </motion.div>
       </div>
     </section>

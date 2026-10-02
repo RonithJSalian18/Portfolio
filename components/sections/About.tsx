@@ -2,16 +2,18 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { GlassCard } from '@/components/GlassCard'
+import { GlassCard, type GlowColor } from '@/components/GlassCard'
+import { SectionHeader } from '@/components/SectionHeader'
 import {
   staggerContainerVariants,
   scrollRevealVariants,
   staggerItemVariants,
 } from '@/lib/animations'
 
-const aboutItems = [
+const aboutItems: { title: string; glow: GlowColor; items: string[] }[] = [
   {
-    title: 'Education',
+    title: 'Jedi Academy',
+    glow: 'jedi',
     items: [
       'BTech in Information Science & Engineering',
       'NMAM Institute of Technology, Nitte',
@@ -19,15 +21,17 @@ const aboutItems = [
     ],
   },
   {
-    title: 'Core Interests',
+    title: 'Paths of the Force',
+    glow: 'yoda',
     items: [
-      'Machine Learning & AI',
+      'Machine Learning & Agentic AI',
       'Data Structures & Algorithms',
       'Full-stack Web Development',
     ],
   },
   {
-    title: 'Passions',
+    title: 'What Drives Me',
+    glow: 'mace',
     items: [
       'Building scalable solutions',
       'Competitive Problem Solving',
@@ -39,7 +43,7 @@ const aboutItems = [
 export function About() {
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.2,
+    threshold: 0.15,
   })
 
   return (
@@ -55,19 +59,34 @@ export function About() {
           animate={inView ? 'visible' : 'hidden'}
           className="space-y-16"
         >
-          {/* Section title */}
-          <motion.div
-            className="text-center space-y-4"
-            variants={scrollRevealVariants}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="text-white">About </span>
-              <span className="text-gradient">Ronith</span>
-            </h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Aspiring software engineer with strong interest in Machine Learning, Data Structures, Algorithms, 
-              and Software Development. Passionate about building efficient, scalable, and intelligent solutions.
-            </p>
+          <SectionHeader
+            kicker="Episode II"
+            title="The Origin"
+            highlight="Story"
+            description="Aspiring software engineer drawn to Machine Learning, Data Structures, Algorithms, and Software Development, building efficient, scalable, and intelligent solutions."
+          />
+
+          {/* Opening crawl */}
+          <motion.div variants={scrollRevealVariants} className="crawl-viewport">
+            <div className="crawl-track">
+              <p className="!text-center font-display uppercase tracking-[0.3em] !text-base">Episode II</p>
+              <p className="!text-center font-display font-black uppercase tracking-[0.2em] !text-3xl !mb-8">
+                The Origin
+              </p>
+              <p>
+                It is a period of relentless learning. From the halls of the NMAM Institute of Technology,
+                Nitte, a young developer studies Information Science &amp; Engineering, holding a CGPA of 8.64.
+              </p>
+              <p>
+                Training at Sasken Technologies brought mastery of the ancient ways of LTE RAN protocols and
+                wireless systems, debugging the signals that bind the galaxy together.
+              </p>
+              <p>
+                Now, armed with Python, TypeScript, React, Next.js and FastAPI, Ronith builds multi-agent AI
+                systems and full-stack applications, one commit at a time, in the hope of shipping software
+                that makes a difference....
+              </p>
+            </div>
           </motion.div>
 
           {/* About cards grid */}
@@ -78,13 +97,13 @@ export function About() {
                 variants={staggerItemVariants}
                 custom={index}
               >
-                <GlassCard className="h-full p-6 md:p-8 hover:shadow-glow-cyan">
-                  <h3 className="text-2xl font-bold text-cyan mb-4">{item.title}</h3>
+                <GlassCard className="h-full p-6 md:p-8" glowColor={item.glow}>
+                  <h3 className="font-display text-lg uppercase tracking-widest text-gold mb-5">{item.title}</h3>
                   <ul className="space-y-3">
-                    {item.items.map((listItem, i) => (
-                      <li key={i} className="flex gap-3">
-                        <span className="text-purple mt-1 flex-shrink-0">•</span>
-                        <span className="text-gray-300">{listItem}</span>
+                    {item.items.map((listItem) => (
+                      <li key={listItem} className="flex gap-3">
+                        <span className="text-jedi mt-0.5 flex-shrink-0" aria-hidden="true">&#x2726;</span>
+                        <span className="text-text-secondary">{listItem}</span>
                       </li>
                     ))}
                   </ul>
@@ -92,27 +111,6 @@ export function About() {
               </motion.div>
             ))}
           </div>
-
-          {/* Introduction paragraph */}
-          <motion.div
-            className="max-w-3xl mx-auto"
-            variants={scrollRevealVariants}
-          >
-            <GlassCard className="p-8 md:p-12">
-              <p className="text-text-secondary text-lg leading-relaxed mb-4">
-                I&apos;m a BTech student in Information Science & Engineering at NMAM Institute of Technology, 
-                Nitte, with a CGPA of 8.64. My passion lies in full-stack development, machine learning, and 
-                solving complex algorithmic problems. I recently interned at Sasken Technologies, working on 
-                LTE RAN protocols and wireless systems.
-              </p>
-              <p className="text-text-secondary text-lg leading-relaxed">
-                I&apos;m committed to continuous learning, problem-solving excellence, and building innovative 
-                software solutions. With skills in Python, JavaScript, TypeScript, React, Next.js, and modern 
-                DevOps tools, I strive to create impactful applications. I&apos;m always eager to collaborate 
-                on challenging projects and contribute to the developer community.
-              </p>
-            </GlassCard>
-          </motion.div>
         </motion.div>
       </div>
     </section>
