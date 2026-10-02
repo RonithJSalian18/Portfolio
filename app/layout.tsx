@@ -1,55 +1,50 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Orbitron } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const poppins = Poppins({
+  variable: '--font-poppins',
   subsets: ['latin'],
-})
-const orbitron = Orbitron({
-  variable: '--font-orbitron',
-  subsets: ['latin'],
-  weight: ['500', '700', '900'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
 })
 
-const title = 'Ronith J Salian | Full Stack & AI Developer'
+const title = 'Ronith J Salian | Full Stack Developer'
 const description =
-  'A long time ago, in a galaxy far, far away... full-stack and AI projects, skills, and experience by Ronith J Salian.'
+  'Ronith J Salian is a full stack developer and Computer Science student building efficient, scalable, and intelligent solutions, from multi-agent AI pipelines to full-stack web apps.'
 
 export const metadata: Metadata = {
   title,
   description,
-  keywords: ['developer', 'full-stack', 'ai', 'langgraph', 'rag', 'computer science', 'portfolio', 'react', 'next.js'],
+  keywords: ['Ronith J Salian', 'full stack developer', 'portfolio', 'next.js', 'react', 'fastapi', 'ai', 'langgraph'],
   authors: [{ name: 'Ronith J Salian' }],
   creator: 'Ronith J Salian',
-  publisher: 'Ronith J Salian',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://ronith.dev',
     title,
     description,
-    siteName: 'Ronith Portfolio',
+    siteName: 'Ronith J Salian',
   },
   twitter: {
     card: 'summary_large_image',
     title,
     description,
   },
-  icons: {
-    icon: '/favicon.ico',
-  },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#03040b',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#86c9ec' },
+    { media: '(prefers-color-scheme: dark)', color: '#020817' },
+  ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
 }
+
+// Runs before first paint: picks the saved theme (or the system one) so the page never flashes the wrong palette.
+const bootScript = `(function(){var d=document.documentElement,t='light';try{var s=localStorage.getItem('theme');t=s==='dark'||s==='light'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){}d.setAttribute('data-theme',t);d.style.colorScheme=t;d.classList.add('js')})()`
 
 export default function RootLayout({
   children,
@@ -57,16 +52,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={poppins.variable} suppressHydrationWarning>
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
-      <body className="font-sans antialiased">
+      <body>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

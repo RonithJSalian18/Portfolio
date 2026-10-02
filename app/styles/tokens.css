@@ -1,0 +1,200 @@
+/*
+ * Design tokens. Light = daytime beach, dark = night beach.
+ * Every component reads these variables, so one attribute on <html> (data-theme) switches the whole site.
+ */
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* Registered so the sky gradient can animate between day and night (gradients themselves can't transition) */
+@property --sky-top {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #3a98d4;
+}
+@property --sky-mid {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #86c9ec;
+}
+@property --sky-low {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #dff1f8;
+}
+
+:root {
+  color-scheme: light;
+
+  /* Sky */
+  --sky-top: #3a98d4;
+  --sky-mid: #86c9ec;
+  --sky-low: #dff1f8;
+  --sun: #ffd166;
+  --sun-core: #fff4c8;
+  --sun-glow: rgba(255, 190, 80, 0.5);
+  --moon: #e9eef7;
+  --moon-shade: #c3cee2;
+  --moon-glow: rgba(190, 210, 255, 0.45);
+  --cloud: rgba(255, 255, 255, 0.92);
+  --stars: 0;
+  --clouds: 1;
+
+  /* Sea */
+  --sea-far: #1689ad;
+  --sea-mid: #17a2b5;
+  --sea-near: #2fbcbe;
+  --sea-shallow: #6fd9cf;
+  --sea-deep: #0b6a80;
+  --foam: #f6fdfc;
+  --wave-edge: rgba(255, 255, 255, 0.95);
+  --wave-glow: rgba(255, 255, 255, 0);
+  --glint: rgba(255, 246, 205, 0.95);
+
+  /* Sand, from the dry dunes (1) down to the wet shoreline */
+  --sand-1: #f7ecd5;
+  --sand-2: #f2e4c6;
+  --sand-3: #ecdab4;
+  --sand-4: #e5cfa3;
+  --sand-5: #dcc392;
+  --sand-wet: #cfb486;
+  --sand-print: rgba(112, 80, 34, 0.3);
+  --grain: rgba(105, 75, 28, 0.16);
+
+  /* Tide pools */
+  --rock: #b8ad9a;
+  --rock-dark: #8f846f;
+  --pool: rgba(47, 188, 190, 0.2);
+  --pool-edge: rgba(23, 150, 170, 0.35);
+  --pebble: #f6f2ea;
+  --pebble-shade: #ddd4c4;
+
+  /* Surfaces and text */
+  --surface: rgba(255, 251, 242, 0.8);
+  --surface-solid: #fffaf0;
+  --border: rgba(90, 64, 24, 0.16);
+  --border-strong: rgba(90, 64, 24, 0.32);
+  --ink: #0b2540;
+  --ink-soft: #33475d;
+  --on-sea: #ffffff;
+  --on-sea-soft: rgba(255, 255, 255, 0.88);
+
+  /* Accents (the *-ink variants are dark enough for text on sand) */
+  --coral: #ff7a5c;
+  --on-coral: #2b0c04;
+  --coral-ink: #a8381b;
+  --sea-ink: #06606a;
+  --sun-ink: #7a4f00;
+  --shell-ink: #983656;
+  --focus: #06606a;
+
+  /* Message-in-a-bottle letter; stays paper-colored at night too */
+  --parchment: #f8ecd0;
+  --parchment-edge: #e2cda2;
+  --parchment-ink: #2e2312;
+
+  /* Lighthouse beam strength */
+  --lamp: 0.18;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --sky-top: #020817;
+  --sky-mid: #0a1838;
+  --sky-low: #1b2c57;
+  --cloud: rgba(200, 215, 255, 0.12);
+  --stars: 1;
+  --clouds: 0;
+
+  --sea-far: #061a36;
+  --sea-mid: #082447;
+  --sea-near: #0b2e57;
+  --sea-shallow: #103d66;
+  --sea-deep: #04112a;
+  --foam: #a9fff4;
+  --wave-edge: #63f5e6;
+  --wave-glow: rgba(99, 245, 230, 0.85);
+  --glint: rgba(214, 226, 255, 0.9);
+
+  --sand-1: #282739;
+  --sand-2: #252436;
+  --sand-3: #222133;
+  --sand-4: #1f1e30;
+  --sand-5: #1c1b2d;
+  --sand-wet: #19182a;
+  --sand-print: rgba(0, 0, 0, 0.42);
+  --grain: rgba(255, 255, 255, 0.07);
+
+  --rock: #3b3e54;
+  --rock-dark: #2b2d40;
+  --pool: rgba(16, 61, 102, 0.55);
+  --pool-edge: rgba(99, 245, 230, 0.28);
+  --pebble: #363b54;
+  --pebble-shade: #2a2e45;
+
+  --surface: rgba(31, 33, 56, 0.8);
+  --surface-solid: #1f2138;
+  --border: rgba(190, 205, 255, 0.14);
+  --border-strong: rgba(190, 205, 255, 0.3);
+  --ink: #eaf0f9;
+  --ink-soft: #b0bbd0;
+  --on-sea: #eaf0f9;
+  --on-sea-soft: rgba(234, 240, 249, 0.84);
+
+  --coral: #ff8a70;
+  --on-coral: #2b0c04;
+  --coral-ink: #ff9d86;
+  --sea-ink: #6ff0e2;
+  --sun-ink: #ffd27a;
+  --shell-ink: #ffadc6;
+  --focus: #6ff0e2;
+
+  --parchment: #efe1c2;
+  --parchment-edge: #d6c39b;
+
+  --lamp: 1;
+}
+
+/* Expose the tokens as Tailwind utilities (bg-sand-1, text-ink, border-border, ...) that follow the theme */
+@theme inline {
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-sand-1: var(--sand-1);
+  --color-sand-2: var(--sand-2);
+  --color-sand-3: var(--sand-3);
+  --color-sand-4: var(--sand-4);
+  --color-sand-5: var(--sand-5);
+  --color-sand-wet: var(--sand-wet);
+  --color-sea-deep: var(--sea-deep);
+  --color-on-sea: var(--on-sea);
+  --color-on-sea-soft: var(--on-sea-soft);
+  --color-coral: var(--coral);
+  --color-on-coral: var(--on-coral);
+  --color-coral-ink: var(--coral-ink);
+  --color-sea-ink: var(--sea-ink);
+  --color-sun-ink: var(--sun-ink);
+  --color-shell-ink: var(--shell-ink);
+}
+
+/* Type scale: ~1.25 ratio, fluid at the top end. Body 300/400, UI 500/600, headings 700/800. */
+@theme {
+  --text-display: clamp(2.5rem, 1.35rem + 5vw, 5.25rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-h2: clamp(2rem, 1.45rem + 2.4vw, 3.05rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: clamp(1.2rem, 1.1rem + 0.45vw, 1.45rem);
+  --text-h3--line-height: 1.3;
+  --text-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --text-lead--line-height: 1.65;
+  --text-eyebrow: 0.8125rem;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.18em;
+}
