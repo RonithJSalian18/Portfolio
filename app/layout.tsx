@@ -10,11 +10,19 @@ const poppins = Poppins({
   display: 'swap',
 })
 
+// Absolute base for link previews: set NEXT_PUBLIC_SITE_URL for a custom domain; on Vercel the production URL is used.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'http://localhost:3000')
+
 const title = 'Ronith J Salian | Full Stack Developer'
 const description =
   'Ronith J Salian is a full stack developer and Computer Science student building efficient, scalable, and intelligent solutions, from multi-agent AI pipelines to full-stack web apps.'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title,
   description,
   keywords: ['Ronith J Salian', 'full stack developer', 'portfolio', 'next.js', 'react', 'fastapi', 'ai', 'langgraph'],
