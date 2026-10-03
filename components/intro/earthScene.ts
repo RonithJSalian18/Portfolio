@@ -74,8 +74,19 @@ export async function createEarthScene(
   options: { lite: boolean; target: { lat: number; lng: number } },
 ) {
   const { lite } = options
-  // Throws if WebGL isn't available; the caller then skips the intro
-  const renderer = new WebGLRenderer({ antialias: !lite, powerPreference: 'high-performance' })
+  // Throws if WebGL isn't available, or would only run in software (no GPU): a CPU-rendered globe would
+  // be janky, so the caller skips the intro in both cases
+  const renderer = new WebGLRenderer({
+    antialias: !lite,
+    powerPreference: 'high-performance',
+    failIfMajorPerformanceCaveat: true,
+  })
+  const debugInfo = renderer.getContext().getExtension('WEBGL_debug_renderer_info')
+  const gpu = debugInfo ? String(renderer.getContext().getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)) : ''
+  if (/swiftshader|llvmpipe|software/i.test(gpu)) {
+    renderer.dispose()
+    throw new Error('Software WebGL: skipping the intro')
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lite ? 1.25 : 2))
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.setClearColor('#02040a', 1)
@@ -85,6 +96,8 @@ export async function createEarthScene(
   const anisotropy = Math.min(lite ? 2 : 8, renderer.capabilities.getMaxAnisotropy())
   const load = async (name: string, color: boolean) => {
     const texture = await loader.loadAsync(`/intro/${name}`)
+    // Decode off the main thread now, rather than synchronously during the first upload
+    await (texture.image as HTMLImageElement).decode?.().catch(() => {})
     texture.colorSpace = color ? SRGBColorSpace : NoColorSpace
     texture.anisotropy = anisotropy
     return texture
@@ -218,6 +231,14 @@ export async function createEarthScene(
   let lastTime = 0
 
   const target = surfacePoint(options.target.lat, options.target.lng, new Vector3())
+
+  // Compile every shader up front (in parallel where the browser supports it) instead of mid-frame,
+  // then upload the textures one per task so no single task blocks the page for long
+  await renderer.compileAsync(scene, camera).catch(() => {})
+  for (const texture of textures) {
+    renderer.initTexture(texture)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  }
 
   return {
     /** The planet's north axis in world space */

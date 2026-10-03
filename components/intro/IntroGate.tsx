@@ -19,6 +19,8 @@ const introIsPlaying = () => {
 export function IntroGate() {
   const playing = useSyncExternalStore(subscribeNever, introIsPlaying, () => false)
   const [finished, setFinished] = useState(false)
+  // The intro's code (three.js) only starts loading once the page has painted, so it never delays it
+  const [started, setStarted] = useState(false)
 
   const finish = useCallback(() => {
     const root = document.documentElement
@@ -44,12 +46,20 @@ export function IntroGate() {
     // Keep keyboard and screen-reader focus on the intro while it covers the page
     document.getElementById('site')?.setAttribute('inert', '')
     window.scrollTo(0, 0)
+    const start = () => setStarted(true)
+    // Safari has no requestIdleCallback; a short timeout does the same job there
+    const hasIdle = typeof window.requestIdleCallback === 'function'
+    const idle = hasIdle ? window.requestIdleCallback(start, { timeout: 700 }) : window.setTimeout(start, 300)
     const failSafe = window.setTimeout(() => {
       if (document.documentElement.dataset.intro === 'play') finish()
     }, FAIL_SAFE_MS)
-    return () => window.clearTimeout(failSafe)
+    return () => {
+      window.clearTimeout(failSafe)
+      if (hasIdle) window.cancelIdleCallback(idle)
+      else window.clearTimeout(idle)
+    }
   }, [playing, finish])
 
-  if (!playing || finished) return null
+  if (!playing || finished || !started) return null
   return <EarthIntro onReady={markRunning} onDone={finish} />
 }

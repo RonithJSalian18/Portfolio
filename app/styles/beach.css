@@ -149,6 +149,8 @@
     left: 0;
     width: clamp(24px, 2.6vw, 36px);
     opacity: var(--beach-dim);
+    /* Resting spot when motion is reduced (the animation overrides it otherwise) */
+    translate: 32vw 0;
     animation: sail-by 220s linear -70s infinite;
   }
 
@@ -292,12 +294,14 @@
     bottom: calc(100% - 28px);
     width: clamp(34px, 4vw, 58px);
     opacity: var(--beach-dim);
+    translate: 26vw 0;
     animation: surf-right 46s linear -12s infinite;
   }
 
   .surfer-far {
     bottom: calc(100% - 18px);
     width: clamp(22px, 2.6vw, 38px);
+    translate: 58vw 0;
     animation: surf-left 64s linear -30s infinite;
   }
 
