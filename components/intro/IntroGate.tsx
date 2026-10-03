@@ -3,11 +3,11 @@
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 
-// The intro (renderer + texture) is its own chunk, only fetched when it's actually going to play
-const PixelEarthIntro = dynamic(() => import('./PixelEarthIntro'), { ssr: false })
+// The intro (three.js + textures) is its own chunk, only fetched when it's actually going to play
+const EarthIntro = dynamic(() => import('./EarthIntro'), { ssr: false })
 
 /** Give up on the intro if it hasn't drawn a frame by then, so a slow connection never blocks the site */
-const FAIL_SAFE_MS = 3000
+const FAIL_SAFE_MS = 5000
 
 const subscribeNever = () => () => {}
 // data-intro is decided before first paint by the boot script in app/layout.tsx
@@ -51,5 +51,5 @@ export function IntroGate() {
   }, [playing, finish])
 
   if (!playing || finished) return null
-  return <PixelEarthIntro onReady={markRunning} onDone={finish} />
+  return <EarthIntro onReady={markRunning} onDone={finish} />
 }

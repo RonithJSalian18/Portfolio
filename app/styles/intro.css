@@ -42,14 +42,15 @@ html[data-intro='running'] {
   opacity: 0;
 }
 
-/* Nearest-neighbor upscaling keeps every pixel a crisp square */
-.intro-canvas {
+.intro-stage {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
+  inset: 0;
+}
+
+.intro-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .intro-hint {
@@ -108,5 +109,12 @@ html[data-intro='running'] {
 @media (max-width: 640px) {
   .intro-hint {
     font-size: 0.8rem;
+  }
+}
+
+/* No dive with reduced motion, so no hint about one */
+@media (prefers-reduced-motion: reduce) {
+  .intro-hint {
+    display: none;
   }
 }
