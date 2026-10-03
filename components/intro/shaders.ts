@@ -44,6 +44,10 @@ export const earthFragment = /* glsl */ `
   uniform sampler2D bumpMap;
   uniform sampler2D oceanMap;
   uniform sampler2D cloudMap;
+  uniform sampler2D detailMap;
+  /** Where the high-resolution patch sits on the globe: uMin, uMax, vMin, vMax */
+  uniform vec4 detailBounds;
+  uniform float detailMix;
   uniform vec3 sunDirection;
   uniform float bumpScale;
   uniform vec2 bumpTexel;
@@ -74,6 +78,12 @@ export const earthFragment = /* glsl */ `
     float diffuse = max(dot(relief, sunDirection), 0.0);
 
     vec3 day = texture2D(dayMap, vUv).rgb;
+    // Near the end of the dive, blend in the sharper patch around the beach (feathered at its edges).
+    // Sampled outside any branch so mipmapping stays well defined.
+    vec2 local = (vUv - detailBounds.xz) / (detailBounds.yw - detailBounds.xz);
+    vec3 detail = texture2D(detailMap, clamp(local, 0.0, 1.0)).rgb;
+    float inside = min(min(local.x, 1.0 - local.x), min(local.y, 1.0 - local.y));
+    day = mix(day, detail, detailMix * smoothstep(0.0, 0.06, inside));
     float shadow = texture2D(cloudMap, vec2(vUv.x + cloudOffset, vUv.y)).r;
     day *= 1.0 - 0.4 * shadow * daylight;
 

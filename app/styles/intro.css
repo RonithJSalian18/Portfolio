@@ -53,6 +53,96 @@ html[data-intro='running'] {
   height: 100%;
 }
 
+/* Cloud fly-through: fog ramps up over the globe, then two cloud banks part to reveal the hero */
+.intro-fog {
+  --puff: #ffffff;
+  --fog-a: #ffffff;
+  --fog-b: #ebf5fb;
+  --fog-c: #cfe5f1;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-theme='dark'] .intro-fog {
+  --puff: #6c7b95;
+  --fog-a: #4b5b76;
+  --fog-b: #2d3a55;
+  --fog-c: #161f35;
+}
+
+.intro-fog-base {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 55%, var(--fog-a), var(--fog-b) 50%, var(--fog-c));
+}
+
+/* A bank of overlapping puffs; --dir points its billowy side toward the middle of the screen */
+.intro-cloudbank {
+  --dir: 1;
+  position: absolute;
+  top: 50%;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  background: var(--puff);
+  box-shadow:
+    0 -34vmax 0 2vmax var(--puff),
+    0 34vmax 0 2vmax var(--puff),
+    calc(14vmax * var(--dir)) -18vmax 0 -4vmax var(--puff),
+    calc(14vmax * var(--dir)) 18vmax 0 -4vmax var(--puff),
+    calc(22vmax * var(--dir)) 0 0 -9vmax var(--puff);
+  filter: blur(30px);
+  translate: 0 -50%;
+}
+
+.intro-cloudbank-left {
+  left: -34vmax;
+}
+
+.intro-cloudbank-right {
+  --dir: -1;
+  right: -34vmax;
+}
+
+.intro[data-phase='reveal'] .intro-stage {
+  visibility: hidden;
+}
+
+.intro[data-phase='reveal'] .intro-fog-base {
+  animation: fog-clear 1.4s ease 0.15s forwards;
+}
+
+.intro[data-phase='reveal'] .intro-cloudbank-left {
+  animation: bank-left 1.8s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+
+.intro[data-phase='reveal'] .intro-cloudbank-right {
+  animation: bank-right 1.8s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+
+@keyframes fog-clear {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bank-left {
+  to {
+    transform: translateX(-72vmax);
+    opacity: 0.15;
+  }
+}
+
+@keyframes bank-right {
+  to {
+    transform: translateX(72vmax);
+    opacity: 0.15;
+  }
+}
+
 .intro-hint {
   position: absolute;
   left: 50%;
@@ -69,9 +159,16 @@ html[data-intro='running'] {
   animation: hint-in 0.6s ease 1.2s both;
 }
 
-.intro[data-phase='dive'] .intro-hint {
+/* Once the dive starts the hint has done its job; the skip button goes too when the clouds part */
+.intro[data-phase] .intro-hint {
   opacity: 0;
   transition: opacity 0.3s ease;
+}
+
+.intro[data-phase='reveal'] .intro-skip {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
 }
 
 @keyframes hint-in {

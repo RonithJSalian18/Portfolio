@@ -21,6 +21,7 @@ import {
   WebGLRenderer,
   type Texture,
 } from 'three'
+import { createCloudSprites } from './cloudSprites'
 import { createSatellites } from './satellites'
 import {
   atmosphereFragment,
@@ -38,6 +39,9 @@ const EARTH_TILT = 0.41
 export const SPIN_SPEED = 0.05
 /** Clouds drift a bit faster than the ground under them */
 const CLOUD_DRIFT = 0.012
+
+/** Where earth-detail-*.webp sits on the globe (texture u/v): a 16° square centred on the beach */
+const DETAIL_BOUNDS = [0.685475, 0.729919, 0.528333, 0.617222]
 
 const Z_AXIS = new Vector3(0, 0, 1)
 const Y_AXIS = new Vector3(0, 1, 0)
@@ -133,6 +137,9 @@ export async function createEarthScene(
       bumpMap: { value: bump },
       oceanMap: { value: ocean },
       cloudMap: { value: clouds },
+      detailMap: { value: null as Texture | null },
+      detailBounds: { value: DETAIL_BOUNDS },
+      detailMix: { value: 0 },
       sunDirection: { value: sunDirection },
       bumpScale: { value: lite ? 1.4 : 1.8 },
       // Sample the elevation 1.5 texels apart (texture sizes are fixed by the file names above)
@@ -206,6 +213,10 @@ export async function createEarthScene(
   const satellites = createSatellites(lite)
   scene.add(satellites.root)
 
+  const cloudSprites = createCloudSprites(camera, lite)
+  let detail: Texture | null = null
+  let lastTime = 0
+
   const target = surfacePoint(options.target.lat, options.target.lng, new Vector3())
 
   return {
@@ -223,7 +234,29 @@ export async function createEarthScene(
       sunDirection.copy(direction).normalize()
       sunLight.position.copy(sunDirection).multiplyScalar(10)
     },
-    render(time: number, pose: CameraPose) {
+    /** Night landing: a touch more moonlight on the dark side and grey-blue clouds */
+    setNight(night: boolean) {
+      earthMaterial.uniforms.nightAmbient.value = night ? 0.06 : 0.03
+      cloudSprites.setNight(night)
+    },
+    /** Fetch the high-resolution patch around the beach; it's only needed late in the dive */
+    async loadDetail() {
+      try {
+        detail = await load(lite ? 'earth-detail-1024.webp' : 'earth-detail-2048.webp', true)
+        earthMaterial.uniforms.detailMap.value = detail
+      } catch {
+        // Without it the dive just uses the global map
+      }
+    },
+    /** extras.detail: how much of the sharp patch to show; extras.clouds: cloud fly-through amount */
+    render(time: number, pose: CameraPose, extras: { detail?: number; clouds?: number } = {}) {
+      const delta = Math.min(0.1, Math.max(0, time - lastTime))
+      lastTime = time
+      earthMaterial.uniforms.detailMix.value = detail ? (extras.detail ?? 0) : 0
+      // The global cloud map turns to mush up close; thin it out and let the fly-through puffs take over
+      const altitude = pose.position.length()
+      cloudMaterial.uniforms.opacity.value = 0.25 + 0.75 * Math.min(1, Math.max(0, (altitude - 1.3) / 0.5))
+      cloudSprites.update(delta, extras.clouds ?? 0)
       spin.rotation.y = SPIN_SPEED * time
       cloudLayer.rotation.y = CLOUD_DRIFT * time
       // Cloud shadows on the ground follow the cloud layer
@@ -248,6 +281,8 @@ export async function createEarthScene(
     },
     dispose() {
       for (const texture of textures) texture.dispose()
+      detail?.dispose()
+      cloudSprites.dispose()
       for (const geometry of geometries) geometry.dispose()
       for (const material of [earthMaterial, cloudMaterial, atmosphereMaterial, ...starMaterials]) material.dispose()
       satellites.dispose()
