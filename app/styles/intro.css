@@ -1,6 +1,7 @@
 /*
  * Intro states on <html data-intro>: "play" (decided before paint, static cover shows while the intro
- * chunk loads), "running" (canvas is drawing), "done" / "skip" (site only).
+ * chunk loads), "running" (canvas is drawing), "reveal" (the cloud banks part over the hero),
+ * "done" / "skip" (site only).
  */
 
 .intro-cover {
@@ -23,8 +24,20 @@ html[data-intro='play'] .intro-cover {
 }
 
 html[data-intro='play'],
-html[data-intro='running'] {
+html[data-intro='running'],
+html[data-intro='reveal'] {
   overflow: hidden;
+}
+
+/* Nothing under the intro needs to move until the clouds part. Pausing it saves the main thread a full
+   style and layer update on every frame of the dive. */
+html[data-intro='play'] #site *,
+html[data-intro='play'] #site *::before,
+html[data-intro='play'] #site *::after,
+html[data-intro='running'] #site *,
+html[data-intro='running'] #site *::before,
+html[data-intro='running'] #site *::after {
+  animation-play-state: paused !important;
 }
 
 .intro {
@@ -239,4 +252,39 @@ html[data-intro='running'] {
   .intro-hint {
     display: none;
   }
+}
+
+/* ?globe-debug: the landing report, and a crosshair on the exact center of the screen */
+.intro-debug {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  max-width: calc(100vw - 2rem);
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.6rem;
+  background: rgba(5, 6, 15, 0.82);
+  color: #9ffff1;
+  font: 600 0.75rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: pre-wrap;
+  pointer-events: none;
+}
+
+.intro-debug:empty {
+  display: none;
+}
+
+.intro[data-debug]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 41px;
+  height: 41px;
+  translate: -50% -50%;
+  background:
+    linear-gradient(#fff, #fff) center / 1px 100% no-repeat,
+    linear-gradient(#fff, #fff) center / 100% 1px no-repeat;
+  mix-blend-mode: difference;
+  pointer-events: none;
 }

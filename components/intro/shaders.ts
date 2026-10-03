@@ -1,173 +1,353 @@
-// GLSL for the intro globe. Written as GLSL 1 style; three.js upgrades it for WebGL 2.
+// GLSL ES 3.00 for the illustrated intro globe (WebGL 2)
 
-const worldVaryings = /* glsl */ `
-  varying vec2 vUv;
-  varying vec3 vNormalW;
-  varying vec3 vPositionW;
+const header = /* glsl */ `#version 300 es
+precision highp float;
 `
 
-export const surfaceVertex = /* glsl */ `
-  ${worldVaryings}
-  void main() {
-    vUv = uv;
-    vec4 world = modelMatrix * vec4(position, 1.0);
-    vPositionW = world.xyz;
-    vNormalW = normalize(mat3(modelMatrix) * normal);
-    gl_Position = projectionMatrix * viewMatrix * world;
-  }
+// ---------- Sky: space gradient plus the atmosphere's halo, computed per ray (one full-screen triangle) ----------
+
+export const skyVertex = /* glsl */ `${header}
+layout(location = 0) in vec2 aPosition;
+out vec2 vNdc;
+void main() {
+  vNdc = aPosition;
+  gl_Position = vec4(aPosition, 0.0, 1.0);
+}
 `
 
-// The planet also passes surface tangents (east and north), which a sphere gives us exactly
-export const earthVertex = /* glsl */ `
-  ${worldVaryings}
-  varying vec3 vTangentW;
-  varying vec3 vBitangentW;
-  void main() {
-    vUv = uv;
-    vec4 world = modelMatrix * vec4(position, 1.0);
-    vPositionW = world.xyz;
-    mat3 toWorld = mat3(modelMatrix);
-    vNormalW = normalize(toWorld * normal);
-    // Direction of increasing longitude (east); undefined at the poles, so fall back to any axis there
-    vec3 tangent = vec3(normal.z, 0.0, -normal.x);
-    float len = length(tangent);
-    tangent = len > 1e-4 ? tangent / len : vec3(1.0, 0.0, 0.0);
-    vTangentW = normalize(toWorld * tangent);
-    vBitangentW = normalize(toWorld * cross(normal, tangent));
-    gl_Position = projectionMatrix * viewMatrix * world;
-  }
+export const skyFragment = /* glsl */ `${header}
+in vec2 vNdc;
+uniform vec3 uCamera;
+uniform vec3 uForward;
+uniform vec3 uRight;
+uniform vec3 uUp;
+uniform vec2 uTan;
+uniform vec3 uSun;
+out vec4 outColor;
+
+void main() {
+  vec3 ray = normalize(uForward + vNdc.x * uTan.x * uRight + vNdc.y * uTan.y * uUp);
+  // Deep navy, warming to violet toward the top of the frame
+  float lift = clamp(vNdc.y * 0.35 + 0.5 + vNdc.x * 0.12, 0.0, 1.0);
+  vec3 color = mix(vec3(0.012, 0.018, 0.058), vec3(0.075, 0.05, 0.17), lift * lift);
+  color *= 1.0 - 0.35 * dot(vNdc * 0.55, vNdc * 0.55);
+
+  // Halo: how far outside the planet this ray passes (0 at the limb)
+  float along = max(dot(-uCamera, ray), 0.0);
+  vec3 closest = uCamera + ray * along;
+  float miss = max(length(closest) - 1.0, 0.0);
+  float sunSide = 0.3 + 0.7 * smoothstep(-0.45, 0.55, dot(normalize(closest), uSun));
+  float inner = exp(-miss * 70.0);
+  float outer = exp(-miss * 11.0);
+  color += (vec3(0.62, 0.92, 1.0) * inner * 0.75 + vec3(0.3, 0.5, 1.0) * outer * 0.42) * sunSide;
+  outColor = vec4(color, 1.0);
+}
 `
 
-export const earthFragment = /* glsl */ `
-  uniform sampler2D dayMap;
-  uniform sampler2D nightMap;
-  uniform sampler2D bumpMap;
-  uniform sampler2D oceanMap;
-  uniform sampler2D cloudMap;
-  uniform sampler2D detailMap;
-  /** Where the high-resolution patch sits on the globe: uMin, uMax, vMin, vMax */
-  uniform vec4 detailBounds;
-  uniform float detailMix;
-  uniform vec3 sunDirection;
-  uniform float bumpScale;
-  uniform vec2 bumpTexel;
-  uniform float cloudOffset;
-  uniform float nightAmbient;
-  ${worldVaryings}
-  varying vec3 vTangentW;
-  varying vec3 vBitangentW;
+// ---------- Stars ----------
 
-  // Terrain relief: central differences of the elevation map in texture space, tilted along the
-  // sphere's east/north directions. Smooth at any zoom (no screen-space derivative blockiness).
-  vec3 perturbNormal(vec3 normal) {
-    float west = texture2D(bumpMap, vUv - vec2(bumpTexel.x, 0.0)).r;
-    float east = texture2D(bumpMap, vUv + vec2(bumpTexel.x, 0.0)).r;
-    float south = texture2D(bumpMap, vUv - vec2(0.0, bumpTexel.y)).r;
-    float north = texture2D(bumpMap, vUv + vec2(0.0, bumpTexel.y)).r;
-    vec3 slope = (east - west) * normalize(vTangentW) + (north - south) * normalize(vBitangentW);
-    return normalize(normal - bumpScale * slope);
-  }
-
-  void main() {
-    vec3 normal = normalize(vNormalW);
-    vec3 viewDir = normalize(cameraPosition - vPositionW);
-    float sunAmount = dot(normal, sunDirection);
-    float daylight = smoothstep(-0.1, 0.25, sunAmount);
-
-    vec3 relief = perturbNormal(normal);
-    float diffuse = max(dot(relief, sunDirection), 0.0);
-
-    vec3 day = texture2D(dayMap, vUv).rgb;
-    // Near the end of the dive, blend in the sharper patch around the beach (feathered at its edges).
-    // Sampled outside any branch so mipmapping stays well defined.
-    vec2 local = (vUv - detailBounds.xz) / (detailBounds.yw - detailBounds.xz);
-    vec3 detail = texture2D(detailMap, clamp(local, 0.0, 1.0)).rgb;
-    float inside = min(min(local.x, 1.0 - local.x), min(local.y, 1.0 - local.y));
-    day = mix(day, detail, detailMix * smoothstep(0.0, 0.06, inside));
-    float shadow = texture2D(cloudMap, vec2(vUv.x + cloudOffset, vUv.y)).r;
-    day *= 1.0 - 0.4 * shadow * daylight;
-
-    vec3 color = day * (diffuse * 1.15 + 0.015);
-    // A little moonlight so the night side isn't pitch black
-    color += day * nightAmbient * (1.0 - daylight);
-
-    // Sun glint on water only
-    float ocean = texture2D(oceanMap, vUv).r;
-    vec3 halfway = normalize(sunDirection + viewDir);
-    float facingSun = max(dot(normal, halfway), 0.0);
-    color += vec3(1.0, 0.9, 0.72) * pow(facingSun, 320.0) * ocean * daylight * 0.5;
-    color += vec3(0.25, 0.45, 0.75) * pow(facingSun, 24.0) * ocean * daylight * 0.04;
-
-    // City lights fade in past the terminator (squared so only bright areas show)
-    vec3 lights = texture2D(nightMap, vUv).rgb;
-    float night = 1.0 - smoothstep(-0.25, 0.05, sunAmount);
-    color += lights * lights * vec3(1.0, 0.8, 0.52) * night * 2.4;
-
-    // Thin blue atmosphere on the lit limb
-    float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
-    color += vec3(0.3, 0.56, 1.0) * fresnel * smoothstep(-0.3, 0.6, sunAmount) * 0.35;
-
-    gl_FragColor = vec4(color, 1.0);
-    #include <colorspace_fragment>
-  }
+export const starVertex = /* glsl */ `${header}
+layout(location = 0) in vec3 aPosition;
+/** size (px), twinkle phase, sparkle (0/1), tint */
+layout(location = 1) in vec4 aStar;
+uniform mat4 uViewProjection;
+uniform float uTime;
+uniform float uPixelRatio;
+out float vAlpha;
+out float vSparkle;
+out vec3 vTint;
+void main() {
+  gl_Position = uViewProjection * vec4(aPosition, 1.0);
+  gl_PointSize = aStar.x * uPixelRatio;
+  vAlpha = 0.5 + 0.5 * sin(uTime * (0.9 + aStar.y * 1.6) + aStar.y * 40.0);
+  vSparkle = aStar.z;
+  vTint = mix(vec3(1.0, 0.94, 0.82), vec3(0.78, 0.88, 1.0), aStar.w);
+}
 `
 
-export const cloudFragment = /* glsl */ `
-  uniform sampler2D cloudMap;
-  uniform vec3 sunDirection;
-  uniform float opacity;
-  ${worldVaryings}
-
-  void main() {
-    vec3 normal = normalize(vNormalW);
-    vec3 viewDir = normalize(cameraPosition - vPositionW);
-    float density = smoothstep(0.12, 0.85, texture2D(cloudMap, vUv).r);
-    float light = smoothstep(-0.15, 0.35, dot(normal, sunDirection));
-    vec3 color = mix(vec3(0.05, 0.07, 0.12), vec3(1.0), light);
-    // Fade toward the limb so the edge of the globe stays soft
-    float facing = max(dot(normal, viewDir), 0.0);
-    float alpha = density * smoothstep(0.0, 0.35, facing) * opacity * (0.3 + 0.7 * light);
-    gl_FragColor = vec4(color, alpha);
-    #include <colorspace_fragment>
-  }
+export const starFragment = /* glsl */ `${header}
+in float vAlpha;
+in float vSparkle;
+in vec3 vTint;
+out vec4 outColor;
+void main() {
+  vec2 p = gl_PointCoord * 2.0 - 1.0;
+  float core = 1.0 - smoothstep(0.0, mix(1.0, 0.35, vSparkle), length(p));
+  // The brightest stars get a four-point sparkle
+  float beams = max(0.0, 1.0 - abs(p.x) * 9.0) * (1.0 - abs(p.y)) + max(0.0, 1.0 - abs(p.y) * 9.0) * (1.0 - abs(p.x));
+  float alpha = (core * core + beams * vSparkle) * vAlpha;
+  outColor = vec4(vTint * alpha, alpha);
+}
 `
 
-export const atmosphereFragment = /* glsl */ `
-  uniform vec3 sunDirection;
-  uniform vec3 glowColor;
-  ${worldVaryings}
+// ---------- The planet ----------
 
-  void main() {
-    // Rendered on the back faces of a slightly larger sphere: 0 at the outer edge of the halo,
-    // rising toward the planet's limb (where the ray grazes the surface).
-    float along = dot(normalize(vNormalW), normalize(vPositionW - cameraPosition));
-    float rim = clamp(along / 0.26, 0.0, 1.0);
-    // Bright on the sunlit limb, almost gone on the night side
-    float sun = 0.05 + 0.95 * smoothstep(-0.3, 0.6, dot(normalize(vNormalW), sunDirection));
-    gl_FragColor = vec4(glowColor * pow(rim, 2.6) * sun * 1.1, 1.0);
-    #include <colorspace_fragment>
-  }
+export const planetVertex = /* glsl */ `${header}
+layout(location = 0) in vec3 aPosition;
+uniform mat4 uModel;
+uniform mat4 uViewProjection;
+out vec3 vGlobe;
+out vec3 vWorld;
+void main() {
+  vGlobe = aPosition;
+  vec4 world = uModel * vec4(aPosition, 1.0);
+  vWorld = world.xyz;
+  gl_Position = uViewProjection * world;
+}
 `
 
-export const starVertex = /* glsl */ `
-  attribute float size;
-  attribute float phase;
-  uniform float time;
-  uniform float pixelRatio;
-  varying float vAlpha;
-  void main() {
-    vec4 view = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * view;
-    gl_PointSize = size * pixelRatio;
-    vAlpha = 0.6 + 0.4 * sin(time * (0.8 + phase * 0.25) + phase * 6.2831);
+export const planetFragment = /* glsl */ `${header}
+in vec3 vGlobe;
+in vec3 vWorld;
+uniform sampler2D uColor;
+uniform sampler2D uCoast;
+uniform sampler2D uLights;
+uniform sampler2D uLocalColor;
+uniform sampler2D uLocalCoast;
+/** Local patch: west longitude, north latitude, size (all degrees) */
+uniform vec3 uLocal;
+/** Coast distance ranges (km) of the global and local maps */
+uniform vec2 uRange;
+uniform vec3 uSun;
+uniform vec3 uCamera;
+/** The beach, in the globe's own frame */
+uniform vec3 uTarget;
+/** 1 once the local patch has loaded */
+uniform float uLocalReady;
+/** Landing ring: 0..1 while it pulses, negative when off */
+uniform float uPulse;
+/** 0: normal, 1: draw the debug marker, 2: output the marker (red) and the coast distance there (green) */
+uniform float uDebug;
+uniform vec3 uDeepSea;
+uniform vec3 uShelfSea;
+uniform vec3 uShallowSea;
+uniform vec3 uFoam;
+out vec4 outColor;
+
+const float PI = 3.14159265359;
+const float DEGREES = 57.29577951308;
+
+/** Inverse of latLngToVector in geo.ts: unit vector → latitude/longitude (degrees) */
+vec2 latLngOf(vec3 p) {
+  return vec2(asin(clamp(p.y, -1.0, 1.0)), atan(-p.z, p.x)) * DEGREES;
+}
+
+/** Equirectangular texture coordinates: u from 180°W, v from 90°N (as the images are stored) */
+vec2 globeUv(vec2 latLng) {
+  return vec2(latLng.y / 360.0 + 0.5, 0.5 - latLng.x / 180.0);
+}
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+void main() {
+  vec3 p = normalize(vGlobe);
+  vec2 latLng = latLngOf(p);
+  vec2 uv = globeUv(latLng);
+
+  // Gradients that don't jump at the date line: use whichever u is continuous here
+  vec2 wrapped = vec2(fract(uv.x + 0.5) - 0.5, uv.y);
+  vec2 dxA = dFdx(uv);
+  vec2 dyA = dFdy(uv);
+  vec2 dxB = dFdx(wrapped);
+  vec2 dyB = dFdy(wrapped);
+  bool useB = abs(dxB.x) + abs(dyB.x) < abs(dxA.x) + abs(dyA.x);
+  vec2 dx = useB ? dxB : dxA;
+  vec2 dy = useB ? dyB : dyA;
+
+  // Ground size of a pixel (km), from the seam-safe gradients
+  float latitudeScale = cos(latLng.x / DEGREES);
+  float kmPerPixel = 111.32 * max(length(dx * vec2(360.0 * latitudeScale, 180.0)), length(dy * vec2(360.0 * latitudeScale, 180.0)));
+
+  vec3 albedo = textureGrad(uColor, uv, dx, dy).rgb;
+  float coast = (textureGrad(uCoast, uv, dx, dy).r - 0.5) * 2.0 * uRange.x;
+
+  // The sharper patch around the beach: feathered into the global map at its edges, and only used up
+  // close (from afar its extra detail would show as a square)
+  vec2 local = vec2(latLng.y - uLocal.x, uLocal.y - latLng.x) / uLocal.z;
+  vec2 localDx = dx * vec2(360.0, 180.0) / uLocal.z;
+  vec2 localDy = dy * vec2(360.0, 180.0) / uLocal.z;
+  float inside = min(min(local.x, 1.0 - local.x), min(local.y, 1.0 - local.y));
+  float patchWeight = smoothstep(0.0, 0.07, inside) * (1.0 - smoothstep(4.0, 10.0, kmPerPixel)) * uLocalReady;
+  vec3 localAlbedo = textureGrad(uLocalColor, clamp(local, 0.0, 1.0), localDx, localDy).rgb;
+  float localCoast = (textureGrad(uLocalCoast, clamp(local, 0.0, 1.0), localDx, localDy).r - 0.5) * 2.0 * uRange.y;
+  albedo = mix(albedo, localAlbedo, patchWeight);
+  coast = mix(coast, localCoast, patchWeight);
+
+  // Coastline and sea bands; minimum widths in pixels keep them visible from far away
+  float land = smoothstep(-0.7 * kmPerPixel, 0.7 * kmPerPixel, coast);
+  float depth = -coast;
+  float shallowEdge = max(26.0, 2.2 * kmPerPixel);
+  float shelfEdge = max(105.0, 5.0 * kmPerPixel);
+  float shallow = 1.0 - smoothstep(shallowEdge - kmPerPixel, shallowEdge + kmPerPixel, depth);
+  float shelf = 1.0 - smoothstep(shelfEdge - kmPerPixel, shelfEdge + kmPerPixel, depth);
+  vec3 sea = mix(mix(uDeepSea, uShelfSea, shelf), uShallowSea, shallow);
+  float foamWidth = max(1.5, 1.2 * kmPerPixel);
+  float foam = (1.0 - smoothstep(foamWidth * 0.4, foamWidth, depth)) * (1.0 - smoothstep(2.0, 5.0, kmPerPixel));
+  sea = mix(sea, uFoam, foam * 0.85);
+  vec3 base = mix(sea, albedo, land);
+
+  // Three-step cel shading with cool shadows
+  vec3 normal = normalize(vWorld);
+  vec3 view = normalize(uCamera - vWorld);
+  float light = dot(normal, uSun);
+  float edge = max(fwidth(light), 1e-4);
+  float bright = smoothstep(0.3 - edge, 0.3 + edge, light);
+  float day = smoothstep(-0.03 - edge, -0.03 + edge, light);
+  vec3 mid = base * vec3(0.78, 0.83, 0.97);
+  vec3 shadow = base * vec3(0.26, 0.3, 0.52) + vec3(0.012, 0.016, 0.055);
+  vec3 color = mix(shadow, mix(mid, base, bright), day);
+
+  // Cartoon sun glint on the water: a crisp highlight inside a soft sheen. The highlight belongs to the
+  // view from space; close to the surface it would be a huge white disc, so it fades out
+  float facing = dot(normal, normalize(uSun + view));
+  float glintEdge = max(fwidth(facing), 1e-5);
+  float water = (1.0 - land) * day;
+  float glint = smoothstep(0.9993 - glintEdge, 0.9993 + glintEdge, facing) * smoothstep(4.0, 9.0, kmPerPixel);
+  color = mix(color, vec3(1.0, 0.97, 0.88), glint * water * 0.9);
+  color += vec3(0.2, 0.3, 0.42) * smoothstep(0.975, 0.997, facing) * water * 0.35;
+
+  // City lights on the night side: warm dots up close, a soft glow from afar
+  float night = 1.0 - smoothstep(-0.12, 0.04, light);
+  vec2 grid = latLng.yx / 0.42;
+  vec2 cell = floor(grid);
+  float density = textureLod(uLights, globeUv((cell.yx + 0.5) * 0.42), 0.0).r;
+  vec2 spot = vec2(hash(cell), hash(cell + 19.7)) * 0.56 + 0.22;
+  float lit = step(hash(cell + 7.3), density * 1.15);
+  float radius = mix(0.09, 0.2, hash(cell + 3.1)) * (0.6 + 0.6 * density);
+  float distanceToDot = length((fract(grid) - spot) * vec2(cos(latLng.x / DEGREES), 1.0));
+  float dotEdge = max(fwidth(distanceToDot), 1e-4);
+  float dots = (1.0 - smoothstep(radius - dotEdge, radius + dotEdge, distanceToDot)) * lit;
+  float cellPixels = 1.0 / max(max(fwidth(grid.x), fwidth(grid.y)), 1e-4);
+  float glow = textureGrad(uLights, uv, dx, dy).r;
+  float lights = mix(glow * 0.55, dots, smoothstep(2.5, 6.0, cellPixels)) * land;
+  color += vec3(1.0, 0.78, 0.42) * lights * night * 1.25;
+
+  // Glowing rim, strongest on the sunlit limb
+  float rim = pow(1.0 - max(dot(normal, view), 0.0), 2.6);
+  color += vec3(0.44, 0.84, 1.0) * rim * (0.22 + 0.7 * smoothstep(-0.25, 0.55, light));
+
+  // Angle from the beach (degrees); the chord form stays precise for tiny angles
+  float fromBeach = 2.0 * asin(min(1.0, length(p - uTarget) * 0.5)) * DEGREES;
+  float angleEdge = max(fwidth(fromBeach), 1e-6);
+  if (uPulse >= 0.0) {
+    float ring = 1.0 - smoothstep(angleEdge, angleEdge * 2.4, abs(fromBeach - mix(0.06, 0.9, uPulse)));
+    float pin = 1.0 - smoothstep(0.045 - angleEdge, 0.045 + angleEdge, fromBeach);
+    color = mix(color, vec3(1.0, 0.54, 0.44), max(ring * (1.0 - uPulse), pin) * 0.95);
   }
+  if (uDebug > 1.5) {
+    outColor = vec4(step(fromBeach, 0.03), clamp(0.5 + coast / 120.0, 0.0, 1.0), 0.0, 1.0);
+    return;
+  }
+  if (uDebug > 0.5) {
+    float marker = (1.0 - smoothstep(angleEdge, angleEdge * 2.0, abs(fromBeach - 0.15))) + step(fromBeach, 0.03);
+    color = mix(color, vec3(1.0, 0.1, 0.85), min(marker, 1.0));
+  }
+  outColor = vec4(color, 1.0);
+}
 `
 
-export const starFragment = /* glsl */ `
-  varying float vAlpha;
-  void main() {
-    float d = length(gl_PointCoord - 0.5);
-    float alpha = smoothstep(0.5, 0.0, d) * vAlpha;
-    gl_FragColor = vec4(vec3(1.0), alpha);
-  }
+// ---------- Clouds: flattened low-poly puffs, one tone per facet ----------
+
+export const cloudVertex = /* glsl */ `${header}
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec3 aNormal;
+/** Puff center (cloud-layer frame, already at cloud height) and radius */
+layout(location = 2) in vec4 aPuff;
+uniform mat4 uModel;
+uniform mat4 uViewProjection;
+out vec3 vNormal;
+out vec3 vWorld;
+out vec3 vUp;
+const float SQUASH = 0.62;
+void main() {
+  vec3 up = normalize(aPuff.xyz);
+  vec3 side = normalize(cross(abs(up.y) < 0.95 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0), up));
+  vec3 ahead = cross(up, side);
+  vec3 offset = aPosition * aPuff.w;
+  vec3 position = aPuff.xyz + side * offset.x + up * offset.y * SQUASH + ahead * offset.z;
+  vec3 normal = side * aNormal.x + up * (aNormal.y / SQUASH) + ahead * aNormal.z;
+  vec4 world = uModel * vec4(position, 1.0);
+  vWorld = world.xyz;
+  vNormal = mat3(uModel) * normal;
+  vUp = mat3(uModel) * up;
+  gl_Position = uViewProjection * world;
+}
+`
+
+export const cloudFragment = /* glsl */ `${header}
+in vec3 vNormal;
+in vec3 vWorld;
+in vec3 vUp;
+uniform vec3 uSun;
+uniform vec3 uCamera;
+out vec4 outColor;
+void main() {
+  vec3 normal = normalize(vNormal);
+  float light = dot(normal, uSun);
+  vec3 color = light > 0.18 ? vec3(1.0) : light > -0.12 ? vec3(0.86, 0.89, 0.98) : vec3(0.66, 0.7, 0.9);
+  // Puffs over the night side take the same cool shadow tint as the ground there (moonlit)
+  float day = smoothstep(-0.14, 0.08, dot(normalize(vUp), uSun));
+  color *= mix(vec3(0.34, 0.39, 0.58), vec3(1.0), day);
+  float rim = pow(1.0 - max(dot(normal, normalize(uCamera - vWorld)), 0.0), 3.0);
+  color += vec3(0.16, 0.2, 0.3) * rim * day;
+  outColor = vec4(color, 1.0);
+}
+`
+
+// ---------- Satellites: flat colors, two tones ----------
+
+export const craftVertex = /* glsl */ `${header}
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec3 aColor;
+uniform mat4 uModel;
+uniform mat4 uViewProjection;
+out vec3 vNormal;
+out vec3 vColor;
+void main() {
+  vNormal = mat3(uModel) * aNormal;
+  vColor = aColor;
+  gl_Position = uViewProjection * uModel * vec4(aPosition, 1.0);
+}
+`
+
+export const craftFragment = /* glsl */ `${header}
+in vec3 vNormal;
+in vec3 vColor;
+uniform vec3 uSun;
+out vec4 outColor;
+void main() {
+  float light = dot(normalize(vNormal), uSun);
+  vec3 color = vColor * (light > 0.0 ? 1.0 : 0.55) * vec3(1.0, 1.0, light > 0.0 ? 1.0 : 1.12);
+  outColor = vec4(color, 1.0);
+}
+`
+
+// ---------- Blinking beacons on the craft ----------
+
+export const beaconVertex = /* glsl */ `${header}
+layout(location = 0) in vec3 aPosition;
+/** rgb, brightness */
+layout(location = 1) in vec4 aGlow;
+uniform mat4 uViewProjection;
+uniform float uPixelRatio;
+out vec4 vGlow;
+void main() {
+  gl_Position = uViewProjection * vec4(aPosition, 1.0);
+  gl_PointSize = (6.0 + 10.0 * aGlow.a) * uPixelRatio;
+  vGlow = aGlow;
+}
+`
+
+export const beaconFragment = /* glsl */ `${header}
+in vec4 vGlow;
+out vec4 outColor;
+void main() {
+  float d = length(gl_PointCoord * 2.0 - 1.0);
+  float alpha = (1.0 - smoothstep(0.0, 1.0, d)) * (0.15 + 0.85 * vGlow.a);
+  alpha = alpha * alpha;
+  outColor = vec4(vGlow.rgb * alpha, alpha);
+}
 `

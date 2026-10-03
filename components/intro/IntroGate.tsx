@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 
-// The intro (three.js + textures) is its own chunk, only fetched when it's actually going to play
+// The intro (WebGL renderer + maps) is its own chunk, only fetched when it's actually going to play
 const EarthIntro = dynamic(() => import('./EarthIntro'), { ssr: false })
 
 /** Give up on the intro if it hasn't drawn a frame by then, so a slow connection never blocks the site */
@@ -19,7 +19,7 @@ const introIsPlaying = () => {
 export function IntroGate() {
   const playing = useSyncExternalStore(subscribeNever, introIsPlaying, () => false)
   const [finished, setFinished] = useState(false)
-  // The intro's code (three.js) only starts loading once the page has painted, so it never delays it
+  // The intro's code only starts loading once the page has painted, so it never delays it
   const [started, setStarted] = useState(false)
 
   const finish = useCallback(() => {
@@ -34,6 +34,11 @@ export function IntroGate() {
 
   const markRunning = useCallback(() => {
     if (document.documentElement.dataset.intro === 'play') document.documentElement.dataset.intro = 'running'
+  }, [])
+
+  // The clouds are parting over the hero, so the page underneath can start moving again
+  const markRevealing = useCallback(() => {
+    if (document.documentElement.dataset.intro === 'running') document.documentElement.dataset.intro = 'reveal'
   }, [])
 
   useEffect(() => {
@@ -61,5 +66,5 @@ export function IntroGate() {
   }, [playing, finish])
 
   if (!playing || finished || !started) return null
-  return <EarthIntro onReady={markRunning} onDone={finish} />
+  return <EarthIntro onReady={markRunning} onReveal={markRevealing} onDone={finish} />
 }

@@ -1,23 +1,24 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Vector3 } from 'three'
 import { BEACH } from '@/config/site'
-import { createEarthScene, type CameraPose, type EarthScene } from './earthScene'
+import { NORTH_AXIS, add, cross, dot, mix, normalize, rotateAbout, scale, slerp, type Vec3 } from './geo'
+import { LANDING_CLOUD_TOP, createGlobe, type Globe, type Pose } from './globe'
 
 const IDLE_MS = 1600
 const DIVE_MS = 7000
 const REVEAL_MS = 1800
 const REDUCED_MOTION_HOLD_MS = 1600
 
-const START_DISTANCE = 3.6
-const END_DISTANCE = 1.13
-/** How far south of the beach the camera ends up, so it looks up the coast toward the horizon */
-const APPROACH_OFFSET = 0.16
-/** Share of the dive spent turning toward the beach (the rest is a straight descent) */
-const TURN_SHARE = 0.78
-const CLOUDS_FROM = 0.66
-const FOG_FROM = 0.84
+/** Dive stages (share of DIVE_MS): turn and zoom in, hover over the beach, then plunge into the cloud */
+const APPROACH_END = 0.7
+const HOVER_END = 0.84
+const FOG_FROM = 0.86
+/** Camera height above the surface while hovering (Earth radii) */
+const HOVER_FROM = 0.15
+const HOVER_TO = 0.13
+/** The plunge stops just above the landing cloud, which by then fills the screen */
+const PLUNGE_TO = LANDING_CLOUD_TOP + 0.01
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t))
@@ -25,19 +26,37 @@ const smoothstep = (from: number, to: number, t: number) => {
   const x = clamp01((t - from) / (to - from))
   return x * x * (3 - 2 * x)
 }
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t
+
+/** Altitude over the dive: an even-feeling zoom (log scale), a short hover, then an accelerating plunge */
+function altitude(progress: number, start: number) {
+  if (progress < APPROACH_END) {
+    const t = easeInOutCubic(progress / APPROACH_END)
+    return Math.exp(lerp(Math.log(start), Math.log(HOVER_FROM), t))
+  }
+  if (progress < HOVER_END) return lerp(HOVER_FROM, HOVER_TO, easeInOutCubic((progress - APPROACH_END) / (HOVER_END - APPROACH_END)))
+  const t = (progress - HOVER_END) / (1 - HOVER_END)
+  return lerp(HOVER_TO, PLUNGE_TO, t * t * t)
+}
+
+/** Unit vector pointing north along the surface at `point` */
+const northAt = (point: Vec3) => normalize(add(NORTH_AXIS, scale(point, -dot(NORTH_AXIS, point))))
 
 interface EarthIntroProps {
   /** First frame is on screen */
   onReady: () => void
+  /** The dive is over and the clouds start parting over the page */
+  onReveal: () => void
   /** The intro has finished (completed, skipped, or failed) */
   onDone: () => void
 }
 
-export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
+export default function EarthIntro({ onReady, onReveal, onDone }: EarthIntroProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const fogRef = useRef<HTMLDivElement>(null)
   const skipRef = useRef<HTMLButtonElement>(null)
+  const debugRef = useRef<HTMLPreElement>(null)
 
   useEffect(() => {
     const root = rootRef.current
@@ -49,8 +68,11 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
     const lite = document.documentElement.dataset.lite === '1'
     const night = document.documentElement.dataset.theme === 'dark'
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // ?globe-debug: stop above the beach, mark it, and report where it lands on screen
+    const debug = new URLSearchParams(window.location.search).has('globe-debug')
+    if (debug) root.dataset.debug = ''
 
-    let scene: EarthScene | null = null
+    let globe: Globe | null = null
     let phase: 'loading' | 'idle' | 'dive' | 'reveal' | 'leaving' = 'loading'
     let frame = 0
     let start = 0
@@ -58,13 +80,9 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
     let readySent = false
     let timer = 0
     let cancelled = false
-
-    const startDirection = new Vector3()
-    const target = new Vector3()
-    const north = new Vector3()
-    const direction = new Vector3()
-    const worldUp = new Vector3(0, 1, 0)
-    const pose: CameraPose = { position: new Vector3(), lookAt: new Vector3(), up: new Vector3(0, 1, 0) }
+    let measured = false
+    let startDirection: Vec3 = [0, 0, 1]
+    let lastFog = ''
 
     const leave = (fade: boolean) => {
       if (phase === 'leaving') return
@@ -83,47 +101,85 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
       diveStart = now
     }
 
-    // Out of the clouds: stop rendering the globe and let the cloud banks part over the real hero
+    // Into the cloud: stop rendering the globe and let the cloud banks part over the real hero
     const startReveal = () => {
       phase = 'reveal'
       root.dataset.phase = 'reveal'
       fog.style.opacity = '1'
+      onReveal()
       timer = window.setTimeout(() => leave(false), REVEAL_MS)
     }
 
+    /** Where the camera is at `time` (seconds) and dive `progress` (0..1) */
+    const poseAt = (scene: Globe, time: number, progress: number): Pose => {
+      const half = scene.halfFov()
+      // Far enough back for the whole globe to fit, with some space around it
+      const startDistance = Math.max(3.6, 1 / Math.sin(Math.min(half.x, half.y) * 0.78))
+      const beach = scene.targetDirection(time)
+      const turn = easeInOutCubic(clamp01(progress / APPROACH_END))
+      const direction = slerp(startDirection, beach, turn)
+      return {
+        position: scale(direction, 1 + altitude(progress, startDistance - 1)),
+        lookAt: scale(beach, smoothstep(0.3, 0.66, progress)),
+        up: normalize(mix([0, 1, 0], northAt(beach), smoothstep(0.2, 0.66, progress))),
+      }
+    }
+
+    const report = (scene: Globe, time: number, pose: Pose) => {
+      const result = scene.measureLanding(time, pose)
+      const offset = (point: { x: number; y: number } | null) =>
+        point ? `${(point.x - result.center.x).toFixed(2)}, ${(point.y - result.center.y).toFixed(2)} px` : 'not visible'
+      const summary = {
+        target: BEACH,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        center: result.center,
+        projected: result.projected,
+        drawn: result.drawn,
+        coastKm: result.coastKm,
+        markerPixels: result.markerPixels,
+      }
+      ;(window as unknown as { __globeDebug?: typeof summary }).__globeDebug = summary
+      if (debugRef.current) {
+        debugRef.current.textContent = [
+          `beach ${BEACH.lat}, ${BEACH.lng}`,
+          `viewport ${window.innerWidth}×${window.innerHeight}, center ${result.center.x}, ${result.center.y}`,
+          `projected (camera maths): off center by ${offset(result.projected)}`,
+          `drawn (shader marker, ${result.markerPixels} px): off center by ${offset(result.drawn)}`,
+          result.coastKm === null
+            ? 'coastline: not measured'
+            : `map under the marker: ${Math.abs(result.coastKm).toFixed(2)} km ${result.coastKm >= 0 ? 'inland from' : 'offshore of'} the coastline`,
+        ].join('\n')
+      }
+    }
+
     const loop = (now: number) => {
+      const scene = globe
       if (!scene || (phase !== 'idle' && phase !== 'dive')) return
       if (phase === 'idle' && now - start >= IDLE_MS) startDive(now)
       const time = (now - start) / 1000
-      const progress = phase === 'dive' ? clamp01((now - diveStart) / DIVE_MS) : 0
+      let progress = phase === 'dive' ? clamp01((now - diveStart) / DIVE_MS) : 0
+      if (debug) progress = Math.min(progress, HOVER_END)
+      const pose = poseAt(scene, time, progress)
+      const landingAt = ((phase === 'dive' ? diveStart - start : IDLE_MS) + DIVE_MS) / 1000
+      // A ring pulses out from the beach while the camera hovers over it
+      const hoverStart = diveStart + (APPROACH_END - 0.02) * DIVE_MS
+      const pulse = phase === 'dive' && now > hoverStart && !debug ? ((now - hoverStart) / 900) % 1 : -1
 
-      // Slow start, faster through the middle, gentle landing
-      const turn = easeInOutCubic(clamp01(progress / TURN_SHARE))
-      const descent = easeInOutCubic(progress)
-      // Narrow (portrait) screens need the camera further back for the whole globe to fit
-      const startDistance = START_DISTANCE * Math.max(1, 1.2 / scene.camera.aspect)
-      const distance = startDistance + (END_DISTANCE - startDistance) * descent
-
-      // The beach keeps moving as the planet spins, so the camera keeps chasing it
-      scene.targetDirection(time, target)
-      direction.copy(startDirection).lerp(target, turn).normalize()
-      north.copy(scene.axis).addScaledVector(target, -scene.axis.dot(target)).normalize()
-      const approach = smoothstep(0.45, 1, progress)
-      pose.position.copy(direction).multiplyScalar(distance).addScaledVector(north, -APPROACH_OFFSET * approach)
-      pose.lookAt.copy(target).multiplyScalar(smoothstep(0.3, 0.95, progress))
-      pose.up.copy(worldUp).lerp(north, smoothstep(0.25, 0.9, progress)).normalize()
-
-      fog.style.opacity = String(smoothstep(FOG_FROM, 1, progress))
-      scene.render(time, pose, {
-        detail: smoothstep(2.1, 1.45, distance),
-        clouds: smoothstep(CLOUDS_FROM, 0.97, progress),
-      })
+      // Only touch the DOM when the fog actually changes (it's 0 for most of the dive)
+      const fogOpacity = smoothstep(FOG_FROM, 1, progress).toFixed(3)
+      if (fogOpacity !== lastFog) fog.style.opacity = lastFog = fogOpacity
+      scene.render(time, pose, { pulse, landingAt, debug })
 
       if (!readySent) {
         readySent = true
         onReady()
+        void scene.loadLocal()
       }
-      if (progress >= 1) return startReveal()
+      if (debug && progress >= HOVER_END && !measured) {
+        measured = true
+        report(scene, time, pose)
+      }
+      if (progress >= 1 && !debug) return startReveal()
       frame = requestAnimationFrame(loop)
     }
 
@@ -138,7 +194,10 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
       startDive(performance.now())
     }
     const onSkip = () => leave(true)
-    const onResize = () => scene?.resize()
+    const onResize = () => {
+      globe?.resize()
+      measured = false
+    }
 
     root.addEventListener('pointerdown', onPointer)
     root.addEventListener('wheel', onWheel, { passive: true })
@@ -148,26 +207,26 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
     skip.addEventListener('click', onSkip)
     skip.focus({ preventScroll: true })
 
-    createEarthScene(stage, { lite, target: BEACH })
+    createGlobe(stage, { lite, target: BEACH })
       .then((created) => {
         if (cancelled) return created.dispose()
-        scene = created
-        scene.onContextLost(() => leave(false))
-        scene.setNight(night)
-        void scene.loadDetail()
+        globe = created
+        globe.onContextLost(() => leave(false))
 
-        // Match the site theme: mid-morning sun over the beach by day; by night the beach is on the dark side
-        const landing = scene.targetDirection((IDLE_MS + DIVE_MS) / 1000, new Vector3())
-        const east = new Vector3().crossVectors(scene.axis, landing).normalize()
-        const sunAngle = night ? 2.55 : 0.6
-        scene.setSun(landing.clone().multiplyScalar(Math.cos(sunAngle)).addScaledVector(east, Math.sin(sunAngle)))
+        // Match the site theme. By day the sun sits west of the beach (afternoon), so the opening shot and the
+        // landing are both lit; by night the dive flies from the sunlit side into the dark, where the coast
+        // shows its city lights
+        const landing = globe.targetDirection((IDLE_MS + DIVE_MS) / 1000)
+        const east = normalize(cross(NORTH_AXIS, landing))
+        const sunAngle = night ? -2.3 : -0.5
+        globe.setSun(add(add(scale(landing, Math.cos(sunAngle)), scale(east, Math.sin(sunAngle))), scale(northAt(landing), 0.25)))
         // Open the shot over Africa, west of the beach
-        startDirection.copy(landing).applyAxisAngle(scene.axis, -1.2)
+        startDirection = rotateAbout(landing, NORTH_AXIS, -1.2)
 
-        if (reduceMotion) {
+        if (reduceMotion && !debug) {
           // One still frame looking down at India, then a plain fade into the site
-          pose.position.copy(scene.targetDirection(0, target)).multiplyScalar(2.3 * Math.max(1, 1.2 / scene.camera.aspect))
-          scene.render(0, pose)
+          const beach = globe.targetDirection(0)
+          globe.render(0, { position: scale(beach, 2.3), lookAt: [0, 0, 0], up: northAt(beach) })
           onReady()
           timer = window.setTimeout(() => leave(true), REDUCED_MOTION_HOLD_MS)
           return
@@ -177,7 +236,7 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
         start = performance.now()
         frame = requestAnimationFrame(loop)
       })
-      // No WebGL, or the textures failed to load: just show the site
+      // No WebGL 2, or the maps failed to load: just show the site
       .catch(() => leave(false))
 
     return () => {
@@ -190,9 +249,9 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('resize', onResize)
       skip.removeEventListener('click', onSkip)
-      scene?.dispose()
+      globe?.dispose()
     }
-  }, [onReady, onDone])
+  }, [onReady, onReveal, onDone])
 
   return (
     <div ref={rootRef} className="intro">
@@ -202,9 +261,10 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
         <div className="intro-cloudbank intro-cloudbank-left" />
         <div className="intro-cloudbank intro-cloudbank-right" />
       </div>
+      <pre ref={debugRef} className="intro-debug" aria-hidden="true" />
       <p className="sr-only">
-        Intro animation: the Earth turns toward the coast of Karnataka, India, and the camera dives through the
-        clouds down to the beach.
+        Intro animation: an illustrated Earth turns toward the coast of Karnataka, India, and the camera dives through a
+        cloud down to the beach.
       </p>
       <p className="intro-hint" aria-hidden="true">
         Click or scroll to dive in

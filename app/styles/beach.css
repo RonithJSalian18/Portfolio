@@ -20,9 +20,7 @@
     --castle-shade: #3b3750;
   }
 
-  /* Pause the whole beach while the intro covers it, and whenever it's scrolled away */
-  html[data-intro='play'] .hero *,
-  html[data-intro='running'] .hero *,
+  /* Pause the whole beach whenever it's scrolled away (intro.css pauses everything while the intro covers it) */
   .hero[data-offscreen] *,
   .hero[data-offscreen] *::before,
   .hero[data-offscreen] *::after {
