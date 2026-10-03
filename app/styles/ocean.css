@@ -1,0 +1,287 @@
+/*
+ * The ocean below the beach: a scroll-driven dive under the waterline, then depth zones that get darker
+ * the deeper you scroll. Each zone re-maps the text/surface tokens so content stays readable (WCAG AA).
+ */
+
+/* Registered so the water can fade between day and night like the sky does */
+@property --water-0 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #74dde0;
+}
+@property --water-1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2fb5d0;
+}
+@property --water-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0f6894;
+}
+@property --water-3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0a4c86;
+}
+@property --water-4 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0a2350;
+}
+@property --water-5 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #030914;
+}
+
+@layer components {
+  /* ---------- Zones ---------- */
+
+  .zone {
+    /* Deeper water: light text on dark frosted panels (the sunlit shallows by day override this) */
+    --ink: #f2f8ff;
+    --ink-soft: #d3e2f1;
+    --surface: rgba(5, 24, 52, 0.66);
+    --surface-solid: #0a2747;
+    --border: rgba(160, 210, 255, 0.2);
+    --border-strong: rgba(160, 210, 255, 0.4);
+    --chip: rgba(255, 255, 255, 0.08);
+    --track: rgba(255, 255, 255, 0.16);
+    --sea-ink: #8ef0f6;
+    --coral-ink: #ffb09c;
+    --sun-ink: #ffd88a;
+    --shell-ink: #ffbdd0;
+    --focus: #8ef0f6;
+    --pebble: #23456c;
+    --pebble-shade: #183556;
+    --pebble-hi: color-mix(in srgb, #fff 12%, #23456c);
+    --rock-dark: #0b1d33;
+    position: relative;
+    isolation: isolate;
+    color: var(--ink);
+    transition:
+      --water-0 1.2s ease,
+      --water-1 1.2s ease,
+      --water-2 1.2s ease,
+      --water-3 1.2s ease,
+      --water-4 1.2s ease,
+      --water-5 1.2s ease;
+  }
+
+  [data-theme='dark'] .zone {
+    --surface: rgba(4, 14, 32, 0.72);
+    --surface-solid: #071a33;
+    --border: rgba(140, 200, 255, 0.16);
+  }
+
+  /* Sunlit shallows by day: the water is bright, so text goes dark */
+  :root:not([data-theme='dark']) .zone-reef {
+    --ink: #0b2540;
+    --ink-soft: #14324a;
+    --surface: rgba(240, 252, 255, 0.82);
+    --surface-solid: #f3fcff;
+    --border: rgba(6, 70, 100, 0.18);
+    --border-strong: rgba(6, 70, 100, 0.34);
+    --chip: rgba(6, 70, 100, 0.08);
+    --track: rgba(6, 70, 100, 0.14);
+    --sea-ink: #023c44;
+    --coral-ink: #96300f;
+    --sun-ink: #6b4500;
+    --shell-ink: #872c4b;
+    --focus: #023c44;
+    --pebble: #f4fbfd;
+    --pebble-shade: #cfe3ea;
+    --pebble-hi: #ffffff;
+    --rock-dark: #5f8a96;
+  }
+
+  /* The reef drops off into open water in its last stretch, below the last card */
+  .zone-reef {
+    background: linear-gradient(to bottom, var(--water-0) 0%, var(--water-1) calc(100% - 240px), var(--water-2) 100%);
+  }
+
+  .zone-open {
+    background: linear-gradient(to bottom, var(--water-2), var(--water-3));
+  }
+
+  .zone-twilight {
+    background: linear-gradient(to bottom, var(--water-3), var(--water-4));
+  }
+
+  .zone-deep {
+    background: linear-gradient(to bottom, var(--water-4), var(--water-5));
+  }
+
+  /* Content sits above any zone decoration */
+  .zone > .section {
+    z-index: 1;
+  }
+
+  /* ---------- Light shafts from the surface ---------- */
+
+  .light-rays {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 120vh;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: var(--ray-strength);
+    transition: opacity 1.2s ease;
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  }
+
+  .light-rays span {
+    position: absolute;
+    top: -10%;
+    width: var(--w, 9%);
+    height: 120%;
+    left: var(--x, 20%);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    filter: blur(6px);
+    transform-origin: top center;
+    rotate: var(--r, 12deg);
+    animation: ray-sway var(--t, 9s) ease-in-out infinite alternate;
+  }
+
+  @keyframes ray-sway {
+    to {
+      rotate: calc(var(--r, 12deg) + 5deg);
+      opacity: 0.55;
+    }
+  }
+
+  /* ---------- Dive below the waterline ---------- */
+
+  .dive {
+    --dive: 0;
+    /* Where the water surface is in the sticky view: starts below the bottom, ends above the top */
+    --waterline: calc((1 - var(--dive)) * 112svh - 12svh);
+    position: relative;
+    height: 170svh;
+    background: var(--water-0);
+  }
+
+  .dive-view {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  /* Above the surface: the end of the beach and the shallows, seen from just above the water */
+  .dive-above {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      var(--sand-1) 0%,
+      var(--sand-wet) 13%,
+      var(--sea-shallow) 21%,
+      var(--sea-near) 55%,
+      var(--sea-mid) 100%
+    );
+  }
+
+  .dive-glints {
+    position: absolute;
+    inset: 22% 0 0 0;
+    background-image:
+      radial-gradient(2px 1px at 12% 18%, var(--glint) 50%, transparent 55%),
+      radial-gradient(3px 1px at 47% 36%, var(--glint) 50%, transparent 55%),
+      radial-gradient(2px 1px at 78% 12%, var(--glint) 50%, transparent 55%),
+      radial-gradient(3px 1px at 30% 64%, var(--glint) 50%, transparent 55%),
+      radial-gradient(2px 1px at 66% 80%, var(--glint) 50%, transparent 55%);
+    background-size: 280px 200px;
+    animation: twinkle 2.4s ease-in-out infinite alternate;
+  }
+
+  /* Lacy foam where the shallows wash up on the sand */
+  .dive-shoreline {
+    position: absolute;
+    left: 0;
+    top: calc(21% - 14px);
+    width: calc(100% + var(--period));
+    height: 30px;
+    --period: 300px;
+    background: var(--foam);
+    opacity: 0.55;
+    mask: var(--tide-line) 0 0 / var(--period) auto repeat-x;
+    animation: swash 7s ease-in-out infinite alternate;
+  }
+
+  /* Below the surface: masked by a wave shape whose crest is the waterline */
+  .dive-below {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--water-0) 0%, var(--water-0) 40%, color-mix(in srgb, var(--water-0) 70%, var(--water-1)) 100%);
+    mask: var(--wave-shape) 0 var(--waterline) / 420px auto repeat-x;
+  }
+
+  /* Bright, rippling underside of the surface just below the waterline */
+  .dive-surface {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--waterline);
+    height: 40px;
+    background: var(--foam);
+    mask: var(--wave-line) 0 0 / 420px auto repeat-x;
+    filter: drop-shadow(0 0 6px var(--wave-glow));
+  }
+
+  .dive-surface::after {
+    content: '';
+    position: absolute;
+    inset: 22px 0 auto 0;
+    height: 60px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+  }
+
+  .dive-bubbles {
+    position: absolute;
+    inset: 0;
+    opacity: clamp(0, calc((var(--dive) - 0.3) * 3), 1);
+  }
+
+  .bubble {
+    position: absolute;
+    bottom: -40px;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.75);
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.85) 0 18%, rgba(255, 255, 255, 0.08) 40%, transparent 70%);
+    animation: bubble-rise var(--d, 6s) linear var(--delay, 0s) infinite;
+  }
+
+  @keyframes bubble-rise {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.9;
+    }
+    50% {
+      transform: translate(10px, -55vh);
+    }
+    100% {
+      transform: translate(-6px, -115vh);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* A still split view: half beach, half underwater */
+    .dive {
+      --dive: 0.5;
+      height: 100svh;
+    }
+
+    .dive-view {
+      position: relative;
+    }
+  }
+}

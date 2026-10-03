@@ -12,10 +12,23 @@
 
   .site-nav[data-scrolled='true'],
   .site-nav[data-menu-open='true'] {
-    background: color-mix(in srgb, var(--sand-1) 84%, transparent);
+    background: var(--nav-bg);
     backdrop-filter: blur(14px) saturate(1.2);
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
     box-shadow: 0 1px 0 var(--border);
+  }
+
+  /* Over the water the bar turns dark and its text light, whatever the theme */
+  .site-nav[data-underwater='true'] {
+    --ink: #f2f8ff;
+    --ink-soft: #d3e2f1;
+    --border: rgba(160, 210, 255, 0.2);
+    --border-strong: rgba(160, 210, 255, 0.4);
+    --chip: rgba(255, 255, 255, 0.08);
+    --surface-solid: #0a2747;
+    --focus: #8ef0f6;
+    --nav-bg: rgba(4, 20, 42, 0.82);
+    color: var(--ink);
   }
 
   .nav-inner {
@@ -103,7 +116,7 @@
   }
 
   .mobile-menu a:hover {
-    background: var(--sand-2);
+    background: var(--chip);
   }
 
   @media (min-width: 900px) {

@@ -7,7 +7,7 @@ const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
 export function Skills() {
   return (
-    <section id="skills" className="section grain bg-sand-2" aria-labelledby="skills-title">
+    <section id="skills" className="section" aria-labelledby="skills-title">
       <div className="section-inner">
         <SectionHeading id="skills" copy={sections.skills} />
 

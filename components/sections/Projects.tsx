@@ -34,7 +34,7 @@ function Bottle() {
 
 export function Projects() {
   return (
-    <section id="projects" className="section grain bg-sand-3" aria-labelledby="projects-title">
+    <section id="projects" className="section" aria-labelledby="projects-title">
       <div className="section-inner">
         <SectionHeading id="projects" copy={sections.projects} />
 
@@ -47,7 +47,10 @@ export function Projects() {
             >
               <article className="card bottle-card" data-glass={project.glass} aria-labelledby={`project-${project.id}`}>
                 <div className="bottle-art" aria-hidden="true">
-                  <div className="bottle-shore" />
+                  <div className="bottle-light" />
+                  <span className="bottle-bubble" />
+                  <span className="bottle-bubble" />
+                  <span className="bottle-bubble" />
                   <Bottle />
                 </div>
 

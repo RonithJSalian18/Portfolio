@@ -11,135 +11,105 @@
     }
   }
 
-  /* Lighthouse scene: same sky as the hero, beam faint by day and sweeping at night */
-  .lighthouse-scene {
+  /* The bottom of the sea: wreck, treasure chest, seabed, and a few glowing specks */
+  .deep-scene {
+    --seabed: #22303f;
     position: relative;
     height: clamp(220px, 26vw, 290px);
     overflow: hidden;
     border-radius: 1.5rem;
     border: 1px solid var(--border);
-    background: linear-gradient(to bottom, var(--sky-top), var(--sky-mid) 60%, var(--sky-low));
-    transition:
-      --sky-top 1.5s ease,
-      --sky-mid 1.5s ease,
-      --sky-low 1.5s ease;
+    background: radial-gradient(120% 95% at 50% 0%, color-mix(in srgb, var(--water-3) 75%, var(--water-4)), var(--water-5));
   }
 
-  .lh-stars {
+  [data-theme='dark'] .deep-scene {
+    --seabed: #0f1622;
+  }
+
+  .deep-specks {
     position: absolute;
     inset: 0;
-    opacity: var(--stars);
-    transition: opacity 1.4s ease;
+    opacity: calc(0.35 + 0.65 * var(--glow));
+    transition: opacity 1.2s ease;
+  }
+
+  .deep-specks::after {
+    content: '';
+    position: absolute;
+    inset: 0;
     background-image:
-      radial-gradient(1.2px 1.2px at 10% 20%, #fff 50%, transparent 55%),
-      radial-gradient(1px 1px at 30% 8%, #fff 50%, transparent 55%),
-      radial-gradient(1.4px 1.4px at 78% 16%, #fff 50%, transparent 55%),
-      radial-gradient(1px 1px at 88% 38%, #fff 50%, transparent 55%),
-      radial-gradient(1px 1px at 18% 44%, #fff 50%, transparent 55%);
-    background-size: 220px 220px;
+      radial-gradient(1.6px 1.6px at 12% 22%, #7ef9ea 50%, transparent 60%),
+      radial-gradient(1.2px 1.2px at 36% 64%, #9ffff1 50%, transparent 60%),
+      radial-gradient(2px 2px at 58% 18%, #7ef9ea 50%, transparent 60%),
+      radial-gradient(1.2px 1.2px at 74% 48%, #b7a6ff 50%, transparent 60%),
+      radial-gradient(1.6px 1.6px at 90% 30%, #7ef9ea 50%, transparent 60%);
+    background-size: 190px 150px;
+    animation: twinkle 3.2s ease-in-out infinite alternate;
   }
 
-  .lighthouse-svg {
+  .deep-wreck {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    right: -6%;
+    bottom: 12%;
+    width: 64%;
+    fill: #0b1d33;
+    stroke: #0b1d33;
+    opacity: 0.85;
   }
 
-  .lh-beam {
-    transform-box: view-box;
-    transform-origin: 160px 70px;
-    opacity: var(--lamp);
-    transition: opacity 1.4s ease;
-    animation: sweep 6s ease-in-out infinite alternate;
+  [data-theme='dark'] .deep-wreck {
+    fill: #06101e;
+    stroke: #06101e;
   }
 
-  @keyframes sweep {
-    from {
-      transform: rotate(-9deg);
-    }
-    to {
-      transform: rotate(9deg);
-    }
+  .deep-wreck-ports {
+    fill: color-mix(in srgb, var(--water-3) 55%, #000);
   }
 
-  .beam-stop {
-    stop-color: #fff3bf;
-    stop-opacity: 0.85;
+  .deep-chest {
+    position: absolute;
+    left: 9%;
+    bottom: 7%;
+    width: 34%;
+    max-width: 170px;
+    overflow: visible;
   }
 
-  .beam-stop-fade {
-    stop-color: #fff3bf;
-    stop-opacity: 0;
+  .chest-glow {
+    fill: rgba(255, 209, 102, 0.42);
+    filter: blur(10px);
   }
 
-  .lh-rock {
-    fill: var(--rock-dark);
+  .chest-body {
+    fill: #6b4224;
   }
 
-  .lh-tower {
-    fill: #f7f2e8;
+  .chest-lid {
+    fill: #57341b;
   }
 
-  .lh-stripes rect {
-    fill: #e2553b;
+  .chest-plank {
+    stroke: #4a2c15;
   }
 
-  .lh-door {
-    fill: #6b4b2e;
+  .chest-band {
+    stroke: #c9a24a;
   }
 
-  .lh-deck,
-  .lh-roof {
-    fill: #2f3b4c;
+  .chest-lock {
+    fill: #e2b84f;
   }
 
-  .lh-room {
-    fill: #d9ecf4;
-    stroke: #2f3b4c;
-    stroke-width: 2;
+  .chest-gold {
+    fill: #ffd166;
   }
 
-  .lh-lamp {
-    fill: #f2cf6b;
-  }
-
-  [data-theme='dark'] .lh-tower {
-    fill: #c9cdd8;
-  }
-
-  [data-theme='dark'] .lh-stripes rect {
-    fill: #b8452f;
-  }
-
-  [data-theme='dark'] .lh-room {
-    fill: #ffe9a6;
-  }
-
-  [data-theme='dark'] .lh-lamp {
-    fill: #fff6c9;
-    filter: drop-shadow(0 0 6px #ffe28a);
-  }
-
-  .lh-sea {
+  .deep-floor {
     position: absolute;
     inset: auto 0 0 0;
     height: 20%;
-  }
-
-  .lh-wave-back {
-    --period: 110px;
-    --fill: var(--sea-near);
-    --speed: 14s;
-    top: 0;
-    animation-direction: reverse;
-  }
-
-  .lh-wave-front {
-    --period: 160px;
-    --fill: var(--sea-shallow);
-    --speed: 10s;
-    top: 30%;
+    background: var(--seabed);
+    mask: var(--tide-shape) 0 0 / 520px auto repeat-x;
   }
 
   .channels {
@@ -168,7 +138,7 @@
     width: 2.6rem;
     height: 2.6rem;
     border-radius: 0.9rem 1.1rem 0.8rem 1.2rem;
-    background: color-mix(in srgb, var(--sea-shallow) 35%, transparent);
+    background: color-mix(in srgb, var(--sea-ink) 16%, transparent);
     color: var(--sea-ink);
   }
 
@@ -246,45 +216,45 @@
     justify-self: start;
   }
 
-  /* A strip of sea along the bottom of the form, where the bottle is tossed */
+  /* A strip of seabed along the bottom of the form; a sent "bottle" floats up from it */
   .form-sea {
     position: relative;
-    height: 4.25rem;
+    height: 3.5rem;
     margin-inline: calc(-1 * clamp(1.4rem, 3vw, 2rem));
-    overflow: hidden;
   }
 
   .form-wave {
-    --period: 180px;
-    --fill: var(--sea-shallow);
-    --speed: 12s;
+    --period: 220px;
+    --fill: color-mix(in srgb, var(--sea-ink) 18%, var(--surface-solid));
+    --speed: 16s;
     top: 1.4rem;
   }
 
   .tossed-bottle {
     position: absolute;
     left: clamp(1.4rem, 3vw, 2rem);
-    top: 0.4rem;
+    bottom: 0.6rem;
     width: 3.2rem;
-    animation: toss 2.2s cubic-bezier(0.25, 0.6, 0.35, 1) forwards;
+    animation: bottle-rise 2.6s cubic-bezier(0.3, 0.2, 0.3, 1) forwards;
   }
 
   .cork-mini {
     fill: #b9854f;
   }
 
-  @keyframes toss {
+  @keyframes bottle-rise {
     0% {
-      transform: translate(0, 0) rotate(-25deg);
+      transform: translate(0, 0) rotate(-20deg);
+      opacity: 0;
     }
-    30% {
-      transform: translate(5rem, -0.6rem) rotate(20deg);
+    12% {
+      opacity: 1;
     }
-    55% {
-      transform: translate(9rem, 1.3rem) rotate(8deg);
+    50% {
+      transform: translate(2.5rem, -9rem) rotate(-70deg);
     }
     100% {
-      transform: translate(22rem, 1.1rem) rotate(-6deg);
+      transform: translate(1rem, -24rem) rotate(-95deg);
       opacity: 0;
     }
   }
@@ -295,8 +265,8 @@
     margin-inline: calc(-1 * clamp(1.4rem, 3vw, 2rem));
     padding: 0 clamp(1.4rem, 3vw, 2rem);
     font-size: 0.92rem;
-    background: var(--sea-shallow);
-    color: var(--on-shallow);
+    background: color-mix(in srgb, var(--sea-ink) 18%, var(--surface-solid));
+    color: var(--ink);
   }
 
   .form-status:not(:empty) {

@@ -1,24 +1,39 @@
 @layer components {
   .site-footer {
     --focus: var(--on-sea);
+    --seabed: #1c2735;
     position: relative;
   }
 
-  .footer-sea {
+  [data-theme='dark'] .site-footer {
+    --seabed: #0c111b;
+  }
+
+  /* The seafloor at the bottom of the dive: a wavy sand ridge rising out of the deep water */
+  .seafloor {
     position: relative;
-    overflow: hidden;
-    /* Extra bottom room so the floating back-to-top button never covers the last line */
-    padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2.5rem) 5rem;
-    background: linear-gradient(to bottom, var(--sea-deep), color-mix(in srgb, var(--sea-deep) 72%, #000));
+    padding: clamp(3.5rem, 6vw, 5rem) clamp(1rem, 4vw, 2.5rem) 5rem;
+    background: linear-gradient(to bottom, var(--seabed), color-mix(in srgb, var(--seabed) 70%, #000));
     color: var(--on-sea);
-    transition: background-color 0.9s ease;
+  }
+
+  .seafloor-dunes {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -56px;
+    height: 60px;
+    background: var(--seabed);
+    mask: var(--tide-shape) 0 0 / 640px auto repeat-x;
+    pointer-events: none;
   }
 
   /* Bioluminescent plankton, only at night (the twinkle lives on ::after so it can't override the opacity) */
   .footer-plankton {
     position: absolute;
     inset: 0;
-    opacity: calc(var(--stars) * 0.9);
+    overflow: hidden;
+    opacity: calc(var(--glow) * 0.9);
     transition: opacity 1.2s ease;
     pointer-events: none;
   }

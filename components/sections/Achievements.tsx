@@ -11,7 +11,7 @@ const medalIcons: Record<MedalShape, React.ComponentType<{ className?: string }>
 
 export function Achievements() {
   return (
-    <section id="achievements" className="section grain bg-sand-5" aria-labelledby="achievements-title">
+    <section id="achievements" className="section" aria-labelledby="achievements-title">
       <div className="section-inner">
         <SectionHeading id="achievements" copy={sections.achievements} />
 

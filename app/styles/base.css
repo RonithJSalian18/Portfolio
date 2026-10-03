@@ -7,7 +7,8 @@
   }
 
   body {
-    background: var(--sand-1);
+    /* The page ends on the seafloor, so overscrolling past the bottom shows deep water */
+    background: var(--water-5);
     color: var(--ink);
     font-family: var(--font-sans);
     font-weight: 400;

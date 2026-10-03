@@ -37,7 +37,7 @@ export const navLinks = [
 ]
 
 export interface SectionCopy {
-  /** Small label above the title; it carries the walk down the beach */
+  /** Small label above the title; it names the depth zone the section sits in */
   eyebrow: string
   title: string
   highlight: string
@@ -46,46 +46,46 @@ export interface SectionCopy {
 
 export const sections = {
   about: {
-    eyebrow: 'The dunes',
+    eyebrow: 'Shallow reef',
     title: 'About',
     highlight: 'Ronith',
     intro:
       'Aspiring software engineer with strong interest in Machine Learning, Data Structures, Algorithms, and Software Development. Passionate about building efficient, scalable, and intelligent solutions.',
   },
   skills: {
-    eyebrow: 'Tide pools',
+    eyebrow: 'Coral garden',
     title: 'Technical',
     highlight: 'Expertise',
     intro:
       'Full-stack development toolkit with expertise in modern web technologies, databases, DevOps, and algorithmic problem solving.',
   },
   projects: {
-    eyebrow: 'Washed ashore',
+    eyebrow: 'Open water',
     title: 'My',
     highlight: 'Projects',
     intro: 'A showcase of innovative solutions and impactful projects built with modern technologies.',
   },
   experience: {
-    eyebrow: 'Footprints',
+    eyebrow: 'Descent line',
     title: 'Journey &',
     highlight: 'Milestones',
     intro: 'Education, internships, and achievements showcasing growth and commitment to excellence.',
   },
   achievements: {
-    eyebrow: 'Shells & treasures',
+    eyebrow: 'Twilight zone',
     title: 'Coding Journey &',
     highlight: 'Achievements',
     intro:
       'Consistent problem-solving on LeetCode showcasing dedication to Data Structures, Algorithms, and Software Development excellence.',
   },
   quotes: {
-    eyebrow: 'Written in the sand',
+    eyebrow: 'Bioluminescence',
     title: 'Inspiration &',
     highlight: 'Philosophy',
     intro: 'Timeless wisdom that guides my approach to software development and problem-solving.',
   },
   contact: {
-    eyebrow: 'The lighthouse',
+    eyebrow: 'The deep',
     title: 'Get in',
     highlight: 'Touch',
     intro:

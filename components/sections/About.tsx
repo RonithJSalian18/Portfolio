@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react'
 import { Brain, GraduationCap, Heart } from 'lucide-react'
-import { Pebbles, Starfish } from '@/components/BeachIcons'
 import { SectionHeading } from '@/components/SectionHeading'
 import { about, sections } from '@/lib/content'
 
@@ -8,7 +7,7 @@ const cardIcons = [GraduationCap, Brain, Heart]
 
 export function About() {
   return (
-    <section id="about" className="section grain bg-sand-1" aria-labelledby="about-title">
+    <section id="about" className="section" aria-labelledby="about-title">
       <div className="section-inner">
         <SectionHeading id="about" copy={sections.about} />
 
@@ -47,9 +46,6 @@ export function About() {
           </ul>
         </div>
       </div>
-
-      <Starfish className="about-starfish" />
-      <Pebbles className="about-pebbles" />
     </section>
   )
 }

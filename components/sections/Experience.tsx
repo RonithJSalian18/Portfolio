@@ -10,7 +10,7 @@ const typeLabels: Record<TimelineType, string> = {
 
 export function Experience() {
   return (
-    <section id="experience" className="section grain bg-sand-4" aria-labelledby="experience-title">
+    <section id="experience" className="section" aria-labelledby="experience-title">
       <div className="section-inner">
         <SectionHeading id="experience" copy={sections.experience} />
 
@@ -22,8 +22,11 @@ export function Experience() {
               data-type={item.type}
               data-reveal
             >
-              <span className="trail-prints" aria-hidden="true" />
+              <span className="trail-rope" aria-hidden="true" />
               <span className="trail-stop" aria-hidden="true" />
+              <span className="trail-depth" aria-hidden="true">
+                −{30 + index * 35} m
+              </span>
               <article className="card trail-card">
                 <p className="trail-meta">
                   <span className="trail-type">{typeLabels[item.type]}</span>

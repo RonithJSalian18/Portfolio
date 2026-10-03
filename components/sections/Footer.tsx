@@ -1,14 +1,14 @@
 import { BackToTop } from '@/components/BackToTop'
-import { WaveDivider } from '@/components/WaveDivider'
 import { footer, navLinks, profile, socials } from '@/lib/content'
 
+/** The seafloor at the bottom of the dive */
 export function Footer() {
   const year = new Date().getFullYear()
 
   return (
     <footer className="site-footer">
-      <WaveDivider from="sand-wet" to="sea-deep" variant="surf" />
-      <div className="footer-sea grain">
+      <div className="seafloor">
+        <div className="seafloor-dunes" aria-hidden="true" />
         <div className="footer-plankton" aria-hidden="true" />
         <div className="footer-inner">
           <div className="footer-brand">

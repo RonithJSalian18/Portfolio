@@ -4,18 +4,18 @@ import { quotes, quotesOutro, sayings, sections } from '@/lib/content'
 
 export function Quotes() {
   return (
-    <section id="quotes" className="section grain bg-sand-wet" aria-labelledby="quotes-title">
+    <section id="quotes" className="section" aria-labelledby="quotes-title">
       <div className="section-inner">
         <SectionHeading id="quotes" copy={sections.quotes} />
 
-        <ul className="sand-quotes">
+        <ul className="quote-list">
           {quotes.map((quote, index) => (
             <li
               key={quote.author}
               data-reveal
               style={{ '--reveal-delay': `${(index % 2) * 110}ms` } as CSSProperties}
             >
-              <figure className="sand-quote">
+              <figure className="quote-card">
                 <blockquote>
                   <p>{quote.text}</p>
                 </blockquote>

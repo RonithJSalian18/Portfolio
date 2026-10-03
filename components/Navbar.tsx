@@ -13,8 +13,11 @@ export function Navbar() {
   useEffect(() => {
     const header = headerRef.current
     if (!header) return
+    const hero = document.getElementById('hero')
     const update = () => {
       header.dataset.scrolled = String(window.scrollY > 12)
+      // Past the beach the bar sits over the water, so it switches to a dark frosted look
+      header.dataset.underwater = String(!!hero && hero.getBoundingClientRect().bottom < header.offsetHeight)
     }
     update()
     window.addEventListener('scroll', update, { passive: true })

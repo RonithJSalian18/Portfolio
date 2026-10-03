@@ -13,58 +13,43 @@ const channels = [
   { Icon: GithubIcon, label: 'GitHub', value: social('github').handle, href: social('github').href },
 ]
 
-function Lighthouse() {
+/** The bottom of the sea: a sunken wreck and a half-open treasure chest, lit by a few glowing specks */
+function DeepScene() {
   return (
-    <div className="lighthouse-scene" aria-hidden="true">
-      <div className="lh-stars" />
-      <svg className="lighthouse-svg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMax meet" focusable="false">
-        <defs>
-          <linearGradient id="beam-right" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" className="beam-stop" />
-            <stop offset="1" className="beam-stop-fade" />
-          </linearGradient>
-          <linearGradient id="beam-left" x1="1" x2="0" y1="0" y2="0">
-            <stop offset="0" className="beam-stop" />
-            <stop offset="1" className="beam-stop-fade" />
-          </linearGradient>
-          <clipPath id="lighthouse-clip">
-            <path d="M138 206 146 90h28l8 116z" />
-          </clipPath>
-        </defs>
-        <g className="lh-beam">
-          <path d="M160 70 340 26v88z" fill="url(#beam-right)" />
-          <path d="M160 70-20 26v88z" fill="url(#beam-left)" />
-        </g>
-        <path className="lh-rock" d="M60 240c6-28 28-40 54-34 16-14 46-14 64-2 24-10 50 0 62 36z" />
-        <path className="lh-tower" d="M138 206 146 90h28l8 116z" />
-        <g className="lh-stripes" clipPath="url(#lighthouse-clip)">
-          <rect x="130" y="104" width="60" height="18" />
-          <rect x="130" y="140" width="60" height="18" />
-          <rect x="130" y="176" width="60" height="18" />
-        </g>
-        <rect className="lh-door" x="154" y="188" width="12" height="18" rx="6" />
-        <rect className="lh-deck" x="140" y="84" width="40" height="7" rx="2" />
-        <rect className="lh-room" x="148" y="58" width="24" height="26" rx="3" />
-        <circle className="lh-lamp" cx="160" cy="70" r="6" />
-        <path className="lh-roof" d="M144 59 160 42l16 17z" />
+    <div className="deep-scene" aria-hidden="true">
+      <div className="deep-specks" />
+      <svg className="deep-wreck" viewBox="0 0 260 120" focusable="false">
+        <path d="M6 112 34 66l178 8 42 38z" />
+        <path d="M70 70 92 6M128 72l12-58M150 30h-36" fill="none" strokeWidth="3" />
+        <path d="M60 80h22v10H60zM100 82h22v10h-22zM140 84h22v10h-22z" className="deep-wreck-ports" />
       </svg>
-      <div className="lh-sea">
-        <div className="wave lh-wave-back" />
-        <div className="wave lh-wave-front" />
-      </div>
+      <svg className="deep-chest" viewBox="0 0 120 92" focusable="false">
+        <ellipse className="chest-glow" cx="60" cy="42" rx="58" ry="22" />
+        <path className="chest-lid" d="M12 42 24 10Q60-2 96 10l12 32z" />
+        <path className="chest-band" d="M24 10l-8 32M96 10l8 32" fill="none" strokeWidth="5" />
+        <ellipse className="chest-gold" cx="60" cy="43" rx="44" ry="8" />
+        <circle className="chest-gold" cx="44" cy="38" r="5" />
+        <circle className="chest-gold" cx="70" cy="37" r="6" />
+        <circle className="chest-gold" cx="58" cy="34" r="4" />
+        <rect className="chest-body" x="10" y="42" width="100" height="42" rx="4" />
+        <path className="chest-plank" d="M10 56h100M10 70h100" fill="none" strokeWidth="2" />
+        <path className="chest-band" d="M26 42v42M94 42v42" fill="none" strokeWidth="6" />
+        <rect className="chest-lock" x="53" y="46" width="14" height="14" rx="2" />
+      </svg>
+      <div className="deep-floor" />
     </div>
   )
 }
 
 export function Contact() {
   return (
-    <section id="contact" className="section grain bg-sand-wet" aria-labelledby="contact-title">
+    <section id="contact" className="section" aria-labelledby="contact-title">
       <div className="section-inner">
         <SectionHeading id="contact" copy={sections.contact} />
 
         <div className="contact-grid">
           <div className="contact-side" data-reveal>
-            <Lighthouse />
+            <DeepScene />
             <ul className="channels">
               {channels.map(({ Icon, label, value, href }) => {
                 const external = href.startsWith('http')
