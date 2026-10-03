@@ -52,7 +52,7 @@ function School({ lane, mode, dur, delay, restX }: { lane: number; mode: 'swim-r
   )
 }
 
-/** Open water (Projects, Experience): a school of fish, dolphins and a manta ray */
+/** Open water (Skills, Projects): a school of fish, dolphins and a manta ray */
 export default function OpenLife() {
   return (
     <>

@@ -96,7 +96,7 @@ function ReefFloor() {
   )
 }
 
-/** Shallow reef (About, Skills): sun shafts, caustics, clownfish, tangs, a turtle and a coral ledge */
+/** Shallow reef (About): sun shafts, caustics, clownfish, tangs, a turtle and a coral ledge */
 export default function ReefLife() {
   return (
     <>

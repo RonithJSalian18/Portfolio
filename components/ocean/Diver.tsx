@@ -12,10 +12,6 @@ const INTERESTING = [
   '.zone .bottle-card',
   '.zone .trail-card',
   '.zone .medal',
-  '.zone .activity',
-  '.zone .difficulty',
-  '.zone .quote-card',
-  '.zone .sayings',
   '.zone .deep-scene',
   '.zone .contact-form',
 ].join(',')

@@ -73,16 +73,10 @@ export const sections = {
   },
   achievements: {
     eyebrow: 'Twilight zone',
-    title: 'Coding Journey &',
+    title: 'Wins &',
     highlight: 'Achievements',
     intro:
       'Consistent problem-solving on LeetCode showcasing dedication to Data Structures, Algorithms, and Software Development excellence.',
-  },
-  quotes: {
-    eyebrow: 'Bioluminescence',
-    title: 'Inspiration &',
-    highlight: 'Philosophy',
-    intro: 'Timeless wisdom that guides my approach to software development and problem-solving.',
   },
   contact: {
     eyebrow: 'The deep',
@@ -303,41 +297,6 @@ export const medals: { shape: MedalShape; title: string; detail: string }[] = [
     detail: 'Participant: built and pitched a prototype against the clock',
   },
   { shape: 'scallop', title: 'HackLoop 2024', detail: 'Participant: shipped StudyBuddy, an AI PDF Q&A app' },
-]
-
-export const leetcodeStats = [
-  { label: 'Problems Solved', value: '328+' },
-  { label: 'Submissions (Last Year)', value: '723+' },
-  { label: 'Active Days', value: '246' },
-  { label: 'Max Streak', value: '33' },
-  { label: 'LeetCode Rank', value: '408K' },
-]
-
-export const difficulty = [
-  { level: 'Easy', solved: 207, total: 949 },
-  { level: 'Medium', solved: 120, total: 2066 },
-  { level: 'Hard', solved: 1, total: 942 },
-]
-
-export const quotes = [
-  { text: 'Stay hungry, stay foolish.', author: 'Steve Jobs' },
-  { text: 'Programs must be written for people to read.', author: 'Harold Abelson' },
-  { text: "Code is like humor. When you have to explain it, it's bad.", author: 'Cory House' },
-  { text: 'The best way to predict the future is to invent it.', author: 'Alan Kay' },
-]
-
-export const quotesOutro =
-  'These principles drive my commitment to building quality software and solving challenging problems.'
-
-/** Short reminders that used to rotate on the old loading screen */
-export const sayings = [
-  'Build projects. Not just resumes.',
-  'Consistency beats motivation.',
-  'Code. Learn. Improve. Repeat.',
-  'First solve the problem, then write the code.',
-  'Every expert was once a beginner.',
-  'Great code is readable code.',
-  'Debug with patience, code with purpose.',
 ]
 
 export const footer = {

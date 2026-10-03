@@ -12,7 +12,6 @@ import { Experience } from '@/components/sections/Experience'
 import { Footer } from '@/components/sections/Footer'
 import { Hero } from '@/components/sections/Hero'
 import { Projects } from '@/components/sections/Projects'
-import { Quotes } from '@/components/sections/Quotes'
 import { Skills } from '@/components/sections/Skills'
 
 // From the beach, dive under the waterline and keep going down: each zone is deeper and darker,
@@ -31,15 +30,14 @@ export default function Home() {
           <DiveTransition />
           <OceanZone zone="reef">
             <About />
-            <Skills />
           </OceanZone>
           <OceanZone zone="open">
+            <Skills />
             <Projects />
-            <Experience />
           </OceanZone>
           <OceanZone zone="twilight">
+            <Experience />
             <Achievements />
-            <Quotes />
           </OceanZone>
           <OceanZone zone="deep">
             <Contact />

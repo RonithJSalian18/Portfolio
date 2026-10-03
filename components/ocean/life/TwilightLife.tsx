@@ -1,7 +1,7 @@
 import { Jellyfish, Octopus } from '../creatures'
 import { Ambient, Critter } from './Critter'
 
-/** Twilight zone (Achievements, Quotes): drifting jellyfish and an octopus watching from its rock */
+/** Twilight zone (Experience, Achievements): drifting jellyfish and an octopus watching from its rock */
 export default function TwilightLife() {
   return (
     <>
