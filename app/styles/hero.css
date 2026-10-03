@@ -269,25 +269,6 @@
     font-weight: 300;
   }
 
-  .hero-roles {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.45rem;
-    max-width: 54rem;
-    margin-top: clamp(0.6rem, 1.6vh, 1.1rem);
-  }
-
-  .hero-roles li {
-    padding: 0.3rem 0.85rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--surface-solid) 58%, transparent);
-    backdrop-filter: blur(4px);
-    font-size: 0.82rem;
-    font-weight: 500;
-  }
-
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
@@ -516,16 +497,6 @@
 
     .hero-content {
       padding-top: calc(4rem + 1.25rem);
-    }
-
-    .hero-roles {
-      gap: 0.35rem;
-      margin-top: 0.9rem;
-    }
-
-    .hero-roles li {
-      padding: 0.22rem 0.65rem;
-      font-size: 0.75rem;
     }
 
     .hero-actions {

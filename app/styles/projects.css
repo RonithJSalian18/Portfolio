@@ -254,6 +254,17 @@
     font-weight: 700;
   }
 
+  .bottle-event,
+  .letter-event {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--sun-ink);
+  }
+
+  .letter-event {
+    margin-top: 0.25rem;
+  }
+
   .bottle-tagline {
     font-weight: 500;
   }

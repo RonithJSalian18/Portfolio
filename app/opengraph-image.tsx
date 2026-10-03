@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
-import { profile } from '@/lib/content'
+import { profile } from '@/data/profile'
 
-export const alt = `${profile.name}, ${profile.role}: a portfolio styled as a walk along a beach`
+export const alt = `${profile.name}, ${profile.role} (${profile.focus}), ${profile.location}`
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -51,7 +51,9 @@ export default async function OpenGraphImage() {
           <div style={{ fontSize: 34, fontWeight: 600 }}>Hi, I&apos;m</div>
           <div style={{ fontSize: 104, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.05 }}>{profile.name}</div>
           <div style={{ marginTop: 18, fontSize: 44, fontWeight: 600 }}>{profile.role}</div>
-          <div style={{ marginTop: 8, fontSize: 28, fontWeight: 600, color: '#33475d' }}>{profile.tagline}</div>
+          <div style={{ marginTop: 8, fontSize: 28, fontWeight: 600, color: '#33475d' }}>
+            {`Also building with ${profile.focus} · ${profile.location}`}
+          </div>
         </div>
       </div>
     ),

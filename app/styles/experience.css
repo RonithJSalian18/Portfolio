@@ -15,20 +15,12 @@
     column-gap: 0.75rem;
   }
 
-  .trail-step[data-type='education'] {
-    --type: var(--sea-ink);
-  }
-
-  .trail-step[data-type='internship'] {
+  .trail-step[data-type='work'] {
     --type: var(--coral-ink);
   }
 
-  .trail-step[data-type='hackathon'] {
-    --type: var(--sun-ink);
-  }
-
-  .trail-step[data-type='achievement'] {
-    --type: var(--shell-ink);
+  .trail-step[data-type='education'] {
+    --type: var(--sea-ink);
   }
 
   /* The descent line: a twisted rope that lowers into view as each entry is revealed */
@@ -137,9 +129,27 @@
     color: var(--type);
   }
 
-  .trail-desc {
-    margin-top: 0.6rem;
+  .trail-points {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.7rem;
     color: var(--ink-soft);
+  }
+
+  .trail-points li {
+    position: relative;
+    padding-left: 1.1rem;
+  }
+
+  .trail-points li::before {
+    content: '';
+    position: absolute;
+    left: 0.1rem;
+    top: 0.68em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--type);
   }
 
   /* Wide screens: the trail runs down the middle and entries alternate sides */

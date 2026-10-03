@@ -1,8 +1,9 @@
-import { Code2, Mail } from 'lucide-react'
+import { Code2, Download, Mail } from 'lucide-react'
 import { BeachFinds, Lighthouse, Sailboat, SkyLife, Surfer } from '@/components/beach/BeachLife'
 import { HeroParallax } from '@/components/HeroParallax'
 import { GithubIcon, LinkedinIcon } from '@/components/SocialIcons'
-import { profile, socials, type SocialKey } from '@/lib/content'
+import { RESUME_PATH } from '@/config/site'
+import { profile, socials, type SocialKey } from '@/data/profile'
 
 const socialIcons: Record<SocialKey, React.ComponentType<{ className?: string }>> = {
   github: GithubIcon,
@@ -35,18 +36,16 @@ export function Hero() {
           {profile.name}
         </h1>
         <p className="hero-role">{profile.role}</p>
-        <p className="hero-tagline">{profile.tagline}</p>
-        <ul className="hero-roles">
-          {profile.roles.map((role) => (
-            <li key={role}>{role}</li>
-          ))}
-        </ul>
+        <p className="hero-tagline">
+          Also building with {profile.focus} · {profile.location}
+        </p>
         <div className="hero-actions">
           <a href="#projects" className="btn btn-primary">
             View Projects
           </a>
-          <a href="#contact" className="btn btn-ghost">
-            Get in Touch
+          <a href={RESUME_PATH} className="btn btn-ghost" download>
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Download Resume
           </a>
         </div>
         <ul className="hero-socials">

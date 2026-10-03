@@ -12,14 +12,8 @@
   }
 
   .about-story {
-    display: grid;
-    gap: 1.1rem;
     font-size: var(--text-lead);
     line-height: var(--text-lead--line-height);
-    font-weight: 300;
-  }
-
-  .about-story p:first-child {
     font-weight: 400;
   }
 
@@ -30,8 +24,9 @@
 
   .about-card {
     display: flex;
+    align-items: flex-start;
     gap: 1rem;
-    padding: 1.25rem 1.35rem;
+    padding: 1.15rem 1.35rem;
     transition: transform 0.25s ease;
   }
 
@@ -47,7 +42,7 @@
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 1rem 1.2rem 0.9rem 1.3rem;
-    background: color-mix(in srgb, var(--sea-shallow) 35%, transparent);
+    background: color-mix(in srgb, var(--sea-ink) 16%, transparent);
     color: var(--sea-ink);
   }
 
@@ -56,27 +51,17 @@
     height: 1.3rem;
   }
 
-  .about-card h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-  }
-
-  .about-card ul {
-    margin-top: 0.4rem;
-    display: grid;
-    gap: 0.2rem;
+  .about-card dt {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    font-size: 0.95rem;
   }
 
-  .about-card li::before {
-    content: '';
-    display: inline-block;
-    width: 0.4rem;
-    height: 0.4rem;
-    margin: 0 0.55rem 0.15rem 0;
-    border-radius: 50% 50% 50% 0;
-    rotate: -45deg;
-    background: var(--coral);
+  .about-card dd {
+    margin-top: 0.2rem;
+    font-weight: 500;
+    line-height: 1.5;
   }
 }

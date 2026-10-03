@@ -4,9 +4,15 @@
     gap: clamp(1rem, 2vw, 1.5rem);
   }
 
-  @media (min-width: 760px) {
+  @media (min-width: 640px) {
     .medals {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .medals {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
@@ -66,6 +72,33 @@
     margin-top: 1rem;
     font-size: 1.1rem;
     font-weight: 700;
+  }
+
+  .medal-link {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--sea-ink) 55%, transparent);
+    text-underline-offset: 0.22em;
+  }
+
+  .medal-link:hover {
+    text-decoration-color: var(--sea-ink);
+  }
+
+  .conch-body {
+    fill: #f6c9a4;
+  }
+
+  .conch-spiral {
+    stroke: #d98e63;
+    stroke-width: 3.5;
+  }
+
+  .conch-lip {
+    fill: #f29b8a;
+  }
+
+  [data-theme='dark'] .conch-body {
+    fill: #d2a985;
   }
 
   .medal-detail {

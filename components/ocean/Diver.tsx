@@ -8,14 +8,13 @@ const INTERESTING = [
   '.zone .about-story',
   '.zone .about-card',
   '.zone .pool',
-  '.zone .gauges',
   '.zone .bottle-card',
   '.zone .trail-card',
   '.zone .medal',
   '.zone .deep-scene',
   '.zone .contact-form',
 ].join(',')
-const POINT_AT = '.bottle-card, .pool, .gauges'
+const POINT_AT = '.bottle-card, .pool'
 
 /** The line (share of the viewport height) the diver tries to keep its subject on */
 const FOCUS = 0.45

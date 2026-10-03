@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 import { SectionHeading } from '@/components/SectionHeading'
 import { GithubIcon } from '@/components/SocialIcons'
 import { UncorkLetter } from '@/components/UncorkLetter'
-import { projects, sections } from '@/lib/content'
+import { projects, sections } from '@/data/profile'
 
 function Bottle() {
   return (
@@ -42,10 +42,11 @@ export function Projects() {
           {projects.map((project, index) => (
             <li
               key={project.id}
+              id={`project-${project.id}`}
               data-reveal
               style={{ '--reveal-delay': `${(index % 2) * 110}ms` } as CSSProperties}
             >
-              <article className="card bottle-card" data-glass={project.glass} aria-labelledby={`project-${project.id}`}>
+              <article className="card bottle-card" data-glass={project.glass} aria-labelledby={`project-${project.id}-title`}>
                 <div className="bottle-art" aria-hidden="true">
                   <div className="bottle-light" />
                   <span className="bottle-bubble" />
@@ -59,22 +60,23 @@ export function Projects() {
                     {project.category}
                     {project.flagship && <span className="bottle-flag">Flagship</span>}
                   </p>
-                  <h3 id={`project-${project.id}`} className="bottle-title">
+                  <h3 id={`project-${project.id}-title`} className="bottle-title">
                     {project.title}
                   </h3>
                   <p className="bottle-tagline">{project.tagline}</p>
-                  <p className="bottle-desc">{project.description}</p>
+                  {project.event && <p className="bottle-event">{project.event}</p>}
+                  <p className="bottle-desc">{project.summary}</p>
                   <ul className="tags" aria-label="Tech stack">
-                    {project.tags.map((tag) => (
+                    {project.stack.map((tag) => (
                       <li key={tag}>{tag}</li>
                     ))}
                   </ul>
 
                   <div className="bottle-actions">
                     <UncorkLetter project={project} />
-                    {project.github && (
+                    {project.repo && (
                       <a
-                        href={project.github}
+                        href={project.repo}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-ghost btn-sm"

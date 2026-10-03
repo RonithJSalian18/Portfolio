@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { ExternalLink, X } from 'lucide-react'
 import { GithubIcon } from '@/components/SocialIcons'
-import type { Project } from '@/lib/content'
+import type { Project } from '@/data/profile'
 
 /** "Uncork" button plus the letter it unrolls: a native modal <dialog> with the project's full story. */
 export function UncorkLetter({ project }: { project: Project }) {
@@ -53,29 +53,30 @@ export function UncorkLetter({ project }: { project: Project }) {
               {project.category}
               {project.flagship && ' · Flagship'}
             </p>
+            {project.event && <p className="letter-event">{project.event}</p>}
             <h3 id={titleId} className="letter-title">
               {project.title}
             </h3>
             <p className="letter-tagline">{project.tagline}</p>
-            <p className="letter-text">{project.fullDescription}</p>
+            <p className="letter-text">{project.summary}</p>
 
             <h4 className="letter-heading">Highlights</h4>
             <ul className="letter-list">
-              {project.features.map((feature) => (
-                <li key={feature}>{feature}</li>
+              {project.points.map((point) => (
+                <li key={point}>{point}</li>
               ))}
             </ul>
 
             <h4 className="letter-heading">Tech stack</h4>
             <ul className="tags">
-              {project.tags.map((tag) => (
+              {project.stack.map((tag) => (
                 <li key={tag}>{tag}</li>
               ))}
             </ul>
 
             <div className="letter-links">
-              {project.github && (
-                <a href={project.github} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
+              {project.repo && (
+                <a href={project.repo} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
                   <GithubIcon className="h-4 w-4" /> View code on GitHub
                 </a>
               )}

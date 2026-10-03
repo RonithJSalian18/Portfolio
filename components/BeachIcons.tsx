@@ -63,3 +63,18 @@ export function Pebbles({ className }: IconProps) {
     </svg>
   )
 }
+
+export function Conch({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <path className="conch-body" d="M22 74C14 58 18 36 36 24 54 12 78 18 86 36 92 50 84 64 70 66 82 76 78 90 62 90 48 90 32 86 22 74Z" />
+      <path
+        className="conch-spiral"
+        d="M70 66C60 66 52 58 54 48S68 36 74 44 72 58 64 56 58 48 64 46"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path className="conch-lip" d="M22 74C30 70 38 72 44 80 36 86 28 82 22 74Z" />
+    </svg>
+  )
+}

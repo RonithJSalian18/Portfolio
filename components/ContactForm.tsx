@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
-import { profile } from '@/lib/content'
+import { profile } from '@/data/profile'
 
 /**
  * There's no backend, so "sending" hands the message to the visitor's mail app, pre-filled,

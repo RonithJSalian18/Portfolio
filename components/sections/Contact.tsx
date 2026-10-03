@@ -1,17 +1,21 @@
-import { Mail, Phone } from 'lucide-react'
+import { Code2, Download, Mail } from 'lucide-react'
 import { ContactForm } from '@/components/ContactForm'
 import { SectionHeading } from '@/components/SectionHeading'
 import { GithubIcon, LinkedinIcon } from '@/components/SocialIcons'
-import { profile, sections, socials } from '@/lib/content'
+import { RESUME_PATH } from '@/config/site'
+import { sections, socials, type SocialKey } from '@/data/profile'
 
-const social = (key: string) => socials.find((s) => s.key === key)!
-
-const channels = [
-  { Icon: Mail, label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
-  { Icon: Phone, label: 'Phone', value: profile.phone.display, href: profile.phone.href },
-  { Icon: LinkedinIcon, label: 'LinkedIn', value: social('linkedin').handle, href: social('linkedin').href },
-  { Icon: GithubIcon, label: 'GitHub', value: social('github').handle, href: social('github').href },
-]
+const channelIcons: Record<SocialKey, React.ComponentType<{ className?: string }>> = {
+  email: Mail,
+  linkedin: LinkedinIcon,
+  github: GithubIcon,
+  leetcode: Code2,
+}
+const channelOrder: SocialKey[] = ['email', 'linkedin', 'github', 'leetcode']
+const channels = channelOrder.map((key) => {
+  const social = socials.find((s) => s.key === key)!
+  return { Icon: channelIcons[key], label: social.label, value: social.handle, href: social.href }
+})
 
 /** The bottom of the sea: a sunken wreck and a half-open treasure chest, lit by a few glowing specks */
 function DeepScene() {
@@ -72,6 +76,10 @@ export function Contact() {
                 )
               })}
             </ul>
+            <a href={RESUME_PATH} className="btn btn-primary contact-resume" download>
+              <Download className="h-4 w-4" aria-hidden="true" />
+              Download Resume
+            </a>
           </div>
 
           <div data-reveal style={{ '--reveal-delay': '120ms' } as React.CSSProperties}>

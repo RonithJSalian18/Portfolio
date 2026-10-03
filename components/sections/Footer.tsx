@@ -1,5 +1,6 @@
 import { BackToTop } from '@/components/BackToTop'
-import { footer, navLinks, profile, socials } from '@/lib/content'
+import { RESUME_PATH } from '@/config/site'
+import { footer, navLinks, profile, socials } from '@/data/profile'
 
 /** The seafloor at the bottom of the dive */
 export function Footer() {
@@ -40,6 +41,11 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a href={RESUME_PATH} download>
+                  Résumé (PDF)
+                </a>
+              </li>
             </ul>
           </div>
         </div>

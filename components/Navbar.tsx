@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import { navLinks, profile } from '@/lib/content'
+import { navLinks, profile } from '@/data/profile'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export function Navbar() {

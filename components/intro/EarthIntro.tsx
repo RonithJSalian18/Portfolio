@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Vector3 } from 'three'
-import { profile } from '@/lib/content'
+import { BEACH } from '@/config/site'
 import { createEarthScene, type CameraPose, type EarthScene } from './earthScene'
 
 const IDLE_MS = 1600
@@ -148,7 +148,7 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
     skip.addEventListener('click', onSkip)
     skip.focus({ preventScroll: true })
 
-    createEarthScene(stage, { lite, target: profile.beach })
+    createEarthScene(stage, { lite, target: BEACH })
       .then((created) => {
         if (cancelled) return created.dispose()
         scene = created
