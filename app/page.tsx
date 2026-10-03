@@ -2,6 +2,7 @@ import { CrabProgress } from '@/components/CrabProgress'
 import { Navbar } from '@/components/Navbar'
 import { IntroGate } from '@/components/intro/IntroGate'
 import { DiveTransition } from '@/components/ocean/DiveTransition'
+import { DiverGate } from '@/components/ocean/DiverGate'
 import { OceanZone } from '@/components/ocean/OceanZone'
 import { RevealObserver } from '@/components/RevealObserver'
 import { About } from '@/components/sections/About'
@@ -45,6 +46,7 @@ export default function Home() {
           </OceanZone>
         </main>
         <Footer />
+        <DiverGate />
         <CrabProgress />
       </div>
       <RevealObserver />
