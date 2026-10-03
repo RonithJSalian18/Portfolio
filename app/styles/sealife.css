@@ -1,0 +1,799 @@
+/*
+ * Sea life behind each ocean zone (components/ocean). Animals swim in "lanes": the text-free bands
+ * between sections, measured by ZoneLife and exposed as --lane-N. Everything is paused while its zone
+ * is off-screen, thinned out in lite mode, and static with reduced motion.
+ */
+
+@layer components {
+  .zone-life {
+    --lane-0: -9999px;
+    --lane-1: -9999px;
+    --lane-2: -9999px;
+    --ledge-h: clamp(46px, 6vw, 82px);
+    --critter-dim: 1;
+    --rock-deep: #23354d;
+    --ledge: #4f7f88;
+    --ledge-dark: #3d6770;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    overflow: clip;
+    pointer-events: none;
+  }
+
+  [data-theme='dark'] .zone-life {
+    --critter-dim: 0.74;
+    --rock-deep: #101b2b;
+    --ledge: #1d3442;
+    --ledge-dark: #152733;
+  }
+
+  .zone-life[data-zone='reef'] {
+    --snow: 0.24;
+    --plankton: 0.45;
+  }
+
+  .zone-life[data-zone='open'] {
+    --snow: 0.3;
+    --plankton: 0.6;
+  }
+
+  .zone-life[data-zone='twilight'] {
+    --snow: 0.36;
+    --plankton: 0.85;
+  }
+
+  .zone-life[data-zone='deep'] {
+    --snow: 0.42;
+    --plankton: 1;
+  }
+
+  /* Paused off-screen, and the viewport-sized ambient layer isn't even rendered */
+  .zone-life:not([data-active]) *,
+  .zone-life:not([data-active]) *::before,
+  .zone-life:not([data-active]) *::after {
+    animation-play-state: paused !important;
+  }
+
+  .zone-life:not([data-active]) .life-sticky {
+    display: none;
+  }
+
+  .zone-life.is-lite [data-extra] {
+    display: none;
+  }
+
+  /* ---------- Ambient: drifting specks, night plankton, caustics ---------- */
+
+  .life-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .snow,
+  .plankton {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -320px;
+    height: calc(100% + 320px);
+    background-size: 320px 320px;
+    animation: specks-fall 46s linear infinite;
+  }
+
+  .snow {
+    opacity: var(--snow);
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 18%, #fff 50%, transparent 60%),
+      radial-gradient(1px 1px at 38% 44%, #fff 50%, transparent 60%),
+      radial-gradient(1.6px 1.6px at 66% 12%, #fff 50%, transparent 60%),
+      radial-gradient(1px 1px at 84% 58%, #fff 50%, transparent 60%),
+      radial-gradient(1.2px 1.2px at 22% 76%, #fff 50%, transparent 60%),
+      radial-gradient(1px 1px at 54% 88%, #fff 50%, transparent 60%);
+  }
+
+  .snow-far {
+    top: -220px;
+    height: calc(100% + 220px);
+    background-size: 220px 220px;
+    opacity: calc(var(--snow) * 0.55);
+    animation: specks-fall-far 70s linear infinite;
+  }
+
+  .plankton {
+    opacity: calc(var(--glow) * var(--plankton));
+    transition: opacity 1.2s ease;
+    background-image:
+      radial-gradient(1.8px 1.8px at 16% 26%, #7ef9ea 50%, transparent 65%),
+      radial-gradient(1.4px 1.4px at 44% 62%, #9ffff1 50%, transparent 65%),
+      radial-gradient(2px 2px at 72% 20%, #7ef9ea 50%, transparent 65%),
+      radial-gradient(1.4px 1.4px at 88% 70%, #b7a6ff 50%, transparent 65%),
+      radial-gradient(1.6px 1.6px at 30% 90%, #7ef9ea 50%, transparent 65%);
+    animation-duration: 80s;
+  }
+
+  @keyframes specks-fall {
+    to {
+      transform: translateY(320px);
+    }
+  }
+
+  @keyframes specks-fall-far {
+    to {
+      transform: translateY(220px);
+    }
+  }
+
+  /* Two caustic layers drifting in different directions shimmer against each other */
+  .caustics-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent 0, #000 140px, #000 25%, transparent 92%);
+  }
+
+  .zone-life > .light-rays {
+    mask-image: linear-gradient(to bottom, transparent 0, #000 160px, transparent 100%);
+  }
+
+  .caustics {
+    position: absolute;
+    top: -256px;
+    left: -256px;
+    width: calc(100% + 512px);
+    height: calc(100% + 512px);
+    background: url('/ocean/caustics.webp') 0 0 / 256px 256px;
+    mix-blend-mode: overlay;
+    opacity: var(--caustics-strength);
+    transition: opacity 1.2s ease;
+    animation: caustics-a 36s linear infinite;
+  }
+
+  .caustics-b {
+    top: -384px;
+    left: -384px;
+    width: calc(100% + 768px);
+    height: calc(100% + 768px);
+    background-size: 384px 384px;
+    opacity: calc(var(--caustics-strength) * 0.8);
+    animation: caustics-b 52s linear infinite;
+  }
+
+  @keyframes caustics-a {
+    to {
+      transform: translate(256px, 256px);
+    }
+  }
+
+  @keyframes caustics-b {
+    to {
+      transform: translate(384px, -384px);
+    }
+  }
+
+  /* ---------- Critters ---------- */
+
+  .critter {
+    position: absolute;
+    left: 0;
+    top: var(--top);
+    width: var(--w);
+    transform: translateY(-50%);
+    opacity: var(--critter-dim);
+    transition: opacity 1.2s ease;
+  }
+
+  .critter.glows {
+    opacity: 1;
+  }
+
+  .critter svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .critter.left svg {
+    scale: -1 1;
+  }
+
+  .swim-right {
+    translate: var(--rest-x, 30vw) 0;
+    animation: swim-right var(--dur, 40s) linear var(--delay, 0s) infinite;
+  }
+
+  .swim-left {
+    translate: var(--rest-x, 60vw) 0;
+    animation: swim-left var(--dur, 40s) linear var(--delay, 0s) infinite;
+  }
+
+  @keyframes swim-right {
+    from {
+      translate: calc(-1 * var(--w) - 80px) 0;
+    }
+    to {
+      translate: calc(100vw + 80px) 0;
+    }
+  }
+
+  @keyframes swim-left {
+    from {
+      translate: calc(100vw + 80px) 0;
+    }
+    to {
+      translate: calc(-1 * var(--w) - 80px) 0;
+    }
+  }
+
+  /* Crosses the screen as you scroll past (--sp: 0 when it enters at the bottom, 1 when it leaves) */
+  .scroll-right {
+    translate: calc(var(--sp, 0.5) * (100vw + var(--w) + 160px) - var(--w) - 80px) 0;
+    transition:
+      translate 0.35s linear,
+      opacity 1.2s ease;
+  }
+
+  .scroll-left {
+    translate: calc((1 - var(--sp, 0.5)) * (100vw + var(--w) + 160px) - var(--w) - 80px) 0;
+    transition:
+      translate 0.35s linear,
+      opacity 1.2s ease;
+  }
+
+  .bob {
+    animation: bob var(--bob-dur, 4s) ease-in-out var(--bob-delay, 0s) infinite alternate;
+  }
+
+  @keyframes bob {
+    from {
+      translate: 0 calc(var(--bob, 6px) * -1);
+    }
+    to {
+      translate: 0 var(--bob, 6px);
+    }
+  }
+
+  /* Dolphin arcs: nose up while rising, down while sinking */
+  .arc {
+    --tilt: -9deg;
+    animation: arc 3.4s ease-in-out var(--bob-delay, 0s) infinite;
+  }
+
+  .left .arc {
+    --tilt: 9deg;
+  }
+
+  @keyframes arc {
+    0%,
+    100% {
+      translate: 0 0;
+      rotate: var(--tilt);
+    }
+    25% {
+      translate: 0 calc(var(--bob, 14px) * -1);
+      rotate: 0deg;
+    }
+    50% {
+      translate: 0 0;
+      rotate: calc(var(--tilt) * -1);
+    }
+    75% {
+      translate: 0 var(--bob, 14px);
+      rotate: 0deg;
+    }
+  }
+
+  .flee {
+    translate: var(--fx, 0px) var(--fy, 0px);
+    transition: translate 0.8s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  /* Side-margin dwellers (only where there are margins wide enough) */
+  .critter.gutter {
+    display: none;
+    translate: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .gutter-left {
+    left: calc((100% - 72rem) / 4);
+  }
+
+  .gutter-right {
+    left: calc(100% - (100% - 72rem) / 4);
+  }
+
+  @media (min-width: 1400px) {
+    .critter.gutter {
+      display: block;
+    }
+  }
+
+  .drift {
+    animation: drift var(--dur, 18s) ease-in-out var(--delay, 0s) infinite alternate;
+  }
+
+  @keyframes drift {
+    from {
+      translate: 0 -90px;
+    }
+    to {
+      translate: 0 90px;
+    }
+  }
+
+  /* ---------- Body parts ---------- */
+
+  .critter .tail {
+    transform-box: fill-box;
+    transform-origin: 100% 50%;
+    animation: wag 0.55s ease-in-out infinite alternate;
+  }
+
+  .critter .fin {
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: wag 0.9s ease-in-out infinite alternate;
+  }
+
+  @keyframes wag {
+    from {
+      transform: rotate(-12deg);
+    }
+    to {
+      transform: rotate(12deg);
+    }
+  }
+
+  .flipper {
+    transform-box: fill-box;
+    animation: paddle 2.8s ease-in-out infinite alternate;
+  }
+
+  .flipper-front {
+    transform-origin: 0% 90%;
+  }
+
+  .flipper-front.flipper-alt {
+    transform-origin: 0% 10%;
+    animation-name: paddle-alt;
+  }
+
+  .flipper-back {
+    transform-origin: 100% 90%;
+  }
+
+  .flipper-back.flipper-alt {
+    transform-origin: 100% 10%;
+    animation-name: paddle-alt;
+  }
+
+  @keyframes paddle {
+    from {
+      transform: rotate(-16deg);
+    }
+    to {
+      transform: rotate(8deg);
+    }
+  }
+
+  @keyframes paddle-alt {
+    from {
+      transform: rotate(16deg);
+    }
+    to {
+      transform: rotate(-8deg);
+    }
+  }
+
+  .wings {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: flap 3.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes flap {
+    from {
+      transform: scaleY(1);
+    }
+    to {
+      transform: scaleY(0.7);
+    }
+  }
+
+  /* School: fish in loose formation, each bobbing and scattering on its own */
+  .school {
+    aspect-ratio: 3.4 / 1;
+  }
+
+  .school-fish {
+    position: absolute;
+    width: calc(clamp(18px, 1.8vw, 26px) * var(--fs, 1));
+  }
+
+  .school .bob {
+    --bob: 4px;
+    --bob-dur: 2.6s;
+  }
+
+  /* Jellyfish: translucent by day, glowing at night */
+  .jelly {
+    --jelly-bell: rgba(255, 196, 222, 0.5);
+    --jelly-edge: rgba(255, 255, 255, 0.8);
+    --jelly-core: rgba(255, 150, 196, 0.45);
+    --jelly-line: rgba(255, 214, 232, 0.7);
+    --jelly-glow: rgba(255, 170, 214, 0.75);
+  }
+
+  .jelly.violet {
+    --jelly-bell: rgba(200, 176, 255, 0.5);
+    --jelly-core: rgba(170, 140, 255, 0.45);
+    --jelly-line: rgba(220, 205, 255, 0.7);
+    --jelly-glow: rgba(180, 150, 255, 0.75);
+  }
+
+  [data-theme='dark'] .jelly {
+    --jelly-bell: rgba(110, 240, 255, 0.26);
+    --jelly-edge: #a6fdff;
+    --jelly-core: rgba(140, 255, 245, 0.55);
+    --jelly-line: rgba(150, 245, 255, 0.8);
+    --jelly-glow: #4fe8ff;
+  }
+
+  [data-theme='dark'] .jelly.violet {
+    --jelly-bell: rgba(190, 150, 255, 0.28);
+    --jelly-edge: #e2d4ff;
+    --jelly-core: rgba(205, 170, 255, 0.55);
+    --jelly-line: rgba(215, 195, 255, 0.8);
+    --jelly-glow: #a77bff;
+  }
+
+  .jelly svg {
+    filter: drop-shadow(0 0 calc(2px + 9px * var(--glow)) var(--jelly-glow));
+  }
+
+  .jelly .bell {
+    fill: var(--jelly-bell);
+    stroke: var(--jelly-edge);
+    stroke-width: 1.2;
+  }
+
+  .jelly .bell-core {
+    fill: var(--jelly-core);
+  }
+
+  .jelly .bell-shine {
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 2;
+  }
+
+  .jelly .tentacle {
+    stroke: var(--jelly-line);
+    stroke-width: 1.2;
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: tentacle 3.2s ease-in-out infinite alternate;
+  }
+
+  .jelly .tentacle-alt {
+    animation-delay: -1.6s;
+  }
+
+  .jelly .arm {
+    stroke: var(--jelly-line);
+    stroke-width: 3;
+    opacity: 0.75;
+  }
+
+  .jelly .bell-group {
+    transform-box: fill-box;
+    transform-origin: 50% 20%;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    40% {
+      transform: scale(1.1, 0.86);
+    }
+  }
+
+  @keyframes tentacle {
+    from {
+      transform: skewX(6deg);
+    }
+    to {
+      transform: skewX(-6deg);
+    }
+  }
+
+  /* Octopus on its rock at the bottom of the twilight zone; its eyes follow the mouse */
+  .octopus-spot {
+    position: absolute;
+    left: 14%;
+    bottom: 0;
+    width: clamp(120px, 14vw, 200px);
+    opacity: var(--critter-dim);
+    mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+  }
+
+  .octopus-spot svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .seabed-rock {
+    fill: var(--rock-deep);
+  }
+
+  .arm-curl {
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: curl 4.6s ease-in-out infinite alternate;
+  }
+
+  .arm-curl-alt {
+    animation-delay: -2.3s;
+  }
+
+  @keyframes curl {
+    from {
+      transform: rotate(-4deg);
+    }
+    to {
+      transform: rotate(4deg);
+    }
+  }
+
+  .look {
+    translate: var(--lx, 0px) var(--ly, 0px);
+    transition: translate 0.3s ease-out;
+  }
+
+  /* Deep sea glowers */
+  .angler .angler-body {
+    fill: #2a2135;
+    stroke: rgba(170, 150, 220, 0.45);
+    stroke-width: 1.2;
+  }
+
+  .lure-rig {
+    transform-box: view-box;
+    transform-origin: 64px 18px;
+    animation: lure-sway 4.2s ease-in-out infinite alternate;
+  }
+
+  .lure {
+    fill: #f6ffc2;
+    filter: drop-shadow(0 0 calc(6px + 8px * var(--glow)) rgba(220, 255, 140, 0.95));
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: lure-pulse 2.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes lure-sway {
+    from {
+      transform: rotate(-5deg);
+    }
+    to {
+      transform: rotate(4deg);
+    }
+  }
+
+  @keyframes lure-pulse {
+    from {
+      opacity: 0.7;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  .lantern .photophores {
+    fill: #8ff8ff;
+    filter: drop-shadow(0 0 calc(1.5px + 2.5px * var(--glow)) #5ff1ff);
+  }
+
+  .comb .comb-body {
+    fill: rgba(190, 225, 255, 0.1);
+    stroke: rgba(190, 225, 255, 0.5);
+    stroke-width: 1;
+  }
+
+  .comb .comb-rows {
+    stroke: #7ff7ff;
+    animation: comb-shimmer 1.4s linear infinite;
+  }
+
+  .comb svg {
+    filter: drop-shadow(0 0 calc(1px + 4px * var(--glow)) #7ff7ff);
+  }
+
+  @keyframes comb-shimmer {
+    to {
+      stroke-dashoffset: -7;
+    }
+  }
+
+  /* ---------- Reef floor ---------- */
+
+  .reef-ledge {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: min(80%, 1150px);
+    height: var(--ledge-h);
+    fill: var(--ledge);
+    opacity: var(--critter-dim);
+    mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
+  }
+
+  .reef-ledge .ledge-shade {
+    fill: var(--ledge-dark);
+  }
+
+  .floor-piece {
+    position: absolute;
+    left: var(--x);
+    bottom: calc(var(--ledge-h) * var(--sink, 0.62));
+    width: var(--w);
+    opacity: var(--critter-dim);
+  }
+
+  .floor-piece svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .kelp-piece svg {
+    height: clamp(130px, 20vw, 270px);
+  }
+
+  .kelp-short svg {
+    height: clamp(90px, 12vw, 170px);
+  }
+
+  .sway-tall {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: kelp 6.5s ease-in-out infinite alternate;
+  }
+
+  .kelp-short .sway-tall {
+    animation-delay: -3s;
+  }
+
+  @keyframes kelp {
+    from {
+      transform: skewX(4deg);
+    }
+    to {
+      transform: skewX(-5deg);
+    }
+  }
+
+  .sway {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: sway 3.4s ease-in-out infinite alternate;
+  }
+
+  .sway-alt {
+    animation-delay: -1.7s;
+  }
+
+  @keyframes sway {
+    from {
+      transform: skewX(6deg);
+    }
+    to {
+      transform: skewX(-6deg);
+    }
+  }
+
+  .fan-piece svg {
+    transform-origin: 50% 100%;
+    animation: fan 7s ease-in-out infinite alternate;
+  }
+
+  @keyframes fan {
+    from {
+      rotate: -3deg;
+    }
+    to {
+      rotate: 3deg;
+    }
+  }
+
+  .star-piece svg {
+    rotate: -18deg;
+  }
+
+  /* Clownfish darting in and out of their anemone */
+  .nemo {
+    position: absolute;
+    left: 34%;
+    top: 4%;
+    width: 36%;
+    animation: nemo 7s ease-in-out infinite;
+  }
+
+  .nemo-2 {
+    left: 46%;
+    top: 22%;
+    width: 28%;
+    animation-delay: -3.2s;
+    animation-duration: 8.4s;
+  }
+
+  .nemo svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @keyframes nemo {
+    0%,
+    100% {
+      translate: -30% 0;
+      scale: 1 1;
+    }
+    45% {
+      translate: 30% -18%;
+      scale: 1 1;
+    }
+    50% {
+      translate: 30% -18%;
+      scale: -1 1;
+    }
+    95% {
+      translate: -30% 0;
+      scale: -1 1;
+    }
+  }
+
+  .bubble-short {
+    position: absolute;
+    left: var(--x);
+    bottom: var(--b);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.7);
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.8) 0 18%, transparent 45%);
+    animation: bubble-short var(--d, 4.5s) ease-in var(--delay, 0s) infinite;
+  }
+
+  @keyframes bubble-short {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.85;
+    }
+    100% {
+      transform: translate(6px, -130px);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-right,
+    .scroll-left {
+      transition: none;
+    }
+  }
+}

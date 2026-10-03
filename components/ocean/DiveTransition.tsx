@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { DiveProgress } from './DiveProgress'
+import { LightRays } from './LightRays'
 
 // Deterministic bubble layout (left %, size px, duration s, delay s)
 const BUBBLES: [number, number, number, number][] = [
@@ -16,14 +17,6 @@ const BUBBLES: [number, number, number, number][] = [
   [82, 8, 5.6, 1.9],
   [89, 13, 7.2, 0.3],
   [94, 6, 4.8, 2.1],
-]
-
-const RAYS: [number, number, number, number][] = [
-  [8, 7, 14, 9],
-  [24, 11, 9, 11],
-  [43, 6, 16, 8],
-  [61, 10, 8, 12],
-  [80, 8, 13, 10],
 ]
 
 /** Scrolling past the beach pulls the view under the water surface, into the shallow reef. */
@@ -50,19 +43,6 @@ export function DiveTransition() {
         <div className="dive-surface" />
       </div>
       <DiveProgress />
-    </div>
-  )
-}
-
-export function LightRays() {
-  return (
-    <div className="light-rays" aria-hidden="true">
-      {RAYS.map(([x, width, angle, time]) => (
-        <span
-          key={x}
-          style={{ '--x': `${x}%`, '--w': `${width}%`, '--r': `${angle}deg`, '--t': `${time}s` } as CSSProperties}
-        />
-      ))}
     </div>
   )
 }

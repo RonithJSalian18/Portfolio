@@ -97,6 +97,19 @@
   }
 
   /* The reef drops off into open water in its last stretch, below the last card */
+  /* Extra water below the last section of a zone, for the scenery that lives there */
+  .zone-reef {
+    padding-bottom: clamp(140px, 15vw, 220px);
+  }
+
+  .zone-twilight {
+    padding-bottom: clamp(120px, 12vw, 170px);
+  }
+
+  .zone-deep {
+    padding-bottom: clamp(56px, 6vw, 90px);
+  }
+
   .zone-reef {
     background: linear-gradient(to bottom, var(--water-0) 0%, var(--water-1) calc(100% - 240px), var(--water-2) 100%);
   }
@@ -214,7 +227,7 @@
   .dive-below {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, var(--water-0) 0%, var(--water-0) 40%, color-mix(in srgb, var(--water-0) 70%, var(--water-1)) 100%);
+    background: var(--water-0);
     mask: var(--wave-shape) 0 var(--waterline) / 420px auto repeat-x;
   }
 

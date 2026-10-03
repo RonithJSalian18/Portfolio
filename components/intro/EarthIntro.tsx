@@ -46,7 +46,7 @@ export default function EarthIntro({ onReady, onDone }: EarthIntroProps) {
     const skip = skipRef.current
     if (!root || !stage || !fog || !skip) return
 
-    const lite = document.documentElement.dataset.introLite === '1'
+    const lite = document.documentElement.dataset.lite === '1'
     const night = document.documentElement.dataset.theme === 'dark'
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
