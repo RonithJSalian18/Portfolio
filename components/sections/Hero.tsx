@@ -1,4 +1,5 @@
 import { Code2, Mail } from 'lucide-react'
+import { BeachFinds, Lighthouse, Sailboat, SkyLife, Surfer } from '@/components/beach/BeachLife'
 import { HeroParallax } from '@/components/HeroParallax'
 import { GithubIcon, LinkedinIcon } from '@/components/SocialIcons'
 import { profile, socials, type SocialKey } from '@/lib/content'
@@ -21,6 +22,7 @@ export function Hero() {
           <span className="cloud cloud-3" />
         </div>
         <div className="hero-dusk" />
+        <SkyLife />
         <div className="celestial">
           <div className="sun" />
           <div className="moon" />
@@ -70,14 +72,18 @@ export function Hero() {
       <div className="hero-scene" aria-hidden="true">
         <div className="reflection reflection-sun" />
         <div className="reflection reflection-moon" />
+        <Sailboat />
+        <Lighthouse />
         <div className="layer layer-far">
           <div className="wave wave-far" />
         </div>
         <div className="layer layer-mid">
           <div className="wave wave-mid" />
+          <Surfer className="surfer-far" />
         </div>
         <div className="layer layer-near">
           <div className="wave wave-near" />
+          <Surfer />
           <div className="wave-glow">
             <div className="wave wave-edge" />
           </div>
@@ -89,6 +95,7 @@ export function Hero() {
         <div className="layer layer-sand">
           <div className="wave wave-sand" />
         </div>
+        <BeachFinds />
       </div>
 
       <HeroParallax />
