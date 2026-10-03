@@ -1,4 +1,5 @@
 import { Jellyfish, Octopus } from '../creatures'
+import { MiniDiver } from '../MiniDiver'
 import { Ambient, Critter } from './Critter'
 
 /** Twilight zone (Experience, Achievements): drifting jellyfish and an octopus watching from its rock */
@@ -6,6 +7,11 @@ export default function TwilightLife() {
   return (
     <>
       <Ambient />
+
+      {/* The diver, on screens without room for it in the side margin */}
+      <Critter lane={0} dy="0px" w="clamp(58px, 14vw, 86px)" mode="scroll-right" bob={4} bobDur={3.4} className="mini-diver">
+        <MiniDiver />
+      </Critter>
 
       <Critter lane={1} dy="clamp(-34px, -2.6vw, -16px)" w="clamp(26px, 3vw, 46px)" mode="swim-right" dur={110} delay={30} restX="18vw" bob={8} bobDur={4.4} glows className="jelly">
         <Jellyfish />

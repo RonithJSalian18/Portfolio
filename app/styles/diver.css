@@ -1,14 +1,37 @@
-/* The scuba diver in the left margin (components/ocean/Diver.tsx). Position, pitch and kick speed come from JS. */
+/*
+ * The diver (components/ocean/Diver.tsx) in the left margin on wide screens, and the mini diver
+ * (components/ocean/MiniDiver.tsx) that swims between sections on narrower ones. JS moves the joints;
+ * colors come from the theme.
+ */
 
 @layer components {
+  .diver,
+  .mini-diver {
+    --suit: #1d2b3d;
+    --suit-far: #152131;
+    --suit-rim: rgba(160, 205, 255, 0.32);
+    --kit-dark: #0f1c29;
+    --tank: #f2c14e;
+    --tank-shade: #c99a2a;
+    --glass: rgba(170, 228, 255, 0.9);
+    --skin: #d39a74;
+  }
+
+  [data-theme='dark'] :is(.diver, .mini-diver) {
+    --suit: #27384d;
+    --suit-far: #1c2a3b;
+    --suit-rim: rgba(160, 205, 255, 0.5);
+  }
+
+  /* ---------- The full diver ---------- */
+
   .diver {
-    --diver-w: clamp(52px, calc((100vw - 72rem) / 2 - 20px), 104px);
-    --suit: #22303f;
-    --suit-rim: rgba(160, 205, 255, 0.35);
+    /* Sized to the margin beside the 72rem column, so even a pointing hand stays clear of the content */
+    --margin: calc((100% - 72rem) / 2);
+    --diver-w: clamp(56px, calc(var(--margin) - 16px), 150px);
     position: fixed;
     top: 0;
-    /* Centre of the left margin: beside the 72rem column, or within the section padding when narrower */
-    left: max(calc((100% - 72rem) / 4), clamp(0.5rem, 2vw, 1.25rem));
+    left: max(4px, calc(var(--margin) / 2 - var(--diver-w) / 2));
     z-index: 30;
     width: var(--diver-w);
     pointer-events: none;
@@ -16,228 +39,341 @@
     transition: opacity 0.6s ease;
   }
 
-  [data-theme='dark'] .diver {
-    --suit: #2b3c50;
-    --suit-rim: rgba(160, 205, 255, 0.55);
-  }
-
   .diver[data-visible='true'] {
     opacity: 1;
   }
 
-  .diver-body {
+  .diver-figure {
     position: absolute;
-    left: 0;
     top: 0;
-    width: var(--diver-w);
+    left: 0;
+    width: 100%;
     will-change: transform;
   }
 
-  .diver-hover {
-    animation: diver-hover 3.6s ease-in-out infinite alternate;
-  }
-
-  @keyframes diver-hover {
-    from {
-      translate: 0 -4px;
-    }
-    to {
-      translate: 0 4px;
-    }
-  }
-
-  .diver-body svg {
+  .diver-figure svg {
     display: block;
     width: 100%;
     height: auto;
     overflow: visible;
   }
 
-  .diver-suit path,
-  .diver-suit-fill {
+  .d-suit {
     fill: var(--suit);
     stroke: var(--suit-rim);
-    stroke-width: 1;
+    stroke-width: 0.8;
   }
 
-  .diver-stripe {
+  .d-suit.d-far {
+    fill: var(--suit-far);
+  }
+
+  .d-accent,
+  .d-stripe {
+    fill: var(--coral);
+  }
+
+  .d-accent.d-far {
+    fill: color-mix(in srgb, var(--coral) 70%, #000);
+  }
+
+  .d-stripe {
     fill: none;
     stroke: var(--coral);
     stroke-width: 3;
     stroke-linecap: round;
   }
 
-  .diver-tank {
-    fill: #f2c14e;
-    stroke: #b8901f;
-    stroke-width: 1;
+  .d-panel {
+    fill: rgba(255, 255, 255, 0.07);
   }
 
-  .diver-tank-band {
-    fill: #b8901f;
-  }
-
-  .diver-valve {
-    fill: #9aa7b4;
-  }
-
-  .diver-hose {
+  .d-harness,
+  .d-strap {
     fill: none;
-    stroke: #2f3d4c;
-    stroke-width: 1.8;
+    stroke: var(--kit-dark);
+    stroke-width: 3;
     stroke-linecap: round;
   }
 
-  .diver-mask {
-    fill: rgba(160, 220, 255, 0.85);
-    stroke: #10202e;
-    stroke-width: 1.4;
+  .d-watch .d-strap,
+  .d-compass .d-strap {
+    fill: var(--kit-dark);
+    stroke: none;
   }
 
-  .diver-glint {
-    stroke: #fff;
-    stroke-width: 1.4;
-    stroke-linecap: round;
-    opacity: 0.8;
-  }
-
-  .diver-reg {
-    fill: #2f3d4c;
-  }
-
-  .diver-lamp {
-    fill: #dfe7ee;
-  }
-
-  /* Headlamp: off by day, glowing at night */
-  .diver-lamp-light {
-    fill: #fff6c4;
-    opacity: calc(0.25 + 0.75 * var(--glow));
-    filter: drop-shadow(0 0 calc(5px * var(--glow)) #ffe9a0);
-  }
-
-  .diver-fin path {
+  .d-fin {
     fill: var(--coral);
   }
 
-  .diver-fin {
-    transform-box: fill-box;
-    animation: kick var(--kick, 1.2s) ease-in-out infinite alternate;
+  .d-fin.d-far {
+    fill: color-mix(in srgb, var(--coral) 72%, #000);
   }
 
-  .diver-fin-top {
-    transform-origin: 100% 85%;
-  }
-
-  .diver-fin-bottom {
-    transform-origin: 100% 15%;
-    animation-direction: alternate-reverse;
-  }
-
-  @keyframes kick {
-    from {
-      transform: rotate(-12deg);
-    }
-    to {
-      transform: rotate(12deg);
-    }
-  }
-
-  /* Arm hangs relaxed; swings forward to point at project cards and skills */
-  .diver-arm {
-    transform-box: view-box;
-    transform-origin: 110px 36px;
-    rotate: 64deg;
-    transition: rotate 0.6s cubic-bezier(0.3, 1.3, 0.5, 1);
-  }
-
-  .diver[data-pose='point'] .diver-arm {
-    rotate: -6deg;
-  }
-
-  .diver-arm-limb {
+  .d-fin-rib {
     fill: none;
-    stroke: var(--suit);
-    stroke-width: 6.5;
+    stroke: rgba(0, 0, 0, 0.22);
+    stroke-width: 1.2;
     stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
-  .diver-glove {
-    fill: #1a232e;
+  .d-tank-body {
+    fill: var(--tank);
+    stroke: var(--tank-shade);
+    stroke-width: 0.8;
   }
 
-  .diver-finger {
-    stroke: #1a232e;
-    stroke-width: 2.4;
+  .d-tank-shine {
+    fill: rgba(255, 255, 255, 0.5);
+  }
+
+  .d-tank-band {
+    fill: var(--tank-shade);
+  }
+
+  .d-valve {
+    fill: #9aa7b4;
+  }
+
+  .d-hose {
+    fill: none;
+    stroke: #233140;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  .d-skin {
+    fill: var(--skin);
+  }
+
+  .d-mask-frame {
+    fill: var(--kit-dark);
+  }
+
+  .d-mask-glass {
+    fill: var(--glass);
+  }
+
+  .d-eye {
+    fill: #fff;
+  }
+
+  .d-pupil {
+    fill: #1b2430;
+  }
+
+  .d-glint {
+    stroke: #fff;
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+
+  .d-lamp-body {
+    fill: #d8e1ea;
+  }
+
+  .d-lamp-lens {
+    fill: #8a95a1;
+  }
+
+  .diver[data-lamp='on'] .d-lamp-lens {
+    fill: #fff6cf;
+    filter: drop-shadow(0 0 3px #ffe7a0);
+  }
+
+  .d-reg {
+    fill: #2c3a49;
+  }
+
+  .d-reg-button {
+    fill: #8fa0b2;
+  }
+
+  .d-watch-face {
+    fill: #9ff7e8;
+    stroke: var(--kit-dark);
+    stroke-width: 0.8;
+  }
+
+  .d-watch-hands {
+    stroke: var(--kit-dark);
+    stroke-width: 0.7;
+    stroke-linecap: round;
+  }
+
+  .d-compass-face {
+    fill: #f4f7fb;
+    stroke: var(--kit-dark);
+    stroke-width: 0.8;
+  }
+
+  .d-compass-needle {
+    fill: var(--coral);
+  }
+
+  .d-glove {
+    fill: #121b26;
+  }
+
+  .d-finger {
+    stroke: #121b26;
+    stroke-width: 3;
     stroke-linecap: round;
     opacity: 0;
-    transition: opacity 0.3s ease 0.3s;
+    transition: opacity 0.25s ease;
   }
 
-  .diver[data-pose='point'] .diver-finger {
+  .diver[data-pose='point'] .d-finger {
     opacity: 1;
   }
 
-  /* Breath bubbles from the regulator */
+  /* Breath bubbles, placed and animated from JS (transform and opacity only) */
   .diver-bubbles {
-    position: absolute;
-    left: calc(var(--diver-w) * 0.33);
-    top: calc(var(--diver-y, -200px) - 6px);
-    width: 0;
-    height: 0;
-  }
-
-  .diver-bubbles span {
-    position: absolute;
-    left: 0;
+    position: fixed;
     top: 0;
-    width: 7px;
-    height: 7px;
+    left: 0;
+  }
+
+  .diver-bubble {
+    position: absolute;
+    top: 0;
+    left: 0;
+    translate: -50% -50%;
+    border: 1.3px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
-    border: 1.4px solid rgba(255, 255, 255, 0.75);
-    animation: diver-bubble 2.8s ease-out infinite;
+    background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.06) 60%);
   }
 
-  .diver-bubbles span:nth-child(2) {
-    left: 4px;
-    width: 5px;
-    height: 5px;
-    animation-delay: 0.25s;
+  /* The headlamp's beam: a soft cone that brightens whatever it falls on (stronger at night) */
+  .diver-beam {
+    --beam-w: min(46vw, 640px);
+    --beam-h: 320px;
+    position: fixed;
+    top: calc(var(--beam-h) / -2);
+    left: 0;
+    width: var(--beam-w);
+    height: var(--beam-h);
+    transform-origin: 0 50%;
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background: radial-gradient(ellipse 100% 60% at 0% 50%, rgba(255, 240, 196, 0.32), rgba(255, 232, 170, 0.1) 55%, transparent 80%);
+    mask-image: conic-gradient(from 72deg at 0% 50%, transparent 0deg, #000 13deg, #000 23deg, transparent 36deg);
   }
 
-  .diver-bubbles span:nth-child(3) {
-    left: -3px;
-    width: 9px;
-    height: 9px;
-    animation-delay: 0.55s;
+  [data-theme='dark'] .diver-beam {
+    background: radial-gradient(ellipse 100% 60% at 0% 50%, rgba(255, 240, 196, 0.62), rgba(255, 232, 170, 0.2) 55%, transparent 80%);
   }
 
-  @keyframes diver-bubble {
+  /* ---------- The mini diver (narrower screens) ---------- */
+
+  .critter.mini-diver {
+    display: none;
+  }
+
+  @media (max-width: 1279.98px) {
+    .critter.mini-diver {
+      display: block;
+    }
+  }
+
+  .mini-suit {
+    fill: var(--suit);
+    stroke: var(--suit-rim);
+    stroke-width: 0.8;
+  }
+
+  .mini-suit.mini-far {
+    fill: var(--suit-far);
+  }
+
+  .mini-tank {
+    fill: var(--tank);
+    stroke: var(--tank-shade);
+    stroke-width: 0.8;
+  }
+
+  .mini-stripe {
+    fill: none;
+    stroke: var(--coral);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+
+  .mini-mask {
+    fill: var(--glass);
+    stroke: var(--kit-dark);
+    stroke-width: 1.4;
+  }
+
+  .mini-eye {
+    fill: #1b2430;
+  }
+
+  .mini-reg {
+    fill: #2c3a49;
+  }
+
+  .mini-arm {
+    fill: none;
+    stroke: var(--suit);
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+
+  .mini-fin path {
+    fill: var(--coral);
+  }
+
+  .mini-fin {
+    transform-box: fill-box;
+    transform-origin: 100% 50%;
+    animation: mini-kick 0.9s ease-in-out infinite alternate;
+  }
+
+  .mini-fin-far {
+    animation-direction: alternate-reverse;
+  }
+
+  @keyframes mini-kick {
+    from {
+      rotate: -14deg;
+    }
+    to {
+      rotate: 12deg;
+    }
+  }
+
+  .mini-lamp {
+    fill: #fff3c4;
+    filter: drop-shadow(0 0 4px #ffe7a0);
+  }
+
+  .mini-bubble {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.85);
+    stroke-width: 1;
+    opacity: 0;
+    transform-box: fill-box;
+    animation: mini-bubble 2.8s ease-out infinite;
+  }
+
+  .mini-bubble-2 {
+    animation-delay: 0.45s;
+  }
+
+  @keyframes mini-bubble {
     0% {
-      transform: translate(0, 0);
+      translate: 0 0;
       opacity: 0;
     }
-    10% {
-      opacity: 0.9;
-    }
-    60% {
-      transform: translate(6px, -90px);
+    12% {
+      opacity: 1;
     }
     100% {
-      transform: translate(-4px, -150px);
+      translate: 5px -36px;
       opacity: 0;
-    }
-  }
-
-  /* Between 1024 and 1279px the margin only has room for the diver's bubble trail */
-  @media (max-width: 1279px) {
-    .diver-body {
-      display: none;
-    }
-
-    .diver-bubbles {
-      left: 0;
     }
   }
 }

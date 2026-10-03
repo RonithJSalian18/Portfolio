@@ -12,6 +12,7 @@ import {
   TubeSponge,
   Turtle,
 } from '../creatures'
+import { MiniDiver } from '../MiniDiver'
 import { Ambient, Bubbles, Critter } from './Critter'
 
 /** A piece of the reef standing on the rock ledge at the bottom of the zone */
@@ -102,6 +103,11 @@ export default function ReefLife() {
     <>
       <Ambient caustics />
       <LightRays />
+
+      {/* The diver, on screens without room for it in the side margin */}
+      <Critter lane={0} dy="0px" w="clamp(58px, 14vw, 86px)" mode="scroll-right" bob={4} bobDur={3.4} className="mini-diver">
+        <MiniDiver />
+      </Critter>
 
       {/* A little group of clownfish in the band above About */}
       <Critter lane={0} dy="-6px" w="clamp(32px, 3.4vw, 50px)" mode="swim-right" dur={44} delay={30} restX="16vw" flee>

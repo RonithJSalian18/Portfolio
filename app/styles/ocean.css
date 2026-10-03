@@ -251,7 +251,7 @@
   .bubble,
   .bubble-short,
   .bottle-bubble,
-  .diver-bubbles span {
+  .diver-bubble {
     box-shadow: 0 0 calc(7px * var(--glow)) rgba(126, 249, 234, calc(0.55 * var(--glow)));
   }
 

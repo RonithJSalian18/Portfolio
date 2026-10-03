@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { Dolphin, Manta, SchoolFish } from '../creatures'
+import { MiniDiver } from '../MiniDiver'
 import { Ambient, Critter } from './Critter'
 
 // A loose school: [x %, y %, size, phase]
@@ -57,6 +58,11 @@ export default function OpenLife() {
   return (
     <>
       <Ambient />
+
+      {/* The diver, on screens without room for it in the side margin */}
+      <Critter lane={1} dy="0px" w="clamp(58px, 14vw, 86px)" mode="scroll-left" bob={4} bobDur={3.4} className="mini-diver">
+        <MiniDiver />
+      </Critter>
       <School lane={0} mode="swim-right" dur={32} delay={20} restX="22vw" />
 
       <Critter lane={1} dy="clamp(-30px, -2vw, -12px)" w="clamp(80px, 9vw, 130px)" mode="swim-left" dur={26} delay={6} restX="58vw" arc bob={16}>

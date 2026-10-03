@@ -1,4 +1,5 @@
 import { Anglerfish, CombJelly, Lanternfish } from '../creatures'
+import { MiniDiver } from '../MiniDiver'
 import { Ambient, Critter } from './Critter'
 
 /** Deep sea (Contact): an anglerfish with its glowing lure, lanternfish and comb jellies */
@@ -6,6 +7,11 @@ export default function DeepLife() {
   return (
     <>
       <Ambient />
+
+      {/* The diver, on screens without room for it in the side margin */}
+      <Critter lane={0} dy="clamp(-34px, -4vw, -20px)" w="clamp(58px, 14vw, 86px)" mode="scroll-right" bob={4} bobDur={3.4} className="mini-diver">
+        <MiniDiver lamp />
+      </Critter>
 
       <Critter lane={0} w="clamp(78px, 9vw, 140px)" mode="swim-left" dur={64} delay={18} restX="62vw" bob={6} bobDur={5.5} glows className="angler">
         <Anglerfish />
