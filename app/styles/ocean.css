@@ -150,7 +150,7 @@
     width: var(--w, 9%);
     height: 120%;
     left: var(--x, 20%);
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background: linear-gradient(to bottom, var(--ray-color), transparent);
     filter: blur(6px);
     transform-origin: top center;
     rotate: var(--r, 12deg);
@@ -255,6 +255,14 @@
     position: absolute;
     inset: 0;
     opacity: clamp(0, calc((var(--dive) - 0.3) * 3), 1);
+  }
+
+  /* At night bubbles stir up glowing plankton */
+  .bubble,
+  .bubble-short,
+  .bottle-bubble,
+  .diver-bubbles span {
+    box-shadow: 0 0 calc(7px * var(--glow)) rgba(126, 249, 234, calc(0.55 * var(--glow)));
   }
 
   .bubble {

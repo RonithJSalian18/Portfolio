@@ -721,6 +721,11 @@
     rotate: -18deg;
   }
 
+  /* Corals fluoresce faintly at night (static pieces only, so the glow is drawn once) */
+  [data-theme='dark'] .floor-piece:not(.kelp-piece, .anemone-piece, .fan-piece) svg {
+    filter: drop-shadow(0 0 5px rgba(255, 150, 190, 0.35));
+  }
+
   /* Clownfish darting in and out of their anemone */
   .nemo {
     position: absolute;

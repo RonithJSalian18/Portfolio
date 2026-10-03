@@ -58,6 +58,7 @@
   --water-4: #0a2350;
   --water-5: #030914;
   --ray-strength: 0.55;
+  --ray-color: rgba(255, 255, 255, 0.75);
   --caustics-strength: 0.32;
   /* Bioluminescence: 0 by day, 1 at night */
   --glow: 0;
@@ -131,7 +132,8 @@
   --water-3: #061e38;
   --water-4: #04132a;
   --water-5: #01050d;
-  --ray-strength: 0.1;
+  --ray-strength: 0.16;
+  --ray-color: rgba(186, 206, 255, 0.7);
   --caustics-strength: 0.06;
   --glow: 1;
 
