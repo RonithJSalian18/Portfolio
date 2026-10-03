@@ -50,7 +50,7 @@ export const sections = {
     eyebrow: 'Open water',
     title: 'Skills &',
     highlight: 'Tools',
-    intro: "Ping a skill to see where I've used it.",
+    intro: 'The languages, frameworks and tools I build with, grouped by what they do.',
   },
   projects: {
     eyebrow: 'Open water',

@@ -47,16 +47,11 @@
     --border: rgba(160, 210, 255, 0.2);
     --border-strong: rgba(160, 210, 255, 0.4);
     --chip: rgba(255, 255, 255, 0.08);
-    --track: rgba(255, 255, 255, 0.16);
     --sea-ink: #8ef0f6;
     --coral-ink: #ffb09c;
     --sun-ink: #ffd88a;
     --shell-ink: #ffbdd0;
     --focus: #8ef0f6;
-    --pebble: #23456c;
-    --pebble-shade: #183556;
-    --pebble-hi: color-mix(in srgb, #fff 12%, #23456c);
-    --rock-dark: #0b1d33;
     position: relative;
     isolation: isolate;
     color: var(--ink);
@@ -84,16 +79,11 @@
     --border: rgba(6, 70, 100, 0.18);
     --border-strong: rgba(6, 70, 100, 0.34);
     --chip: rgba(6, 70, 100, 0.08);
-    --track: rgba(6, 70, 100, 0.14);
     --sea-ink: #023c44;
     --coral-ink: #96300f;
     --sun-ink: #6b4500;
     --shell-ink: #872c4b;
     --focus: #023c44;
-    --pebble: #f4fbfd;
-    --pebble-shade: #cfe3ea;
-    --pebble-hi: #ffffff;
-    --rock-dark: #5f8a96;
   }
 
   /* The reef drops off into open water in its last stretch, below the last card */

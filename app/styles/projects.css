@@ -15,10 +15,32 @@
   }
 
   .bottle-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
     overflow: hidden;
+  }
+
+  /* Arriving from a skill's readout link: the card glows for a moment so it's easy to spot */
+  .bottles > li:target .bottle-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow:
+      inset 0 0 0 2px var(--coral),
+      inset 0 0 32px -8px var(--coral);
+    opacity: 0;
+    pointer-events: none;
+    animation: card-found 2.6s ease-out 0.5s;
+  }
+
+  @keyframes card-found {
+    15%,
+    55% {
+      opacity: 1;
+    }
   }
 
   [data-glass='cobalt'] {

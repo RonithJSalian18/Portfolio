@@ -54,16 +54,6 @@ export function Scallop({ className }: IconProps) {
   )
 }
 
-export function Pebbles({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 120 50" aria-hidden="true" focusable="false">
-      <ellipse className="pebble-a" cx="30" cy="32" rx="24" ry="14" />
-      <ellipse className="pebble-b" cx="72" cy="36" rx="16" ry="10" />
-      <ellipse className="pebble-c" cx="98" cy="30" rx="10" ry="7" />
-    </svg>
-  )
-}
-
 export function Conch({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 100 100" aria-hidden="true" focusable="false">

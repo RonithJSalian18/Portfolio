@@ -1,173 +1,524 @@
 @layer components {
-  .pools {
+  /*
+   * Sonar skills. The grouped chips and the readout are the content; the scope beside them is a
+   * decorative mirror, shown only on wide screens with motion allowed.
+   */
+  .sonar {
+    --sweep: 6s;
+    --phosphor: #6ff5e0;
+    --blip-hot: #ff8a70;
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+
+  /* ---------- Chips ---------- */
+
+  .sonar-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: 1.35rem 2rem;
+    padding: clamp(1.2rem, 2.5vw, 1.7rem);
+  }
+
+  .sonar-group {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* Floated so the legend lays out like an ordinary heading instead of sitting on the fieldset border */
+  .sonar-group legend {
+    float: left;
+    width: 100%;
+    margin-bottom: 0.6rem;
+    padding: 0;
+  }
+
+  .sonar-group legend + * {
+    clear: both;
+  }
+
+  .sonar-group-title {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: clamp(1rem, 2vw, 1.5rem);
-  }
-
-  .pools > .pool {
-    flex: 1 1 100%;
-  }
-
-  @media (min-width: 700px) {
-    .pools > .pool {
-      flex-basis: calc(50% - 0.75rem);
-      max-width: calc(50% - 0.75rem);
-    }
-  }
-
-  @media (min-width: 1080px) {
-    .pools > .pool {
-      flex-basis: calc(33.333% - 1rem);
-      max-width: calc(33.333% - 1rem);
-    }
-  }
-
-  /* A reef patch: frosted panel with a fringe of coral polyps along its top edge */
-  .pool {
-    position: relative;
-    padding: 1.6rem 1.4rem 3.6rem;
-    border-radius: 2.1rem 2.7rem 2.3rem 2.9rem / 2.5rem 2.1rem 2.9rem 2.3rem;
-    border: 1px solid var(--border);
-    background:
-      radial-gradient(110% 70% at 15% 0%, color-mix(in srgb, #fff 16%, transparent), transparent 60%),
-      var(--surface);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    box-shadow: 0 16px 34px -22px rgba(0, 20, 45, 0.6);
-  }
-
-  .pool::before {
-    content: '';
-    position: absolute;
-    left: 1.6rem;
-    right: 1.6rem;
-    top: -11px;
-    height: 20px;
-    background:
-      radial-gradient(circle at 9px 11px, var(--coral) 6px, transparent 7px) 0 0 / 30px 20px repeat-x,
-      radial-gradient(circle at 9px 13px, #ffb36b 4.5px, transparent 5.5px) 15px 2px / 30px 20px repeat-x,
-      radial-gradient(circle at 6px 14px, #f58fb0 3.5px, transparent 4.5px) 8px 3px / 30px 20px repeat-x;
-    opacity: 0.9;
-    pointer-events: none;
-  }
-
-  .pool:nth-child(3n + 2) {
-    border-radius: 2.8rem 2rem 2.6rem 2.2rem / 2.2rem 2.8rem 2.1rem 2.6rem;
-  }
-
-  .pool:nth-child(3n) {
-    border-radius: 2.3rem 2.9rem 2.1rem 2.5rem / 2.9rem 2.3rem 2.6rem 2.1rem;
-  }
-
-  [data-theme='dark'] .pool {
-    box-shadow:
-      0 16px 34px -22px rgba(0, 0, 0, 0.7),
-      0 0 22px -10px var(--wave-glow);
-  }
-
-  .pool-title {
-    font-size: 1.08rem;
-    font-weight: 700;
-  }
-
-  .pebbles {
-    display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 0.5rem;
-    margin-top: 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sea-ink);
   }
 
-  .pebble-stone {
-    display: inline-block;
-    padding: 0.38rem 0.85rem;
-    border-radius: 48% 52% 46% 54% / 56% 48% 52% 44%;
-    background: radial-gradient(circle at 30% 26%, var(--pebble-hi), var(--pebble) 48%, var(--pebble-shade));
-    box-shadow:
-      0 2px 0 color-mix(in srgb, var(--rock-dark) 45%, transparent),
-      inset 0 -2px 3px rgba(0, 0, 0, 0.08);
-    color: var(--ink);
-    font-size: 0.85rem;
-    font-weight: 500;
-    line-height: 1.35;
-    transition: transform 0.2s ease;
-  }
-
-  .pebble:nth-child(even) .pebble-stone {
-    border-radius: 54% 46% 52% 48% / 46% 54% 44% 56%;
-  }
-
-  .pebble:nth-child(3n) .pebble-stone {
-    border-radius: 44% 56% 50% 50% / 52% 44% 56% 48%;
-  }
-
-  /* Pebbles that link to projects glint; hovering or focusing shows where they were used */
-  .pebble-shiny .pebble-stone {
-    position: relative;
-    cursor: help;
-    box-shadow:
-      0 2px 0 color-mix(in srgb, var(--rock-dark) 45%, transparent),
-      inset 0 0 0 1.5px color-mix(in srgb, var(--sea-ink) 45%, transparent);
-  }
-
-  .pebble-shiny .pebble-stone::after {
+  .sonar-group-title::before {
     content: '';
-    position: absolute;
-    top: -0.3rem;
-    right: -0.15rem;
     width: 0.7rem;
     height: 0.7rem;
-    background: var(--coral);
-    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-    animation: glint 2.4s ease-in-out infinite;
+    border-radius: 0 100% 0 0;
+    background: color-mix(in srgb, var(--sea-ink) 55%, transparent);
   }
 
-  @keyframes glint {
-    50% {
-      transform: scale(0.4);
-      opacity: 0.5;
+  .sonar-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .sonar-chip {
+    position: relative;
+    display: inline-flex;
+  }
+
+  /* The real radio sits over the chip: same hit area, native keyboard and screen reader behavior */
+  .sonar-chip input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .chip-face {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.85rem 0.4rem 0.7rem;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.35;
+    transition: translate 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+
+  .chip-face::before {
+    content: '';
+    flex: none;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--sea-ink) 60%, transparent);
+  }
+
+  .sonar-chip:hover .chip-face {
+    translate: 0 -2px;
+    border-color: var(--sea-ink);
+  }
+
+  .sonar-chip input:checked + .chip-face {
+    border-color: var(--sea-ink);
+    background: color-mix(in srgb, var(--sea-ink) 22%, var(--surface-solid));
+    font-weight: 600;
+  }
+
+  .sonar-chip input:checked + .chip-face::before {
+    background: var(--blip-hot);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--blip-hot) 35%, transparent);
+  }
+
+  .sonar-chip input:focus-visible + .chip-face {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  @media (forced-colors: active) {
+    .sonar-chip input:checked + .chip-face {
+      outline: 2px solid Highlight;
     }
   }
 
-  .pebble-shiny .pebble-stone:hover,
-  .pebble-shiny .pebble-stone:focus-visible {
-    transform: translateY(-2px);
+  /* ---------- Readout ---------- */
+
+  .sonar-readout {
+    min-width: 0;
   }
 
-  .pebble-tip,
-  .pool-caption {
-    position: absolute;
-    left: 1.4rem;
-    right: 1.4rem;
-    bottom: 1.1rem;
-    font-size: 0.82rem;
-    line-height: 1.4;
-    transition:
-      opacity 0.2s ease,
-      translate 0.2s ease;
+  .readout-panel {
+    display: grid;
+    align-content: start;
+    gap: 0.15rem;
+    min-height: 8.75rem;
+    padding: 1.1rem 1.35rem 1.2rem;
   }
 
-  .pool-caption {
-    color: var(--ink-soft);
-    font-style: normal;
-  }
-
-  .pebble-tip {
+  .readout-sector {
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--ink);
-    opacity: 0;
-    translate: 0 4px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sea-ink);
+  }
+
+  .readout-skill {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .readout-label {
+    margin-top: 0.3rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  .readout-hits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1.1rem;
+  }
+
+  .readout-hits a {
+    display: inline-flex;
+    gap: 0.4rem;
+    font-weight: 600;
+  }
+
+  .readout-name {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+  }
+
+  .readout-hits a:hover .readout-name {
+    text-decoration-thickness: 2px;
+  }
+
+  .readout-arrow {
+    color: var(--coral-ink);
+  }
+
+  .readout-idle {
+    align-self: center;
+    color: var(--ink-soft);
+  }
+
+  /* Without the scope, a chosen skill's readout rides along the bottom of the screen while the list is in view */
+  @media (max-width: 1023.98px), (prefers-reduced-motion: reduce), (forced-colors: active) {
+    .sonar[data-locked] .sonar-readout {
+      position: sticky;
+      /* clears the scroll-progress crab that runs along the bottom edge on phones */
+      bottom: max(1.9rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+      z-index: 5;
+      container-type: scroll-state;
+    }
+
+    .sonar[data-locked] .readout-panel {
+      min-height: 0;
+    }
+
+    .sonar[data-locked] .readout-skill {
+      font-size: 1.1rem;
+    }
+
+    /* While it floats: solid, lifted, and clear of the back-to-top button. Browsers that can't tell when
+       it's stuck get the floating style whenever a skill is chosen. */
+    @supports not (container-type: scroll-state) {
+      .sonar[data-locked] .readout-panel {
+        margin-inline-end: 3.6rem;
+        background: var(--surface-solid);
+        box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    @container scroll-state(stuck: bottom) {
+      .sonar[data-locked] .readout-panel {
+        margin-inline-end: 3.6rem;
+        background: var(--surface-solid);
+        box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+
+  /* ---------- Scope ---------- */
+
+  .sonar-scope {
+    display: none;
+  }
+
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+    .sonar {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+      grid-template-areas:
+        'scope list'
+        'readout list';
+      grid-template-rows: auto 1fr;
+      column-gap: clamp(2rem, 4vw, 3.5rem);
+    }
+
+    .sonar-scope {
+      display: block;
+      grid-area: scope;
+    }
+
+    .sonar-list {
+      grid-area: list;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sonar-readout {
+      grid-area: readout;
+    }
+  }
+
+  .sonar-scope {
+    position: relative;
+    width: min(100%, 30rem);
+    aspect-ratio: 1;
+    margin-inline: auto;
+    border-radius: 50%;
+    box-shadow: 0 26px 50px -22px rgba(0, 8, 24, 0.75);
+    user-select: none;
+  }
+
+  [data-theme='dark'] .sonar-scope {
+    box-shadow:
+      0 26px 50px -22px rgba(0, 0, 0, 0.85),
+      0 0 70px -18px rgba(111, 245, 224, 0.3);
+  }
+
+  .sonar-dial {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .dial-bezel {
+    fill: none;
+    stroke-width: 14;
+  }
+
+  .dial-rim {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.22);
+    stroke-width: 0.8;
+  }
+
+  .dial-screen {
+    stroke: #020b14;
+    stroke-width: 1;
+  }
+
+  .dial-ring {
+    fill: none;
+    stroke: var(--phosphor);
+    stroke-opacity: 0.18;
+    stroke-width: 0.5;
+    stroke-dasharray: 1.5 2.5;
+  }
+
+  .dial-spoke {
+    stroke: var(--phosphor);
+    stroke-opacity: 0.16;
+    stroke-width: 0.5;
+  }
+
+  .dial-ticks {
+    stroke: var(--phosphor);
+    stroke-opacity: 0.45;
+    stroke-width: 0.6;
+  }
+
+  .dial-label {
+    fill: #d6ecf6;
+    font-size: 5.4px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* Inner layers all share the screen circle */
+  .sonar-sector,
+  .sonar-sweep {
+    position: absolute;
+    inset: 7%;
+    border-radius: 50%;
     pointer-events: none;
   }
 
-  .pebble-shiny .pebble-stone:hover + .pebble-tip,
-  .pebble-shiny .pebble-stone:focus-visible + .pebble-tip {
-    opacity: 1;
-    translate: 0 0;
+  .sonar-sector {
+    background: conic-gradient(
+      from 0deg,
+      rgba(111, 245, 224, 0.14) 0deg calc(var(--span) * 1deg),
+      transparent calc(var(--span) * 1deg)
+    );
+    opacity: 0;
+    transform: rotate(calc(var(--turn) * 1deg));
+    transition:
+      transform 0.7s cubic-bezier(0.3, 1.25, 0.45, 1),
+      opacity 0.4s ease;
   }
 
-  .pool:has(.pebble-stone:hover, .pebble-stone:focus-visible) .pool-caption {
+  /* The beam's leading edge is at twelve o'clock before it turns; the glow trails behind it */
+  .sonar-sweep {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 280deg,
+      rgba(111, 245, 224, 0.05) 292deg,
+      rgba(111, 245, 224, 0.36) 359.6deg,
+      transparent 360deg
+    );
+    animation: sonar-sweep var(--sweep) linear infinite;
+  }
+
+  .sonar-sweep::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 50%;
+    border-radius: 2px;
+    background: linear-gradient(to top, rgba(111, 245, 224, 0.1), var(--phosphor));
+  }
+
+  @keyframes sonar-sweep {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  .sonar-bearing {
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 43%;
+    background: repeating-linear-gradient(to bottom, rgba(255, 138, 112, 0.9) 0 4px, transparent 4px 8px);
     opacity: 0;
+    transform-origin: 50% 0;
+    transform: rotate(calc(var(--turn) * 1deg - 180deg)) scaleY(var(--reach));
+    transition:
+      transform 0.7s cubic-bezier(0.3, 1.35, 0.45, 1),
+      opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .sonar[data-locked] :is(.sonar-sector, .sonar-bearing) {
+    opacity: 1;
+  }
+
+  /* A blip lights up the moment the beam crosses its bearing, then fades until the next pass */
+  .blip {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: -0.75rem 0 0 -0.75rem;
+    cursor: pointer;
+  }
+
+  .blip i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--phosphor);
+    box-shadow: 0 0 8px 1px rgba(111, 245, 224, 0.75);
+    opacity: 0.2;
+    animation: blip-echo var(--sweep) linear infinite;
+    animation-delay: calc(var(--a) / 360 * var(--sweep) - var(--sweep));
+  }
+
+  @keyframes blip-echo {
+    0% {
+      opacity: 1;
+      transform: scale(1.6);
+      animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+    12% {
+      opacity: 0.9;
+      transform: scale(1);
+      animation-timing-function: ease-in;
+    }
+    75%,
+    100% {
+      opacity: 0.2;
+      transform: scale(0.85);
+    }
+  }
+
+  .blip.is-locked::before,
+  .blip.is-locked::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    border-radius: 50%;
+  }
+
+  .blip.is-locked::before {
+    width: 0.65rem;
+    height: 0.65rem;
+    background: var(--blip-hot);
+    box-shadow: 0 0 10px 2px rgba(255, 138, 112, 0.8);
+  }
+
+  .blip.is-locked::after {
+    border: 2px solid var(--blip-hot);
+    animation: blip-ping 1.5s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+
+  @keyframes blip-ping {
+    from {
+      opacity: 1;
+      transform: scale(0.35);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+
+  .sonar-tag {
+    position: absolute;
+    padding: 0.15rem 0.6rem;
+    border: 1px solid rgba(255, 138, 112, 0.65);
+    border-radius: 999px;
+    background: rgba(3, 17, 31, 0.9);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    translate: 0.95rem -50%;
+    pointer-events: none;
+    animation: tag-in 0.35s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+
+  .sonar-tag[data-side='left'] {
+    translate: calc(-100% - 0.95rem) -50%;
+  }
+
+  @keyframes tag-in {
+    from {
+      opacity: 0;
+      scale: 0.85;
+    }
+  }
+
+  .sonar-hub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin: -0.3rem 0 0 -0.3rem;
+    border-radius: 50%;
+    background: var(--phosphor);
+    box-shadow: 0 0 10px var(--phosphor);
+    pointer-events: none;
+  }
+
+  /* Everything on the scope pauses at once off-screen, so the sweep and blips stay in step */
+  .sonar:not([data-running]) .sonar-scope *,
+  .sonar:not([data-running]) .sonar-scope *::before,
+  .sonar:not([data-running]) .sonar-scope *::after {
+    animation-play-state: paused;
   }
 }

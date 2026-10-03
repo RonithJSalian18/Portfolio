@@ -69,12 +69,9 @@
   --sand-print: rgba(112, 80, 34, 0.3);
   --grain: rgba(105, 75, 28, 0.16);
 
-  /* Rocks and pebbles */
+  /* Rocks */
   --rock: #b8ad9a;
   --rock-dark: #8f846f;
-  --pebble: #f6f2ea;
-  --pebble-shade: #ddd4c4;
-  --pebble-hi: color-mix(in srgb, #fff 55%, var(--pebble));
 
   /* Surfaces and text */
   --surface: rgba(255, 251, 242, 0.8);
@@ -82,7 +79,6 @@
   --border: rgba(90, 64, 24, 0.16);
   --border-strong: rgba(90, 64, 24, 0.32);
   --chip: rgba(90, 64, 24, 0.08);
-  --track: rgba(90, 64, 24, 0.14);
   --ink: #0b2540;
   --ink-soft: #33475d;
   --on-sea: #ffffff;
@@ -144,16 +140,12 @@
 
   --rock: #3b3e54;
   --rock-dark: #2b2d40;
-  --pebble: #363b54;
-  --pebble-shade: #2a2e45;
-  --pebble-hi: color-mix(in srgb, #fff 10%, var(--pebble));
 
   --surface: rgba(31, 33, 56, 0.8);
   --surface-solid: #1f2138;
   --border: rgba(190, 205, 255, 0.14);
   --border-strong: rgba(190, 205, 255, 0.3);
   --chip: rgba(255, 255, 255, 0.07);
-  --track: rgba(255, 255, 255, 0.14);
   --ink: #eaf0f9;
   --ink-soft: #b0bbd0;
   --on-sea: #eaf0f9;
