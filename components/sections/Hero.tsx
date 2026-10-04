@@ -83,8 +83,11 @@ export function Hero() {
         <div className="layer layer-near">
           <div className="wave wave-near" />
           <Surfer />
-          <div className="wave-glow">
-            <div className="wave wave-edge" />
+          <div className="wave-edge">
+            <div className="wave-edge-glow">
+              <span />
+            </div>
+            <span className="wave-edge-line" />
           </div>
         </div>
         <div className="layer layer-shore">

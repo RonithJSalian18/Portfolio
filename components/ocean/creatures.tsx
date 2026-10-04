@@ -1,13 +1,13 @@
 // Hand-drawn SVG sea life. Every piece faces right; CSS flips the ones swimming left.
-// Moving parts carry class names (tail, flipper, tentacle, ...) that sealife.css animates.
+// Motion is applied to each creature's own <svg> (see "Body motion" in sealife.css), so the compositor can run it.
 // Purely decorative: the zone layer that holds them is aria-hidden.
 
 const OUTLINE = '#1d1a1a'
 
 export function Clownfish() {
   return (
-    <svg viewBox="0 0 64 36" focusable="false">
-      <path className="tail" d="M15 18 4 8.5Q2 9 3 11.5 6 18 3 24.5 2 27 4 27.5Z" fill="#ff7b25" stroke={OUTLINE} strokeWidth="1.2" strokeLinejoin="round" />
+    <svg className="swim" viewBox="0 0 64 36" focusable="false">
+      <path d="M15 18 4 8.5Q2 9 3 11.5 6 18 3 24.5 2 27 4 27.5Z" fill="#ff7b25" stroke={OUTLINE} strokeWidth="1.2" strokeLinejoin="round" />
       <path d="M24 9Q30 1.5 40 6.5L38 10Z" fill="#ff7b25" stroke={OUTLINE} strokeWidth="1.2" strokeLinejoin="round" />
       <path d="M28 28Q32 34 37 29Z" fill="#ff7b25" stroke={OUTLINE} strokeWidth="1.1" strokeLinejoin="round" />
       <ellipse cx="34" cy="18" rx="21" ry="11.5" fill="#ff7b25" stroke={OUTLINE} strokeWidth="1.2" />
@@ -16,7 +16,7 @@ export function Clownfish() {
         <ellipse cx="32" cy="18" rx="3.4" ry="11" />
         <ellipse cx="20.5" cy="18" rx="2.4" ry="8" />
       </g>
-      <path className="fin" d="M41 22Q44 28 38 29 39 25 41 22Z" fill="#ff9a4d" stroke={OUTLINE} strokeWidth="1" />
+      <path d="M41 22Q44 28 38 29 39 25 41 22Z" fill="#ff9a4d" stroke={OUTLINE} strokeWidth="1" />
       <circle cx="49.5" cy="15" r="2.6" fill="#fff" stroke={OUTLINE} strokeWidth="0.8" />
       <circle cx="50.2" cy="15.2" r="1.4" fill={OUTLINE} />
       <path d="M54.5 20q1.5.8.4 1.8" fill="none" stroke={OUTLINE} strokeWidth="0.9" strokeLinecap="round" />
@@ -26,22 +26,22 @@ export function Clownfish() {
 
 export function Tang() {
   return (
-    <svg viewBox="0 0 46 34" focusable="false">
-      <path className="tail" d="M9 17 1 9.5Q3 17 1 24.5Z" fill="#ffcf2e" />
+    <svg className="swim" viewBox="0 0 46 34" focusable="false">
+      <path d="M9 17 1 9.5Q3 17 1 24.5Z" fill="#ffcf2e" />
       <path d="M7 17Q13 3 27 3.5 38 5 42.5 15 43.5 18 41 20.5 34 31 19 31 10 29 7 17Z" fill="#ffd23f" />
       <path d="M14 7Q22 1 32 4M14 27Q22 33 32 29" fill="none" stroke="#f2b705" strokeWidth="2" strokeLinecap="round" />
       <path d="M9 15.5 13 17 9 18.5Z" fill="#fff" />
       <circle cx="35" cy="12.5" r="2.4" fill="#1b2430" />
       <circle cx="35.6" cy="12" r="0.7" fill="#fff" />
-      <path className="fin" d="M28 19Q30 25 24 25.5 25.5 22 28 19Z" fill="#f2b705" />
+      <path d="M28 19Q30 25 24 25.5 25.5 22 28 19Z" fill="#f2b705" />
     </svg>
   )
 }
 
 export function SchoolFish() {
   return (
-    <svg viewBox="0 0 30 14" focusable="false">
-      <path className="tail" d="M7.5 7 1.5 2.5 3.5 7 1.5 11.5Z" fill="#9fbad0" />
+    <svg className="swim" viewBox="0 0 30 14" focusable="false">
+      <path d="M7.5 7 1.5 2.5 3.5 7 1.5 11.5Z" fill="#9fbad0" />
       <path d="M6 7Q14 1.5 23 4.5 28.5 6.5 28.5 7 28.5 7.5 23 9.5 14 12.5 6 7Z" fill="#c4d9e8" />
       <path d="M8 6.2Q16 2.6 24 5.2" fill="none" stroke="#6e8fae" strokeWidth="1.4" strokeLinecap="round" />
       <circle cx="24.6" cy="6.4" r="0.9" fill="#1d2733" />
@@ -51,12 +51,12 @@ export function SchoolFish() {
 
 export function Turtle() {
   return (
-    <svg viewBox="0 0 140 100" focusable="false">
+    <svg className="glide" viewBox="0 0 140 100" focusable="false">
       <g fill="#8fbf6e" stroke="#5f8a45" strokeWidth="1.2">
-        <path className="flipper flipper-front" d="M80 32Q96 4 120 7 104 22 88 40Z" />
-        <path className="flipper flipper-front flipper-alt" d="M80 68Q96 96 120 93 104 78 88 60Z" />
-        <path className="flipper flipper-back" d="M40 36Q28 22 16 25 25 36 38 43Z" />
-        <path className="flipper flipper-back flipper-alt" d="M40 64Q28 78 16 75 25 64 38 57Z" />
+        <path d="M80 32Q96 4 120 7 104 22 88 40Z" />
+        <path d="M80 68Q96 96 120 93 104 78 88 60Z" />
+        <path d="M40 36Q28 22 16 25 25 36 38 43Z" />
+        <path d="M40 64Q28 78 16 75 25 64 38 57Z" />
         <path d="M27 47 14 50 27 53Z" />
         <ellipse cx="112" cy="50" rx="15" ry="10.5" />
       </g>
@@ -79,11 +79,11 @@ export function Turtle() {
 export function Dolphin() {
   return (
     <svg viewBox="0 0 120 52" focusable="false">
-      <path className="tail" d="M14 23 2 14 6 26 1 37 14 31Z" fill="#6f8ba6" />
+      <path d="M14 23 2 14 6 26 1 37 14 31Z" fill="#6f8ba6" />
       <path d="M60 12Q66 0 75 1 70 6 72 13Z" fill="#6f8ba6" />
       <path d="M118 30Q110 26 102 25 92 12 70 10 46 9 30 18 20 24 12 25L12 30Q30 37 64 36 80 35 92 38 104 37 110 33Z" fill="#7d99b4" />
       <path d="M100 34Q80 40 60 37 40 35 24 31 50 30 70 31 88 31 100 34Z" fill="#dce8f1" />
-      <path className="fin" d="M74 34Q72 44 64 46 68 40 66 34Z" fill="#6f8ba6" />
+      <path d="M74 34Q72 44 64 46 68 40 66 34Z" fill="#6f8ba6" />
       <circle cx="100" cy="25.5" r="1.4" fill="#1b2533" />
       <path d="M108 30.5q3 .6 6 0" fill="none" stroke="#5c7690" strokeWidth="0.9" strokeLinecap="round" />
     </svg>
@@ -92,9 +92,9 @@ export function Dolphin() {
 
 export function Manta() {
   return (
-    <svg viewBox="-36 0 166 100" focusable="false">
+    <svg className="beat" viewBox="-36 0 166 100" focusable="false">
       <path d="M12 50H-34" stroke="#22344a" strokeWidth="1.6" strokeLinecap="round" />
-      <g className="wings">
+      <g>
         <path d="M118 50C112 47 104 46 96 44 86 26 70 8 44 4 52 16 56 30 54 42 40 45 22 48 8 50 22 52 40 55 54 58 56 70 52 84 44 96 70 92 86 74 96 56 104 54 112 53 118 50Z" fill="#2b3f55" />
         <path d="M90 43C84 35 76 29 68 27 73 33 77 39 79 45ZM90 57C84 65 76 71 68 73 73 67 77 61 79 55Z" fill="#ffffff" opacity="0.16" />
       </g>
@@ -108,9 +108,9 @@ export function Jellyfish() {
     <svg viewBox="0 0 60 130" focusable="false">
       <g className="tentacles" fill="none" strokeLinecap="round">
         <path className="tentacle" d="M11 34q-4 18 2 34t-2 34 2 22" />
-        <path className="tentacle tentacle-alt" d="M21 36q4 18-2 34t2 34-2 18" />
+        <path className="tentacle" d="M21 36q4 18-2 34t2 34-2 18" />
         <path className="tentacle" d="M39 36q-4 18 2 34t-2 34 2 18" />
-        <path className="tentacle tentacle-alt" d="M49 34q4 18-2 34t2 34-2 22" />
+        <path className="tentacle" d="M49 34q4 18-2 34t2 34-2 22" />
         <path className="arm" d="M27 35q-7 14 2 27t-3 26" />
         <path className="arm" d="M33 35q7 14-2 27t3 24" />
       </g>
@@ -128,11 +128,11 @@ export function Octopus() {
     <svg viewBox="0 0 170 120" focusable="false">
       <path className="seabed-rock" d="M0 120C6 100 22 92 44 90 64 84 92 82 116 88 140 92 160 100 170 120Z" />
       <g fill="#c9503a">
-        <path className="arm-curl" d="M66 78C52 84 40 92 30 100 24 105 18 104 20 98 22 94 26 96 28 98 34 92 46 84 60 74Z" />
-        <path className="arm-curl arm-curl-alt" d="M72 80C66 92 60 104 50 110 46 112 42 110 45 106 52 104 58 94 64 80Z" />
-        <path className="arm-curl" d="M90 80C96 92 102 104 112 110 116 112 120 110 117 106 110 104 104 94 98 80Z" />
-        <path className="arm-curl arm-curl-alt" d="M96 78C110 84 122 92 132 100 138 105 144 104 142 98 140 94 136 96 134 98 128 92 116 84 102 74Z" />
-        <path className="arm-curl" d="M80 80C78 94 84 102 92 100 98 98 96 92 92 94 88 96 86 92 86 82Z" />
+        <path d="M66 78C52 84 40 92 30 100 24 105 18 104 20 98 22 94 26 96 28 98 34 92 46 84 60 74Z" />
+        <path d="M72 80C66 92 60 104 50 110 46 112 42 110 45 106 52 104 58 94 64 80Z" />
+        <path d="M90 80C96 92 102 104 112 110 116 112 120 110 117 106 110 104 104 94 98 80Z" />
+        <path d="M96 78C110 84 122 92 132 100 138 105 144 104 142 98 140 94 136 96 134 98 128 92 116 84 102 74Z" />
+        <path d="M80 80C78 94 84 102 92 100 98 98 96 92 92 94 88 96 86 92 86 82Z" />
       </g>
       <g fill="#f3b19c">
         <circle cx="40" cy="94" r="1.6" />
@@ -154,28 +154,36 @@ export function Octopus() {
   )
 }
 
+/** The lure's glow pulses as its own composited layer (an SVG filter animating would repaint every frame) */
 export function Anglerfish() {
   return (
-    <svg viewBox="0 -12 150 122" focusable="false">
-      <g className="lure-rig">
+    <span className="angler-art">
+      <svg viewBox="0 -12 150 122" focusable="false">
         <path d="M64 18C58-2 36-8 22 4" fill="none" stroke="#4a3d5c" strokeWidth="2.4" strokeLinecap="round" />
         <circle className="lure" cx="21" cy="6" r="5.5" />
-      </g>
-      <path d="M128 56 148 40 144 56 148 72Z" fill="#2b2238" />
-      <path className="angler-body" d="M130 56C130 24 104 14 80 16 54 18 30 30 22 52 18 64 22 74 30 82 46 96 74 100 100 92 120 86 130 74 130 56Z" />
-      <path d="M24 60C34 78 54 84 74 80L70 70C56 72 40 68 30 60Z" fill="#140f1c" />
-      <path d="M30 59l2.5 6 2.5-6ZM37 61l2.5 7 2.5-7ZM45 64l2.5 6 2.5-6ZM53 66l2.5 6.5 2.5-6.5ZM61 67.5l2.5 6 2.5-6ZM40 75l2.5-6 2.5 6ZM50 78l2.5-6.5 2.5 6.5ZM60 79l2.5-6 2.5 6Z" fill="#e8e4dc" />
-      <path d="M86 70C92 80 100 84 108 82 100 76 94 70 92 64Z" fill="#3a2f4a" />
-      <circle cx="52" cy="40" r="5" fill="#0d0a12" />
-      <circle cx="51" cy="39" r="1.6" fill="#9fd8ff" />
-    </svg>
+        <path d="M128 56 148 40 144 56 148 72Z" fill="#2b2238" />
+        <path
+          className="angler-body"
+          d="M130 56C130 24 104 14 80 16 54 18 30 30 22 52 18 64 22 74 30 82 46 96 74 100 100 92 120 86 130 74 130 56Z"
+        />
+        <path d="M24 60C34 78 54 84 74 80L70 70C56 72 40 68 30 60Z" fill="#140f1c" />
+        <path
+          d="M30 59l2.5 6 2.5-6ZM37 61l2.5 7 2.5-7ZM45 64l2.5 6 2.5-6ZM53 66l2.5 6.5 2.5-6.5ZM61 67.5l2.5 6 2.5-6ZM40 75l2.5-6 2.5 6ZM50 78l2.5-6.5 2.5 6.5ZM60 79l2.5-6 2.5 6Z"
+          fill="#e8e4dc"
+        />
+        <path d="M86 70C92 80 100 84 108 82 100 76 94 70 92 64Z" fill="#3a2f4a" />
+        <circle cx="52" cy="40" r="5" fill="#0d0a12" />
+        <circle cx="51" cy="39" r="1.6" fill="#9fd8ff" />
+      </svg>
+      <span className="lure-glow" />
+    </span>
   )
 }
 
 export function Lanternfish() {
   return (
-    <svg viewBox="0 0 40 16" focusable="false">
-      <path className="tail" d="M5 8 0 3 1.5 8 0 13Z" fill="#1d2b44" />
+    <svg className="swim" viewBox="0 0 40 16" focusable="false">
+      <path d="M5 8 0 3 1.5 8 0 13Z" fill="#1d2b44" />
       <path d="M4 8Q14 2 30 5 37 7 37 8 37 9 30 11 14 14 4 8Z" fill="#22344f" />
       <g className="photophores">
         <circle cx="10" cy="10" r="0.9" />
@@ -191,17 +199,21 @@ export function Lanternfish() {
   )
 }
 
+/** Static drawing; the shimmer running down its comb rows is a separate composited layer (see .comb-glint) */
 export function CombJelly() {
   return (
-    <svg viewBox="0 0 30 44" focusable="false">
-      <path className="comb-body" d="M15 2C26 2 28 16 26 28 24 38 19 42 15 42S6 38 4 28C2 16 4 2 15 2Z" />
-      <g className="comb-rows" fill="none" strokeWidth="1.2" strokeLinecap="round" strokeDasharray="1.5 2">
-        <path d="M15 3C21 10 22 28 15.5 41" />
-        <path d="M15 3C9 10 8 28 14.5 41" />
-        <path d="M15 3C25 12 25 30 17 40" />
-        <path d="M15 3C5 12 5 30 13 40" />
-      </g>
-    </svg>
+    <span className="comb-art">
+      <svg viewBox="0 0 30 44" focusable="false">
+        <path className="comb-body" d="M15 2C26 2 28 16 26 28 24 38 19 42 15 42S6 38 4 28C2 16 4 2 15 2Z" />
+        <g className="comb-rows" fill="none" strokeWidth="1.2" strokeLinecap="round" strokeDasharray="1.5 2">
+          <path d="M15 3C21 10 22 28 15.5 41" />
+          <path d="M15 3C9 10 8 28 14.5 41" />
+          <path d="M15 3C25 12 25 30 17 40" />
+          <path d="M15 3C5 12 5 30 13 40" />
+        </g>
+      </svg>
+      <span className="comb-glint" />
+    </span>
   )
 }
 
@@ -294,8 +306,8 @@ export function Anemone() {
   return (
     <svg viewBox="0 0 110 92" focusable="false">
       <g fill="none" stroke="#f6a0bf" strokeWidth="5" strokeLinecap="round">
-        <path className="sway" d={TENTACLES.filter((_, i) => i % 2 === 0).join('')} />
-        <path className="sway sway-alt" d={TENTACLES.filter((_, i) => i % 2 === 1).join('')} />
+        <path d={TENTACLES.filter((_, i) => i % 2 === 0).join('')} />
+        <path d={TENTACLES.filter((_, i) => i % 2 === 1).join('')} />
       </g>
       <path d="M30 92C28 74 38 66 55 66S82 74 80 92Z" fill="#c94f7c" />
     </svg>
@@ -305,7 +317,7 @@ export function Anemone() {
 export function Kelp() {
   return (
     <svg viewBox="0 0 40 200" focusable="false" preserveAspectRatio="xMidYMax meet">
-      <g className="sway-tall">
+      <g>
         <path d="M20 200C14 160 28 130 20 96S28 36 22 4" fill="none" stroke="#3c9a64" strokeWidth="4.5" strokeLinecap="round" />
         <g fill="#4bb176">
           <path d="M20 160C30 150 36 138 34 128 28 138 24 148 20 160Z" />

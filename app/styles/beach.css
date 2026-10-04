@@ -20,13 +20,6 @@
     --castle-shade: #3b3750;
   }
 
-  /* Pause the whole beach whenever it's scrolled away (intro.css pauses everything while the intro covers it) */
-  .hero[data-offscreen] *,
-  .hero[data-offscreen] *::before,
-  .hero[data-offscreen] *::after {
-    animation-play-state: paused !important;
-  }
-
   html[data-lite='1'] .hero [data-extra] {
     display: none;
   }
@@ -39,12 +32,17 @@
     translate: 0 calc(var(--hero-scroll, 0) * 0.3px);
   }
 
+  /* Gulls by day, a shooting star by night (the hidden one is taken out, see .hero-stars in hero.css) */
+  [data-theme='dark'] .gull,
+  :root:not([data-theme='dark']) .shooting-star {
+    display: none;
+  }
+
   .gull {
     position: absolute;
     width: clamp(22px, 2.4vw, 36px);
     color: var(--gull);
     opacity: var(--clouds);
-    transition: opacity 1.2s ease;
     animation: gull-glide var(--dur, 16s) ease-in-out var(--delay, 0s) infinite alternate;
   }
 
@@ -52,23 +50,30 @@
     width: clamp(16px, 1.7vw, 26px);
   }
 
-  .gull svg {
+  .gull-art {
+    position: relative;
     display: block;
+    aspect-ratio: 40 / 16;
+  }
+
+  .gull svg {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
     overflow: visible;
     fill: currentColor;
     stroke: currentColor;
   }
 
   .gull-bob {
-    animation: gull-bob 4.6s ease-in-out var(--delay, 0s) infinite alternate;
+    animation: gull-bob 18.4s ease-in-out var(--delay, 0s) infinite;
   }
 
+  /* The wings are their own <svg> layer, flapping about the body (20, 9 in the 40 × 16 drawing) */
   .gull-wings {
-    transform-box: view-box;
-    transform-origin: 20px 9px;
-    animation: gull-flap 1.1s ease-in-out infinite alternate;
+    transform-origin: 50% 56.25%;
+    animation: gull-flap 11s ease-in-out infinite;
   }
 
   @keyframes gull-glide {
@@ -83,20 +88,41 @@
   }
 
   @keyframes gull-bob {
-    from {
+    0%,
+    50%,
+    100% {
       translate: 0 -10px;
     }
-    to {
+    25%,
+    75% {
       translate: 0 12px;
     }
   }
 
   @keyframes gull-flap {
     0%,
-    55% {
+    5.5%,
+    14.5%,
+    20%,
+    25.5%,
+    34.5%,
+    40%,
+    45.5%,
+    54.5%,
+    60%,
+    65.5%,
+    74.5%,
+    80%,
+    85.5%,
+    94.5%,
+    100% {
       transform: scaleY(1);
     }
-    100% {
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
       transform: scaleY(-0.35);
     }
   }
@@ -152,16 +178,13 @@
     animation: sail-by 220s linear -70s infinite;
   }
 
+  /* The whole boat rocks on its keel */
   .sailboat svg {
     display: block;
     width: 100%;
     height: auto;
     overflow: visible;
-  }
-
-  .sailboat-rock {
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
+    transform-origin: 50% 90%;
     animation: rock 4.4s ease-in-out infinite alternate;
   }
 
@@ -182,7 +205,8 @@
     fill: var(--hull);
   }
 
-  .lantern {
+  /* (scoped: the lanternfish in the deep share the class name) */
+  .sailboat .lantern {
     fill: #ffe9a6;
     opacity: var(--glow);
     filter: drop-shadow(0 0 3px #ffd36b);
@@ -222,9 +246,12 @@
     overflow: visible;
   }
 
+  /* The beam is its own <svg> layer behind the tower, sweeping about the lamp (70, 46 in 140 × 170) */
   .hero-lighthouse .lh-beam {
-    transform-box: view-box;
-    transform-origin: 70px 46px;
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    transform-origin: 50% 27.06%;
     opacity: var(--lamp);
     transition: opacity 1.4s ease;
     animation: sweep 6s ease-in-out infinite alternate;
@@ -442,18 +469,6 @@
 
   .flag {
     fill: var(--coral);
-    transform-box: fill-box;
-    transform-origin: 0 50%;
-    animation: flag 1.4s ease-in-out infinite alternate;
-  }
-
-  @keyframes flag {
-    from {
-      transform: scaleX(1) skewY(0deg);
-    }
-    to {
-      transform: scaleX(0.82) skewY(6deg);
-    }
   }
 
   .beach-bottle {
@@ -493,17 +508,6 @@
 
   .find-crab .crab-eye {
     fill: var(--ink);
-  }
-
-  .find-crab .crab-legs-a,
-  .find-crab .crab-legs-b {
-    transform-box: view-box;
-    transform-origin: 20px 18px;
-    animation: scuttle 0.24s steps(2) infinite;
-  }
-
-  .find-crab .crab-legs-b {
-    animation-direction: reverse;
   }
 
   @keyframes crab-walk {

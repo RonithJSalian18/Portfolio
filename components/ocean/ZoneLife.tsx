@@ -65,9 +65,15 @@ export function ZoneLife({ zone }: { zone: Zone }) {
     let pointer: { x: number; y: number } | null = null
 
     const react = (x: number, y: number) => {
-      for (const fish of layer.querySelectorAll<HTMLElement>('.flee')) {
-        // Measure the un-displaced parent so the fish doesn't chase its own offset
-        const box = (fish.parentElement ?? fish).getBoundingClientRect()
+      // All reads first, then all writes: interleaving them would force a fresh layout for every fish
+      const fishes = Array.from(layer.querySelectorAll<HTMLElement>('.flee'))
+      const eyes = Array.from(layer.querySelectorAll<SVGElement>('.look'))
+      // Measure each fish's un-displaced parent so it doesn't chase its own offset
+      const fishBoxes = fishes.map((fish) => (fish.parentElement ?? fish).getBoundingClientRect())
+      const eyeBoxes = eyes.map((eye) => eye.getBoundingClientRect())
+
+      fishes.forEach((fish, index) => {
+        const box = fishBoxes[index]
         const dx = box.left + box.width / 2 - x
         const dy = box.top + box.height / 2 - y
         const distance = Math.hypot(dx, dy) || 1
@@ -79,15 +85,15 @@ export function ZoneLife({ zone }: { zone: Zone }) {
           fish.style.removeProperty('--fx')
           fish.style.removeProperty('--fy')
         }
-      }
-      for (const eye of layer.querySelectorAll<SVGElement>('.look')) {
-        const box = eye.getBoundingClientRect()
+      })
+      eyes.forEach((eye, index) => {
+        const box = eyeBoxes[index]
         const dx = x - (box.left + box.width / 2)
         const dy = y - (box.top + box.height / 2)
         const distance = Math.hypot(dx, dy) || 1
         eye.style.setProperty('--lx', `${((dx / distance) * 1.6).toFixed(2)}px`)
         eye.style.setProperty('--ly', `${((dy / distance) * 1.2).toFixed(2)}px`)
-      }
+      })
     }
 
     const tick = () => {
@@ -96,11 +102,13 @@ export function ZoneLife({ zone }: { zone: Zone }) {
       if (!reduceMotion) {
         // Animals that cross the screen as you scroll past them
         const viewport = window.innerHeight
-        for (const critter of layer.querySelectorAll<HTMLElement>('.scroll-right, .scroll-left')) {
-          const box = critter.getBoundingClientRect()
+        const critters = Array.from(layer.querySelectorAll<HTMLElement>('.scroll-right, .scroll-left'))
+        const boxes = critters.map((critter) => critter.getBoundingClientRect())
+        critters.forEach((critter, index) => {
+          const box = boxes[index]
           const progress = Math.min(1, Math.max(0, (viewport - box.top) / (viewport + box.height)))
           critter.style.setProperty('--sp', progress.toFixed(4))
-        }
+        })
       }
       if (pointer) react(pointer.x, pointer.y)
     }

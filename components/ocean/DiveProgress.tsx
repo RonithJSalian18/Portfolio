@@ -17,6 +17,8 @@ export function DiveProgress() {
       const travel = rect.height - window.innerHeight
       const progress = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 1
       dive.style.setProperty('--dive', progress.toFixed(4))
+      // The bubbles only show once the view is under water (see .dive[data-dry] in ocean.css)
+      dive.toggleAttribute('data-dry', progress < 0.28)
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)

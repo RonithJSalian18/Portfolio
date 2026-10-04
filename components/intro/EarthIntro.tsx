@@ -2,55 +2,25 @@
 
 import { useEffect, useRef } from 'react'
 import { BEACH } from '@/config/site'
-import { NORTH_AXIS, add, cross, dot, mix, normalize, rotateAbout, scale, slerp, type Vec3 } from './geo'
-import { LANDING_CLOUD_TOP, createGlobe, type Globe, type Pose } from './globe'
+import { loadBitmap } from './gl'
+import type { IntroCommand, IntroEvent, LandingReport } from './messages'
 
-const IDLE_MS = 1600
-const DIVE_MS = 7000
 const REVEAL_MS = 1800
 const REDUCED_MOTION_HOLD_MS = 1600
-
-/** Dive stages (share of DIVE_MS): turn and zoom in, hover over the beach, then plunge into the cloud */
-const APPROACH_END = 0.7
-const HOVER_END = 0.84
-const FOG_FROM = 0.86
-/** Camera height above the surface while hovering (Earth radii) */
-const HOVER_FROM = 0.15
-const HOVER_TO = 0.13
-/** The plunge stops just above the landing cloud, which by then fills the screen */
-const PLUNGE_TO = LANDING_CLOUD_TOP + 0.01
-
-const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t))
-const smoothstep = (from: number, to: number, t: number) => {
-  const x = clamp01((t - from) / (to - from))
-  return x * x * (3 - 2 * x)
-}
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t
-
-/** Altitude over the dive: an even-feeling zoom (log scale), a short hover, then an accelerating plunge */
-function altitude(progress: number, start: number) {
-  if (progress < APPROACH_END) {
-    const t = easeInOutCubic(progress / APPROACH_END)
-    return Math.exp(lerp(Math.log(start), Math.log(HOVER_FROM), t))
-  }
-  if (progress < HOVER_END) return lerp(HOVER_FROM, HOVER_TO, easeInOutCubic((progress - APPROACH_END) / (HOVER_END - APPROACH_END)))
-  const t = (progress - HOVER_END) / (1 - HOVER_END)
-  return lerp(HOVER_TO, PLUNGE_TO, t * t * t)
-}
-
-/** Unit vector pointing north along the surface at `point` */
-const northAt = (point: Vec3) => normalize(add(NORTH_AXIS, scale(point, -dot(NORTH_AXIS, point))))
 
 interface EarthIntroProps {
   /** First frame is on screen */
   onReady: () => void
-  /** The dive is over and the clouds start parting over the page */
+  /** The page is being uncovered (the clouds part, or the intro fades out): it can move and take focus again */
   onReveal: () => void
   /** The intro has finished (completed, skipped, or failed) */
   onDone: () => void
 }
 
+/**
+ * The intro's page side: the canvas, input, the fog and the cloud reveal. The globe itself renders in a worker
+ * (intro.worker.ts), so none of its GPU work can hold up the page underneath.
+ */
 export default function EarthIntro({ onReady, onReveal, onDone }: EarthIntroProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -72,184 +42,158 @@ export default function EarthIntro({ onReady, onReveal, onDone }: EarthIntroProp
     const debug = new URLSearchParams(window.location.search).has('globe-debug')
     if (debug) root.dataset.debug = ''
 
-    let globe: Globe | null = null
-    let phase: 'loading' | 'idle' | 'dive' | 'reveal' | 'leaving' = 'loading'
-    let frame = 0
-    let start = 0
-    let diveStart = 0
-    let readySent = false
+    let phase: 'loading' | 'running' | 'reveal' | 'leaving' = 'loading'
     let timer = 0
-    let cancelled = false
-    let measured = false
-    let startDirection: Vec3 = [0, 0, 1]
-    let lastFog = ''
+    let releaseFrame = 0
+    let releaseTimer = 0
+    let worker: Worker | null = null
+    const send = (command: IntroCommand, transfer: Transferable[] = []) => worker?.postMessage(command, transfer)
 
     const leave = (fade: boolean) => {
       if (phase === 'leaving') return
       phase = 'leaving'
-      cancelAnimationFrame(frame)
       window.clearTimeout(timer)
       if (!fade) return onDone()
       root.classList.add('is-leaving')
+      // Uncover the page once the fade's first frame is out: that restyles the whole page, which takes a moment
+      // on a phone and shouldn't hold up the fade (or the response to a click on Skip)
+      releaseFrame = requestAnimationFrame(() => (releaseTimer = window.setTimeout(onReveal, 0)))
       timer = window.setTimeout(onDone, 420)
     }
 
-    const startDive = (now: number) => {
-      if (phase !== 'idle') return
-      phase = 'dive'
-      root.dataset.phase = 'dive'
-      diveStart = now
+    const startDive = () => {
+      if (phase === 'running') send({ type: 'dive' })
     }
 
-    // Into the cloud: stop rendering the globe and let the cloud banks part over the real hero
-    const startReveal = () => {
-      phase = 'reveal'
-      root.dataset.phase = 'reveal'
-      fog.style.opacity = '1'
-      onReveal()
-      timer = window.setTimeout(() => leave(false), REVEAL_MS)
-    }
-
-    /** Where the camera is at `time` (seconds) and dive `progress` (0..1) */
-    const poseAt = (scene: Globe, time: number, progress: number): Pose => {
-      const half = scene.halfFov()
-      // Far enough back for the whole globe to fit, with some space around it
-      const startDistance = Math.max(3.6, 1 / Math.sin(Math.min(half.x, half.y) * 0.78))
-      const beach = scene.targetDirection(time)
-      const turn = easeInOutCubic(clamp01(progress / APPROACH_END))
-      const direction = slerp(startDirection, beach, turn)
-      return {
-        position: scale(direction, 1 + altitude(progress, startDistance - 1)),
-        lookAt: scale(beach, smoothstep(0.3, 0.66, progress)),
-        up: normalize(mix([0, 1, 0], northAt(beach), smoothstep(0.2, 0.66, progress))),
-      }
-    }
-
-    const report = (scene: Globe, time: number, pose: Pose) => {
-      const result = scene.measureLanding(time, pose)
+    const report = (result: LandingReport) => {
+      ;(window as unknown as { __globeDebug?: LandingReport }).__globeDebug = result
+      if (!debugRef.current) return
       const offset = (point: { x: number; y: number } | null) =>
         point ? `${(point.x - result.center.x).toFixed(2)}, ${(point.y - result.center.y).toFixed(2)} px` : 'not visible'
-      const summary = {
-        target: BEACH,
-        viewport: { width: window.innerWidth, height: window.innerHeight },
-        center: result.center,
-        projected: result.projected,
-        drawn: result.drawn,
-        coastKm: result.coastKm,
-        markerPixels: result.markerPixels,
-      }
-      ;(window as unknown as { __globeDebug?: typeof summary }).__globeDebug = summary
-      if (debugRef.current) {
-        debugRef.current.textContent = [
-          `beach ${BEACH.lat}, ${BEACH.lng}`,
-          `viewport ${window.innerWidth}×${window.innerHeight}, center ${result.center.x}, ${result.center.y}`,
-          `projected (camera maths): off center by ${offset(result.projected)}`,
-          `drawn (shader marker, ${result.markerPixels} px): off center by ${offset(result.drawn)}`,
-          result.coastKm === null
-            ? 'coastline: not measured'
-            : `map under the marker: ${Math.abs(result.coastKm).toFixed(2)} km ${result.coastKm >= 0 ? 'inland from' : 'offshore of'} the coastline`,
-        ].join('\n')
-      }
+      debugRef.current.textContent = [
+        `beach ${result.target.lat}, ${result.target.lng}`,
+        `viewport ${result.viewport.width}×${result.viewport.height}, center ${result.center.x}, ${result.center.y}`,
+        `projected (camera maths): off center by ${offset(result.projected)}`,
+        `drawn (shader marker, ${result.markerPixels} px): off center by ${offset(result.drawn)}`,
+        result.coastKm === null
+          ? 'coastline: not measured'
+          : `map under the marker: ${Math.abs(result.coastKm).toFixed(2)} km ${result.coastKm >= 0 ? 'inland from' : 'offshore of'} the coastline`,
+      ].join('\n')
     }
 
-    const loop = (now: number) => {
-      const scene = globe
-      if (!scene || (phase !== 'idle' && phase !== 'dive')) return
-      if (phase === 'idle' && now - start >= IDLE_MS) startDive(now)
-      const time = (now - start) / 1000
-      let progress = phase === 'dive' ? clamp01((now - diveStart) / DIVE_MS) : 0
-      if (debug) progress = Math.min(progress, HOVER_END)
-      const pose = poseAt(scene, time, progress)
-      const landingAt = ((phase === 'dive' ? diveStart - start : IDLE_MS) + DIVE_MS) / 1000
-      // A ring pulses out from the beach while the camera hovers over it
-      const hoverStart = diveStart + (APPROACH_END - 0.02) * DIVE_MS
-      const pulse = phase === 'dive' && now > hoverStart && !debug ? ((now - hoverStart) / 900) % 1 : -1
-
-      // Only touch the DOM when the fog actually changes (it's 0 for most of the dive)
-      const fogOpacity = smoothstep(FOG_FROM, 1, progress).toFixed(3)
-      if (fogOpacity !== lastFog) fog.style.opacity = lastFog = fogOpacity
-      scene.render(time, pose, { pulse, landingAt, debug })
-
-      if (!readySent) {
-        readySent = true
-        onReady()
-        void scene.loadLocal()
+    const handle = (event: IntroEvent) => {
+      if (phase === 'leaving') return
+      switch (event.type) {
+        case 'ready':
+          phase = 'running'
+          onReady()
+          // Reduced motion gets one still frame, held briefly, then a plain fade into the site
+          if (reduceMotion && !debug) timer = window.setTimeout(() => leave(true), REDUCED_MOTION_HOLD_MS)
+          break
+        case 'dive':
+          root.dataset.phase = 'dive'
+          break
+        case 'fog':
+          fog.style.opacity = event.opacity
+          break
+        // Into the cloud: the globe stops and the cloud banks part over the real hero
+        case 'reveal':
+          phase = 'reveal'
+          root.dataset.phase = 'reveal'
+          fog.style.opacity = '1'
+          onReveal()
+          timer = window.setTimeout(() => leave(false), REVEAL_MS)
+          break
+        case 'debug':
+          report(event.report)
+          break
+        case 'failed':
+          leave(false)
+          break
       }
-      if (debug && progress >= HOVER_END && !measured) {
-        measured = true
-        report(scene, time, pose)
-      }
-      if (progress >= 1 && !debug) return startReveal()
-      frame = requestAnimationFrame(loop)
     }
 
     // Clicking, scrolling or pressing a key starts the dive early (Escape or the button skips)
     const onPointer = (event: PointerEvent) => {
-      if (event.target !== skip) startDive(performance.now())
+      if (event.target !== skip) startDive()
     }
-    const onWheel = () => startDive(performance.now())
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') return leave(true)
       if (event.key === 'Tab' || event.key === 'Shift' || event.target === skip) return
-      startDive(performance.now())
+      startDive()
     }
     const onSkip = () => leave(true)
-    const onResize = () => {
-      globe?.resize()
-      measured = false
-    }
+    const onResize = () => send({ type: 'resize', width: window.innerWidth, height: window.innerHeight })
 
     root.addEventListener('pointerdown', onPointer)
-    root.addEventListener('wheel', onWheel, { passive: true })
-    root.addEventListener('touchmove', onWheel, { passive: true })
+    root.addEventListener('wheel', startDive, { passive: true })
+    root.addEventListener('touchmove', startDive, { passive: true })
     window.addEventListener('keydown', onKey)
     window.addEventListener('resize', onResize)
     skip.addEventListener('click', onSkip)
     skip.focus({ preventScroll: true })
 
-    createGlobe(stage, { lite, target: BEACH })
-      .then((created) => {
-        if (cancelled) return created.dispose()
-        globe = created
-        globe.onContextLost(() => leave(false))
+    // Until the worker's first frame arrives the canvas is transparent, so the starfield cover shows through
+    const canvas = document.createElement('canvas')
+    // The intro is an extra: where workers can't draw with WebGL (Safari before 17), the site just shows
+    if (typeof Worker === 'undefined' || !('transferControlToOffscreen' in canvas)) {
+      timer = window.setTimeout(() => leave(false), 0)
+    } else {
+      stage.appendChild(canvas)
+      const offscreen = canvas.transferControlToOffscreen()
+      worker = new Worker(new URL('./intro.worker.ts', import.meta.url), { type: 'module' })
+      worker.onmessage = (event: MessageEvent<IntroEvent>) => handle(event.data)
+      worker.onerror = () => leave(false)
+      send(
+        {
+          type: 'start',
+          canvas: offscreen,
+          options: {
+            lite,
+            night,
+            reduceMotion,
+            debug,
+            target: BEACH,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            devicePixelRatio: window.devicePixelRatio,
+          },
+        },
+        [offscreen],
+      )
 
-        // Match the site theme. By day the sun sits west of the beach (afternoon), so the opening shot and the
-        // landing are both lit; by night the dive flies from the sunlit side into the dark, where the coast
-        // shows its city lights
-        const landing = globe.targetDirection((IDLE_MS + DIVE_MS) / 1000)
-        const east = normalize(cross(NORTH_AXIS, landing))
-        const sunAngle = night ? -2.3 : -0.5
-        globe.setSun(add(add(scale(landing, Math.cos(sunAngle)), scale(east, Math.sin(sunAngle))), scale(northAt(landing), 0.25)))
-        // Open the shot over Africa, west of the beach
-        startDirection = rotateAbout(landing, NORTH_AXIS, -1.2)
-
-        if (reduceMotion && !debug) {
-          // One still frame looking down at India, then a plain fade into the site
-          const beach = globe.targetDirection(0)
-          globe.render(0, { position: scale(beach, 2.3), lookAt: [0, 0, 0], up: northAt(beach) })
-          onReady()
-          timer = window.setTimeout(() => leave(true), REDUCED_MOTION_HOLD_MS)
-          return
-        }
-
-        phase = 'idle'
-        start = performance.now()
-        frame = requestAnimationFrame(loop)
-      })
-      // No WebGL 2, or the maps failed to load: just show the site
-      .catch(() => leave(false))
+      // The page preloaded the maps (app/layout.tsx), so they're fetched here, where the preloads match, then
+      // decoded off the main thread and handed over
+      const file = (name: string) => `/intro/${name}.webp`
+      const hand = (names: string[], type: 'maps' | 'local-maps') =>
+        Promise.all(names.map((name) => loadBitmap(file(name)))).then(
+          (maps) => {
+            if (worker) send({ type, maps }, maps)
+            else for (const map of maps) map.close()
+          },
+          () => send({ type: type === 'maps' ? 'maps-failed' : 'local-maps-failed' }),
+        )
+      void hand([lite ? 'globe-color-1024' : 'globe-color-2048', 'globe-coast-1024', 'globe-lights-512'], 'maps')
+      // Only needed for the last stretch of the dive
+      void hand(['globe-local-color-1024', 'globe-local-coast-1024'], 'local-maps')
+    }
 
     return () => {
-      cancelled = true
-      cancelAnimationFrame(frame)
       window.clearTimeout(timer)
+      cancelAnimationFrame(releaseFrame)
+      window.clearTimeout(releaseTimer)
       root.removeEventListener('pointerdown', onPointer)
-      root.removeEventListener('wheel', onWheel)
-      root.removeEventListener('touchmove', onWheel)
+      root.removeEventListener('wheel', startDive)
+      root.removeEventListener('touchmove', startDive)
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('resize', onResize)
       skip.removeEventListener('click', onSkip)
-      globe?.dispose()
+      // The worker stops drawing at once and frees the GPU memory and its context soon after (losing the context
+      // on purpose, so nothing it says from here on matters)
+      send({ type: 'dispose' })
+      if (worker) worker.onmessage = worker.onerror = null
+      worker = null
+      canvas.remove()
     }
   }, [onReady, onReveal, onDone])
 

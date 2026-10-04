@@ -26,13 +26,13 @@ export function About() {
                   data-reveal
                   style={{ '--reveal-delay': `${index * 90}ms` } as CSSProperties}
                 >
-                  <span className="about-icon">
-                    <Icon aria-hidden="true" />
-                  </span>
-                  <div>
-                    <dt>{fact.label}</dt>
-                    <dd>{fact.value}</dd>
-                  </div>
+                  <dt>
+                    <span className="about-icon">
+                      <Icon aria-hidden="true" />
+                    </span>
+                    {fact.label}
+                  </dt>
+                  <dd>{fact.value}</dd>
                 </div>
               )
             })}

@@ -19,7 +19,6 @@ import {
   createTexture,
   finishPrograms,
   globeMatrix,
-  loadBitmap,
   lookAt,
   mat4,
   multiply,
@@ -255,12 +254,22 @@ function puffCluster(puffs: number[], center: Vec3, spread: number, count: numbe
 
 // ---------- Scene ----------
 
-export async function createGlobe(
-  container: HTMLElement,
-  options: { lite: boolean; target: { lat: number; lng: number } },
-) {
+export interface GlobeOptions {
+  lite: boolean
+  target: { lat: number; lng: number }
+  /** Viewport in CSS pixels, and the screen's pixel ratio */
+  width: number
+  height: number
+  devicePixelRatio: number
+  /** Color, coast and city-lights maps, decoded by the page (which preloaded them) */
+  maps: Promise<ImageBitmap[]>
+  /** The sharper patch around the beach, only needed for the last stretch of the dive */
+  localMaps: Promise<ImageBitmap[]>
+}
+
+/** Runs in the intro worker (intro.worker.ts), drawing on the page's canvas through an OffscreenCanvas */
+export async function createGlobe(canvas: OffscreenCanvas, options: GlobeOptions) {
   const { lite } = options
-  const canvas = document.createElement('canvas')
   const gl = canvas.getContext('webgl2', {
     antialias: !lite,
     alpha: false,
@@ -276,13 +285,13 @@ export async function createGlobe(
     gl.getExtension('WEBGL_lose_context')?.loseContext()
     throw new Error('Software WebGL: skipping the intro')
   }
-  const pixelRatio = Math.min(window.devicePixelRatio || 1, lite ? 1.25 : 1.5)
+  const pixelRatio = Math.min(options.devicePixelRatio || 1, lite ? 1.25 : 1.5)
   const fail = (error: unknown): never => {
     gl.getExtension('WEBGL_lose_context')?.loseContext()
     throw error
   }
 
-  // Programs compile in the background while the textures download
+  // Programs compile in the background while the page decodes the maps
   const pending = [
     startProgram(gl, shaders.skyVertex, shaders.skyFragment),
     startProgram(gl, shaders.starVertex, shaders.starFragment),
@@ -291,18 +300,10 @@ export async function createGlobe(
     startProgram(gl, shaders.craftVertex, shaders.craftFragment),
     startProgram(gl, shaders.beaconVertex, shaders.beaconFragment),
   ]
-  const file = (name: string) => `/intro/${name}.webp`
-  const mainMaps = Promise.all(
-    [lite ? 'globe-color-1024' : 'globe-color-2048', 'globe-coast-1024', 'globe-lights-512'].map((name) => loadBitmap(file(name))),
-  )
-  // Only needed for the last stretch of the dive; fetched now, uploaded after the first frame
-  const localMaps = Promise.all(['globe-local-color-1024', 'globe-local-coast-1024'].map((name) => loadBitmap(file(name))))
-  localMaps.catch(() => {})
-
   let programs: Program[]
   let images: ImageBitmap[]
   try {
-    ;[programs, images] = await Promise.all([finishPrograms(gl, pending), mainMaps])
+    ;[programs, images] = await Promise.all([finishPrograms(gl, pending), options.maps])
   } catch (error) {
     return fail(error)
   }
@@ -312,8 +313,6 @@ export async function createGlobe(
   const textures: WebGLTexture[] = []
   for (const [index, image] of images.entries()) {
     textures.push(createTexture(gl, image, { repeatX: true, anisotropy: index < 2 ? anisotropy : undefined }))
-    // One upload per task, so no single task blocks the page for long
-    await new Promise((resolve) => setTimeout(resolve, 0))
   }
   // Placeholders until the local patch arrives (uLocalReady keeps them unused)
   const blank = gl.createTexture()
@@ -424,17 +423,20 @@ export async function createGlobe(
   let height = 0
   let aspect = 1
   let fovY = 0
+  let viewport = { width: options.width, height: options.height }
 
-  const resize = () => {
-    width = Math.max(1, Math.round(window.innerWidth * pixelRatio))
-    height = Math.max(1, Math.round(window.innerHeight * pixelRatio))
+  /** Size the drawing buffer for a viewport in CSS pixels */
+  const resize = (cssWidth: number, cssHeight: number) => {
+    viewport = { width: cssWidth, height: cssHeight }
+    width = Math.max(1, Math.round(cssWidth * pixelRatio))
+    height = Math.max(1, Math.round(cssHeight * pixelRatio))
     canvas.width = width
     canvas.height = height
     aspect = width / height
     // Landscape keeps a 40° view; portrait widens it so the coast isn't cropped to a sliver
     fovY = 2 * Math.atan(Math.max(Math.tan((20 * Math.PI) / 180), Math.tan((14 * Math.PI) / 180) / aspect))
   }
-  resize()
+  resize(options.width, options.height)
 
   const halfFov = () => ({ x: Math.atan(Math.tan(fovY / 2) * aspect), y: fovY / 2 })
 
@@ -484,11 +486,8 @@ export async function createGlobe(
 
   let lost = false
   canvas.addEventListener('webglcontextlost', () => (lost = true))
-  // Only now, so the CSS starfield shows while everything loads instead of a blank canvas
-  container.appendChild(canvas)
 
   return {
-    canvas,
     /** Half the field of view, horizontally and vertically (radians) */
     halfFov,
     /** World-space direction of the beach at a given time (the planet keeps spinning) */
@@ -501,9 +500,8 @@ export async function createGlobe(
     /** Upload the sharper patch around the beach (call after the first frame) */
     async loadLocal() {
       try {
-        const [color, coast] = await localMaps
+        const [color, coast] = await options.localMaps
         localTextures[0] = createTexture(gl, color, { anisotropy })
-        await new Promise((resolve) => setTimeout(resolve, 0))
         localTextures[1] = createTexture(gl, coast)
         localReady = 1
       } catch {
@@ -611,7 +609,7 @@ export async function createGlobe(
     measureLanding(time: number, pose: Pose) {
       setCamera(pose)
       const clip = project(viewProjection, globeToWorld(target, SPIN_SPEED * time))
-      const projected = { x: ((clip.x + 1) / 2) * window.innerWidth, y: ((1 - clip.y) / 2) * window.innerHeight }
+      const projected = { x: ((clip.x + 1) / 2) * viewport.width, y: ((1 - clip.y) / 2) * viewport.height }
 
       const framebuffer = gl.createFramebuffer()
       const color = gl.createRenderbuffer()
@@ -650,7 +648,7 @@ export async function createGlobe(
       const drawn = count ? { x: sumX / count / pixelRatio, y: sumY / count / pixelRatio } : null
       // How far the rendered map puts the beach from its coastline (km, positive inland)
       const coastKm = count ? (sumCoast / count / 255 - 0.5) * 120 : null
-      return { projected, drawn, coastKm, markerPixels: count, center: { x: window.innerWidth / 2, y: window.innerHeight / 2 } }
+      return { projected, drawn, coastKm, markerPixels: count, center: { x: viewport.width / 2, y: viewport.height / 2 } }
     },
     resize,
     onContextLost(callback: () => void) {
@@ -664,7 +662,6 @@ export async function createGlobe(
       for (const { program } of programs) gl.deleteProgram(program)
       gl.getExtension('WEBGL_lose_context')?.loseContext()
       canvas.width = canvas.height = 1
-      canvas.remove()
     },
   }
 }

@@ -3,38 +3,6 @@
  * the deeper you scroll. Each zone re-maps the text/surface tokens so content stays readable (WCAG AA).
  */
 
-/* Registered so the water can fade between day and night like the sky does */
-@property --water-0 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #74dde0;
-}
-@property --water-1 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #2fb5d0;
-}
-@property --water-2 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #0f6894;
-}
-@property --water-3 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #0a4c86;
-}
-@property --water-4 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #0a2350;
-}
-@property --water-5 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #030914;
-}
-
 @layer components {
   /* ---------- Zones ---------- */
 
@@ -55,13 +23,6 @@
     position: relative;
     isolation: isolate;
     color: var(--ink);
-    transition:
-      --water-0 1.2s ease,
-      --water-1 1.2s ease,
-      --water-2 1.2s ease,
-      --water-3 1.2s ease,
-      --water-4 1.2s ease,
-      --water-5 1.2s ease;
   }
 
   [data-theme='dark'] .zone {
@@ -196,7 +157,7 @@
       radial-gradient(3px 1px at 30% 64%, var(--glint) 50%, transparent 55%),
       radial-gradient(2px 1px at 66% 80%, var(--glint) 50%, transparent 55%);
     background-size: 280px 200px;
-    animation: twinkle 2.4s ease-in-out infinite alternate;
+    animation: twinkle 9.6s ease-in-out infinite;
   }
 
   /* Lacy foam where the shallows wash up on the sand */
@@ -245,6 +206,11 @@
     position: absolute;
     inset: 0;
     opacity: clamp(0, calc((var(--dive) - 0.3) * 3), 1);
+  }
+
+  /* Above the water the bubbles are fully transparent, so they don't run at all (DiveProgress sets data-dry) */
+  .dive[data-dry] .dive-bubbles {
+    display: none;
   }
 
   /* At night bubbles stir up glowing plankton */

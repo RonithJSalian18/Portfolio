@@ -34,8 +34,12 @@
     inset: 0;
     overflow: hidden;
     opacity: calc(var(--glow) * 0.9);
-    transition: opacity 1.2s ease;
     pointer-events: none;
+  }
+
+  /* Taken out by day: hidden but animating, it would still cost a style update every frame */
+  :root:not([data-theme='dark']) .footer-plankton {
+    display: none;
   }
 
   .footer-plankton::after {
@@ -49,7 +53,7 @@
       radial-gradient(1.5px 1.5px at 76% 62%, #74fbe9 50%, transparent 60%),
       radial-gradient(2px 2px at 90% 36%, #9ffff1 50%, transparent 60%);
     background-size: 340px 220px;
-    animation: twinkle 3.6s ease-in-out infinite alternate;
+    animation: twinkle 14.4s ease-in-out infinite;
   }
 
   .footer-inner {

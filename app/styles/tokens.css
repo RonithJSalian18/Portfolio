@@ -6,23 +6,6 @@
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-/* Registered so the sky gradient can animate between day and night (gradients themselves can't transition) */
-@property --sky-top {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #3a98d4;
-}
-@property --sky-mid {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #86c9ec;
-}
-@property --sky-low {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #dff1f8;
-}
-
 :root {
   color-scheme: light;
 

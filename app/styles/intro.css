@@ -30,13 +30,11 @@ html[data-intro='reveal'] {
 }
 
 /* Nothing under the intro needs to move until the clouds part. Pausing it saves the main thread a full
-   style and layer update on every frame of the dive. */
-html[data-intro='play'] #site *,
-html[data-intro='play'] #site *::before,
-html[data-intro='play'] #site *::after,
-html[data-intro='running'] #site *,
-html[data-intro='running'] #site *::before,
-html[data-intro='running'] #site *::after {
+   style and layer update on every frame of the dive. It has its own attribute, removed once when the clouds
+   part: a rule like this keyed on data-intro would restyle the whole page at every change of intro state. */
+html[data-paused] #site *,
+html[data-paused] #site *::before,
+html[data-paused] #site *::after {
   animation-play-state: paused !important;
 }
 

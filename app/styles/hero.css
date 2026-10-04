@@ -28,10 +28,6 @@
     inset: 0 0 var(--scene-h) 0;
     z-index: -1;
     background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-low) 100%);
-    transition:
-      --sky-top 1.5s ease,
-      --sky-mid 1.5s ease,
-      --sky-low 1.5s ease;
   }
 
   /* Stars: two tiled layers of different sizes so the repeat is hard to spot; the second one twinkles */
@@ -53,21 +49,32 @@
 
   .hero-stars {
     opacity: var(--stars);
-    transition: opacity 1.4s ease;
+  }
+
+  /* Whatever a theme hides is taken out entirely: an invisible animation still costs the main thread a
+     style update every frame (only visible ones run on the compositor) */
+  :root:not([data-theme='dark']) .hero-stars,
+  :root:not([data-theme='dark']) .reflection-moon,
+  [data-theme='dark'] .hero-clouds,
+  [data-theme='dark'] .reflection-sun {
+    display: none;
   }
 
   .hero-stars::after {
     content: '';
     background-size: 410px 410px;
     background-position: 120px 60px;
-    animation: twinkle 3.2s ease-in-out infinite alternate;
+    animation: twinkle 12.8s ease-in-out infinite;
   }
 
   @keyframes twinkle {
-    from {
+    0%,
+    50%,
+    100% {
       opacity: 0.2;
     }
-    to {
+    25%,
+    75% {
       opacity: 1;
     }
   }
@@ -76,7 +83,6 @@
     position: absolute;
     inset: 0;
     opacity: calc(var(--clouds) * 0.75);
-    transition: opacity 1.2s ease;
   }
 
   .cloud {
@@ -266,7 +272,7 @@
     margin-top: 0.45rem;
     font-size: var(--text-lead);
     line-height: var(--text-lead--line-height);
-    font-weight: 300;
+    font-weight: 400;
   }
 
   .hero-actions {
@@ -331,7 +337,7 @@
     background: repeating-linear-gradient(to bottom, var(--glint) 0 2px, transparent 2px 8px);
     mask-image: radial-gradient(50% 100% at 50% 0%, #000 25%, transparent 100%);
     transition: opacity 1.4s ease;
-    animation: shimmer 2.6s ease-in-out infinite alternate;
+    animation: shimmer 10.4s ease-in-out infinite;
   }
 
   .reflection-sun {
@@ -345,10 +351,13 @@
   }
 
   @keyframes shimmer {
-    from {
+    0%,
+    50%,
+    100% {
       transform: scaleX(0.7);
     }
-    to {
+    25%,
+    75% {
       transform: scaleX(1.1);
     }
   }
@@ -392,7 +401,6 @@
     mask: var(--shape, var(--wave-shape)) 0 0 / var(--period) auto repeat-x;
     animation: wave-drift var(--speed, 30s) linear infinite;
     will-change: transform;
-    transition: background-color 1.2s ease;
   }
 
   @keyframes wave-drift {
@@ -421,18 +429,40 @@
   }
 
   /* Foam on the near wave; at night it glows like bioluminescence */
-  .wave-glow {
-    position: absolute;
-    inset: 0;
-    filter: drop-shadow(0 0 5px var(--wave-glow));
-    transition: filter 1.2s ease;
-  }
-
+  /* The foam line on the near wave, glowing at night. Only the outer element moves; the blurred glow and
+     the line inside it are static, so the blur is drawn once rather than every frame */
   .wave-edge {
     --period: 380px;
-    --speed: 22s;
-    --shape: var(--wave-line);
-    --fill: var(--wave-edge);
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(100% + var(--period));
+    animation: wave-drift 22s linear infinite;
+    will-change: transform;
+  }
+
+  .wave-edge span {
+    position: absolute;
+    inset: 0;
+    mask: var(--wave-line) 0 0 / var(--period) auto repeat-x;
+  }
+
+  .wave-edge-line {
+    background: var(--wave-edge);
+  }
+
+  /* Blurred after the mask (on the parent), so the glow spreads beyond the line */
+  .wave-edge-glow {
+    position: absolute;
+    inset: 0;
+    filter: blur(4px);
+  }
+
+  .wave-edge-glow span {
+    background: var(--wave-glow);
+  }
+
+  :root:not([data-theme='dark']) .wave-edge-glow {
+    display: none;
   }
 
   .wave-shore {

@@ -102,7 +102,7 @@
     height: 8px;
     border-radius: 50%;
     border: 1.5px solid rgba(255, 255, 255, 0.7);
-    animation: bottle-bubble 5s linear infinite;
+    animation: bottle-bubble 10s linear infinite;
   }
 
   .bottle-bubble:nth-of-type(1) {
@@ -124,30 +124,41 @@
   }
 
   @keyframes bottle-bubble {
-    0% {
+    0%,
+    50.01% {
       transform: translate(0, 0);
       opacity: 0;
     }
-    15% {
+    7.5%,
+    57.5% {
       opacity: 0.8;
     }
+    50%,
     100% {
       transform: translate(8px, -220px);
       opacity: 0;
     }
   }
 
-  .bottle-svg {
+  /* The bottle bobs and tilts on an HTML wrapper: an <svg> with its own translate/rotate can't have its
+     animation composited, and its drop shadow would be redrawn every frame */
+  .bottle-float {
     position: absolute;
     left: 50%;
     top: 60%;
     width: min(74%, 330px);
     translate: -50% -50%;
     rotate: -7deg;
-    overflow: visible;
-    filter: drop-shadow(0 10px 10px rgba(0, 20, 40, 0.35));
     transition: rotate 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
     animation: bottle-drift 7s ease-in-out infinite;
+  }
+
+  .bottle-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 10px 10px rgba(0, 20, 40, 0.35));
   }
 
   @keyframes bottle-drift {
@@ -156,8 +167,8 @@
     }
   }
 
-  .bottle-card:hover .bottle-svg,
-  .bottle-card:focus-within .bottle-svg {
+  .bottle-card:hover .bottle-float,
+  .bottle-card:focus-within .bottle-float {
     rotate: -3deg;
   }
 

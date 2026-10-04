@@ -52,7 +52,9 @@ export function Projects() {
                   <span className="bottle-bubble" />
                   <span className="bottle-bubble" />
                   <span className="bottle-bubble" />
-                  <Bottle />
+                  <div className="bottle-float">
+                    <Bottle />
+                  </div>
                 </div>
 
                 <div className="bottle-body">

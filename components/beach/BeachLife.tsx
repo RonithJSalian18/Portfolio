@@ -2,17 +2,20 @@ import type { CSSProperties, ReactNode } from 'react'
 import { SandDollar, Scallop, Starfish } from '@/components/BeachIcons'
 
 // Background life for the beach hero. Purely decorative (aria-hidden), colours from theme tokens.
+// Moving parts (gull wings, the lighthouse beam) are their own <svg> layers so the compositor can animate them.
 
 const at = (style: Record<string, string | number>) => style as CSSProperties
 
 function Gull() {
   return (
-    <svg viewBox="0 0 40 16" focusable="false">
-      <g className="gull-wings">
+    <span className="gull-art">
+      <svg className="gull-wings" viewBox="0 0 40 16" focusable="false">
         <path d="M2 10Q10 1 20 9Q30 1 38 10" fill="none" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-      </g>
-      <ellipse cx="20" cy="9.6" rx="2.6" ry="1.8" />
-    </svg>
+      </svg>
+      <svg viewBox="0 0 40 16" focusable="false">
+        <ellipse cx="20" cy="9.6" rx="2.6" ry="1.8" />
+      </svg>
+    </span>
   )
 }
 
@@ -45,13 +48,11 @@ export function Sailboat() {
   return (
     <div className="sailboat" aria-hidden="true">
       <svg viewBox="0 0 40 40" focusable="false">
-        <g className="sailboat-rock">
-          <path className="sail" d="M21 4 34 28H21Z" />
-          <path className="sail sail-jib" d="M19 8V28H8Z" />
-          <path className="mast" d="M20 3V30" />
-          <path className="hull" d="M4 30H36L31.5 36H8.5Z" />
-          <circle className="lantern" cx="20" cy="3.4" r="1.6" />
-        </g>
+        <path className="sail" d="M21 4 34 28H21Z" />
+        <path className="sail sail-jib" d="M19 8V28H8Z" />
+        <path className="mast" d="M20 3V30" />
+        <path className="hull" d="M4 30H36L31.5 36H8.5Z" />
+        <circle className="lantern" cx="20" cy="3.4" r="1.6" />
       </svg>
     </div>
   )
@@ -61,16 +62,16 @@ export function Sailboat() {
 export function Lighthouse() {
   return (
     <div className="hero-lighthouse" aria-hidden="true">
-      <svg viewBox="0 0 140 170" focusable="false">
+      <svg className="lh-beam" viewBox="0 0 140 170" focusable="false">
         <defs>
           <linearGradient id="hero-beam" x1="1" x2="0" y1="0" y2="0">
             <stop offset="0" stopColor="#fff3bf" stopOpacity="0.85" />
             <stop offset="1" stopColor="#fff3bf" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <g className="lh-beam">
-          <path d="M70 46-170 6V86Z" fill="url(#hero-beam)" />
-        </g>
+        <path d="M70 46-170 6V86Z" fill="url(#hero-beam)" />
+      </svg>
+      <svg viewBox="0 0 140 170" focusable="false">
         <path className="lh-rock" d="M14 170C18 140 34 128 52 130 62 118 86 116 100 126 116 122 132 138 136 170Z" />
         <path className="lh-tower" d="M56 136 61 58H79L84 136Z" />
         <g className="lh-stripes">

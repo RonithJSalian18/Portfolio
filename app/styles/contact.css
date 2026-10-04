@@ -44,7 +44,7 @@
       radial-gradient(1.2px 1.2px at 74% 48%, #b7a6ff 50%, transparent 60%),
       radial-gradient(1.6px 1.6px at 90% 30%, #7ef9ea 50%, transparent 60%);
     background-size: 190px 150px;
-    animation: twinkle 3.2s ease-in-out infinite alternate;
+    animation: twinkle 12.8s ease-in-out infinite;
   }
 
   .deep-wreck {

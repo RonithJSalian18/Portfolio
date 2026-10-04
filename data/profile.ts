@@ -4,6 +4,8 @@
 export const profile = {
   name: 'Ronith J Salian',
   shortName: 'Ronith',
+  givenName: 'Ronith',
+  familyName: 'Salian',
   role: 'Full Stack Developer',
   focus: 'AI/ML',
   location: 'Udupi, Karnataka',
@@ -12,6 +14,24 @@ export const profile = {
   /** Written from the résumé's facts; edit freely */
   bio: "I'm a full stack developer from Udupi, Karnataka, studying Information Science and Engineering at NMAM Institute of Technology. I build web apps end to end with React, Next.js, Node.js and FastAPI, and I'm working more and more on AI/ML: multi-agent LangGraph pipelines, retrieval over pgvector, and TensorFlow models for computer vision.",
 } as const
+
+/** Search and link-preview text (the preview image is app/opengraph-image.tsx) */
+export const seo = {
+  title: `${profile.name} | ${profile.role}`,
+  description: `${profile.role} from ${profile.location}, building web apps with React, Next.js and FastAPI, and ${profile.focus} systems with LangGraph, RAG and TensorFlow.`,
+  keywords: [
+    profile.name,
+    'full stack developer',
+    'AI/ML',
+    'Udupi',
+    'Karnataka',
+    'React',
+    'Next.js',
+    'FastAPI',
+    'LangGraph',
+    'portfolio',
+  ],
+}
 
 export type SocialKey = 'github' | 'linkedin' | 'leetcode' | 'email'
 

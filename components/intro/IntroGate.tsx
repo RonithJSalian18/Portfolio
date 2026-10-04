@@ -10,6 +10,12 @@ const EarthIntro = dynamic(() => import('./EarthIntro'), { ssr: false })
 const FAIL_SAFE_MS = 5000
 
 const subscribeNever = () => () => {}
+
+/** Let the page move and take focus again. Both restyle the whole page, so they happen together, once. */
+function releasePage() {
+  document.documentElement.removeAttribute('data-paused')
+  document.getElementById('site')?.removeAttribute('inert')
+}
 // data-intro is decided before first paint by the boot script in app/layout.tsx
 const introIsPlaying = () => {
   const state = document.documentElement.dataset.intro
@@ -27,7 +33,7 @@ export function IntroGate() {
     if (root.dataset.intro === 'done') return
     const focusWasInIntro = document.activeElement?.closest('.intro') != null
     root.dataset.intro = 'done'
-    document.getElementById('site')?.removeAttribute('inert')
+    releasePage()
     setFinished(true)
     if (focusWasInIntro) document.getElementById('hero-title')?.focus({ preventScroll: true })
   }, [])
@@ -36,9 +42,11 @@ export function IntroGate() {
     if (document.documentElement.dataset.intro === 'play') document.documentElement.dataset.intro = 'running'
   }, [])
 
-  // The clouds are parting over the hero, so the page underneath can start moving again
+  // The clouds are parting over the hero (or the intro is fading out), so the page underneath can start moving
+  // again
   const markRevealing = useCallback(() => {
     if (document.documentElement.dataset.intro === 'running') document.documentElement.dataset.intro = 'reveal'
+    releasePage()
   }, [])
 
   useEffect(() => {
@@ -48,8 +56,10 @@ export function IntroGate() {
     } catch {
       // Storage blocked: the intro may play again next visit, which is fine
     }
-    // Keep keyboard and screen-reader focus on the intro while it covers the page
-    document.getElementById('site')?.setAttribute('inert', '')
+    // Keep keyboard and screen-reader focus on the intro while it covers the page (app/page.tsx normally did
+    // this already, before the page was styled; adding it now would restyle the whole page)
+    const site = document.getElementById('site')
+    if (site && !site.hasAttribute('inert')) site.setAttribute('inert', '')
     window.scrollTo(0, 0)
     const start = () => setStarted(true)
     // Safari has no requestIdleCallback; a short timeout does the same job there

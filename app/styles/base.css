@@ -155,7 +155,7 @@
     margin-top: 1rem;
     font-size: var(--text-lead);
     line-height: var(--text-lead--line-height);
-    font-weight: 300;
+    font-weight: 400;
     color: var(--ink-soft);
   }
 
@@ -253,14 +253,20 @@
     transform: translateY(18px);
   }
 
-  /* While the theme flips, let colors fade instead of snapping (components with their own transitions win) */
-  .theme-switching :where(*) {
-    transition:
-      background-color 0.9s ease,
-      border-color 0.9s ease,
-      color 0.9s ease,
-      fill 0.9s ease,
-      stroke 0.9s ease;
+  /* Anything scrolled well out of view stops animating (HeroParallax and OffscreenPauser set the flag; the
+     intro pauses the whole page while it plays, see intro.css) */
+  [data-offscreen] *,
+  [data-offscreen] *::before,
+  [data-offscreen] *::after {
+    animation-play-state: paused !important;
+  }
+
+  /* Theme switch: the old and new page cross-fade as two snapshots (ThemeToggle uses the View Transitions
+     API), so no element has to animate its own colors */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.8s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

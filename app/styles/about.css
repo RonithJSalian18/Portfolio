@@ -22,11 +22,11 @@
     gap: 1rem;
   }
 
+  /* The icon sits inside the <dt> (a <dl> group may only hold <dt> and <dd>), placed in the card's left gutter */
   .about-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.15rem 1.35rem;
+    position: relative;
+    min-height: calc(2.75rem + 2.3rem);
+    padding: 1.15rem 1.35rem 1.15rem calc(1.35rem + 2.75rem + 1rem);
     transition: transform 0.25s ease;
   }
 
@@ -35,8 +35,10 @@
   }
 
   .about-icon {
+    position: absolute;
+    top: 1.15rem;
+    left: 1.35rem;
     display: inline-flex;
-    flex: none;
     align-items: center;
     justify-content: center;
     width: 2.75rem;
