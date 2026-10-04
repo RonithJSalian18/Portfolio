@@ -1,6 +1,5 @@
 import { BackToTop } from '@/components/BackToTop'
-import { RESUME_PATH } from '@/config/site'
-import { footer, navLinks, profile, socials } from '@/data/profile'
+import { RESUME_URL, footer, navLinks, profile, socials } from '@/data/profile'
 
 /** The seafloor at the bottom of the dive */
 export function Footer() {
@@ -42,7 +41,7 @@ export function Footer() {
                 </li>
               ))}
               <li>
-                <a href={RESUME_PATH} download>
+                <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" aria-label="Résumé (PDF, opens in a new tab)">
                   Résumé (PDF)
                 </a>
               </li>

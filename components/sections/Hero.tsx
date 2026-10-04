@@ -2,8 +2,7 @@ import { Code2, Download, Mail } from 'lucide-react'
 import { BeachFinds, Lighthouse, Sailboat, SkyLife, Surfer } from '@/components/beach/BeachLife'
 import { HeroParallax } from '@/components/HeroParallax'
 import { GithubIcon, LinkedinIcon } from '@/components/SocialIcons'
-import { RESUME_PATH } from '@/config/site'
-import { profile, socials, type SocialKey } from '@/data/profile'
+import { RESUME_URL, focus, profile, socials, type SocialKey } from '@/data/profile'
 
 const socialIcons: Record<SocialKey, React.ComponentType<{ className?: string }>> = {
   github: GithubIcon,
@@ -37,13 +36,19 @@ export function Hero() {
         </h1>
         <p className="hero-role">{profile.role}</p>
         <p className="hero-tagline">
-          Also building with {profile.focus} · {profile.location}
+          Also building with {focus}
         </p>
         <div className="hero-actions">
           <a href="#projects" className="btn btn-primary">
             View Projects
           </a>
-          <a href={RESUME_PATH} className="btn btn-ghost" download>
+          <a
+            href={RESUME_URL}
+            className="btn btn-ghost"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Download résumé (PDF, opens in a new tab)"
+          >
             <Download className="h-4 w-4" aria-hidden="true" />
             Download Resume
           </a>

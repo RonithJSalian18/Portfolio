@@ -207,7 +207,7 @@ export default function EarthIntro({ onReady, onReveal, onDone }: EarthIntroProp
       </div>
       <pre ref={debugRef} className="intro-debug" aria-hidden="true" />
       <p className="sr-only">
-        Intro animation: an illustrated Earth turns toward the coast of Karnataka, India, and the camera dives through a
+        Intro animation: an illustrated Earth turns toward the southwest coast of India, and the camera dives through a
         cloud down to the beach.
       </p>
       <p className="intro-hint" aria-hidden="true">

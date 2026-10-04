@@ -2,8 +2,7 @@ import { Code2, Download, Mail } from 'lucide-react'
 import { ContactForm } from '@/components/ContactForm'
 import { SectionHeading } from '@/components/SectionHeading'
 import { GithubIcon, LinkedinIcon } from '@/components/SocialIcons'
-import { RESUME_PATH } from '@/config/site'
-import { sections, socials, type SocialKey } from '@/data/profile'
+import { RESUME_URL, sections, socials, type SocialKey } from '@/data/profile'
 
 const channelIcons: Record<SocialKey, React.ComponentType<{ className?: string }>> = {
   email: Mail,
@@ -76,7 +75,13 @@ export function Contact() {
                 )
               })}
             </ul>
-            <a href={RESUME_PATH} className="btn btn-primary contact-resume" download>
+            <a
+              href={RESUME_URL}
+              className="btn btn-primary contact-resume"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Download résumé (PDF, opens in a new tab)"
+            >
               <Download className="h-4 w-4" aria-hidden="true" />
               Download Resume
             </a>

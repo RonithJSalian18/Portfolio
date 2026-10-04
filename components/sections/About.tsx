@@ -1,9 +1,10 @@
 import type { CSSProperties } from 'react'
-import { GraduationCap, Languages, MapPin, Sparkles } from 'lucide-react'
+import { GraduationCap, Languages, Sparkles } from 'lucide-react'
 import { SectionHeading } from '@/components/SectionHeading'
 import { facts, profile, sections } from '@/data/profile'
 
-const factIcons = [MapPin, GraduationCap, Sparkles, Languages]
+// One per fact, in order: focus, studies, languages
+const factIcons = [Sparkles, GraduationCap, Languages]
 
 export function About() {
   return (
