@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Menu, X } from 'lucide-react'
-import { navLinks, profile } from '@/data/profile'
+import { FileText, Menu, X } from 'lucide-react'
+import { RESUME_URL, navLinks, profile } from '@/data/profile'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export function Navbar() {
@@ -52,6 +52,16 @@ export function Navbar() {
         </ul>
 
         <div className="nav-actions">
+          <a
+            href={RESUME_URL}
+            className="nav-resume"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Résumé (PDF, opens in a new tab)"
+          >
+            <FileText aria-hidden="true" />
+            Resume
+          </a>
           <ThemeToggle />
           <button
             type="button"

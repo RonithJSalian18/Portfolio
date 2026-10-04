@@ -1,7 +1,7 @@
 # Ronith J Salian: Portfolio
 
-A personal portfolio styled as a trip from space to the bottom of the sea. An illustrated 3D Earth turns to the
-coast of Karnataka and dives through a cloud onto a beach; scrolling past the beach takes you under the waves and
+A personal portfolio styled as a trip from space to the bottom of the sea. An illustrated 3D Earth turns to
+India's southwest coast and dives through a cloud onto a beach; scrolling past the beach takes you under the waves and
 down through a shallow reef, open water, the twilight zone and the deep sea, with a diver exploring along the
 way. Day and night themes (sun and moon) switch every scene.
 
@@ -23,8 +23,9 @@ pnpm build   # type-checks and builds for production
   experience and education, achievements, links, and the search and link-preview text. Each project lists the
   skills it uses; that's what the skills sonar shows when you pick a skill.
 - **Site settings** live in `config/site.ts`: the beach coordinates the globe lands on, the site address used for
-  link previews (`NEXT_PUBLIC_SITE_URL` overrides it), and the résumé path.
-- **The résumé download** links to `/resume.pdf`; put the file at `public/resume.pdf`.
+  link previews (`NEXT_PUBLIC_SITE_URL` overrides it).
+- **The résumé** is `public/resume.pdf`. The navbar, hero and contact buttons all use `RESUME_URL` in
+  `data/profile.ts` and open it in a new tab; replace the file to update it.
 
 ## Where things live
 
@@ -81,7 +82,6 @@ through the gaps between sections, like the fish.
 
 ## Before launch
 
-- Add the résumé as `public/resume.pdf`.
 - Confirm the GitHub links marked `TODO` in `data/profile.ts` (VoxScribeAI, SentinelFi, and
   Space-Derbis-Identification, whose name is spelled "Derbis"), and add UniBank MDM's repository (its card
   shows no Code button until then).

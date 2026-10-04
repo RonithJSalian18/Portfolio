@@ -7,24 +7,31 @@ export const profile = {
   givenName: 'Ronith',
   familyName: 'Salian',
   role: 'Full Stack Developer',
-  focus: 'AI/ML',
-  location: 'Udupi, Karnataka',
+  /** What I'm building with besides full stack web */
+  focusAreas: ['AI/ML', 'GenAI'],
   email: 'ronithjsalian01@gmail.com',
   spokenLanguages: ['English', 'Hindi', 'Kannada', 'Tulu'],
   /** Written from the résumé's facts; edit freely */
-  bio: "I'm a full stack developer from Udupi, Karnataka, studying Information Science and Engineering at NMAM Institute of Technology. I build web apps end to end with React, Next.js, Node.js and FastAPI, and I'm working more and more on AI/ML: multi-agent LangGraph pipelines, retrieval over pgvector, and TensorFlow models for computer vision.",
+  bio: "I'm a full stack developer studying Information Science and Engineering at NMAM Institute of Technology. I build web apps end to end with React, Next.js, Node.js and FastAPI, and I'm working more and more on AI/ML and GenAI: multi-agent LangGraph pipelines, retrieval over pgvector, and TensorFlow models for computer vision.",
 } as const
+
+/** "AI/ML · GenAI" */
+export const focus = profile.focusAreas.join(' · ')
+/** "Full Stack Developer · AI/ML · GenAI" */
+export const headline = `${profile.role} · ${focus}`
+
+/** The résumé PDF (public/resume.pdf). The navbar, hero and contact buttons all link here. */
+export const RESUME_URL = '/resume.pdf'
 
 /** Search and link-preview text (the preview image is app/opengraph-image.tsx) */
 export const seo = {
   title: `${profile.name} | ${profile.role}`,
-  description: `${profile.role} from ${profile.location}, building web apps with React, Next.js and FastAPI, and ${profile.focus} systems with LangGraph, RAG and TensorFlow.`,
+  description: `${profile.role} building web apps with React, Next.js and FastAPI, AI/ML models with TensorFlow, and GenAI systems with LangGraph and RAG.`,
   keywords: [
     profile.name,
     'full stack developer',
     'AI/ML',
-    'Udupi',
-    'Karnataka',
+    'GenAI',
     'React',
     'Next.js',
     'FastAPI',
@@ -74,7 +81,6 @@ export const sections = {
   },
   projects: {
     eyebrow: 'Open water',
-    title: 'Selected',
     highlight: 'Projects',
     intro: 'Four builds across full stack web, AI agents and computer vision.',
   },
@@ -87,7 +93,7 @@ export const sections = {
   achievements: {
     eyebrow: 'Twilight zone',
     highlight: 'Achievements',
-    intro: 'Problem-solving milestones and hackathons.',
+    intro: 'Hackathons I took part in, and what I built at each.',
   },
   contact: {
     eyebrow: 'The deep',
@@ -99,28 +105,28 @@ export const sections = {
 
 /** Quick facts shown beside the bio */
 export const facts = [
-  { label: 'Based in', value: profile.location },
+  { label: 'Focus', value: headline },
   {
     label: 'Studying',
     value: 'B.Tech in Information Science and Engineering, NMAM Institute of Technology (2023–2027), CGPA 8.68/10',
   },
-  { label: 'Focus', value: `Full stack development, with a growing focus on ${profile.focus}` },
   { label: 'Speaks', value: profile.spokenLanguages.join(', ') },
 ] as const
 
 // ---------- Skills ----------
 
-export type SkillGroupId = 'languages' | 'frontend' | 'backend' | 'ai' | 'databases' | 'tools'
+export type SkillGroupId = 'languages' | 'frontend' | 'backend' | 'genai' | 'ai' | 'databases' | 'tools'
 
 export const skillGroups = [
   { id: 'languages', name: 'Languages', skills: ['Python', 'JavaScript', 'TypeScript', 'SQL'] },
   { id: 'frontend', name: 'Frontend', skills: ['React.js', 'Next.js', 'Tailwind CSS', 'HTML', 'CSS'] },
   { id: 'backend', name: 'Backend', skills: ['Node.js', 'Express.js', 'FastAPI', 'REST APIs'] },
   {
-    id: 'ai',
-    name: 'AI/ML',
-    skills: ['LangGraph', 'LangChain', 'RAG', 'pgvector', 'Hugging Face', 'TensorFlow', 'OpenCV', 'scikit-learn'],
+    id: 'genai',
+    name: 'GenAI',
+    skills: ['LangGraph', 'LangChain', 'RAG', 'pgvector', 'Hugging Face', 'Multi-agent pipelines'],
   },
+  { id: 'ai', name: 'AI/ML', skills: ['TensorFlow', 'OpenCV', 'scikit-learn'] },
   { id: 'databases', name: 'Databases', skills: ['PostgreSQL (Supabase)', 'MySQL'] },
   { id: 'tools', name: 'Tools', skills: ['Git', 'GitHub', 'Docker', 'Linux', 'pytest', 'Vercel', 'Render'] },
 ] as const satisfies readonly { id: SkillGroupId; name: string; skills: readonly string[] }[]
@@ -178,6 +184,7 @@ export const projects: Project[] = [
       'RAG',
       'pgvector',
       'Hugging Face',
+      'Multi-agent pipelines',
       'PostgreSQL (Supabase)',
       'Git',
       'GitHub',
@@ -315,7 +322,7 @@ export const timeline: TimelineEntry[] = [
     title: 'Pre-University (Class XII), PCMCs',
     org: 'Vidyodaya PU College',
     period: '2021 – 2023',
-    points: ['Karnataka State Board', 'Aggregate 96.66%'],
+    points: ['State Board', 'Aggregate 96.66%'],
   },
 ]
 
@@ -333,20 +340,12 @@ export interface Achievement {
 }
 
 export const achievements: Achievement[] = [
-  {
-    icon: 'sand-dollar',
-    title: 'LeetCode: 480+ problems',
-    detail: 'Solved in Python and SQL',
-    href: 'https://leetcode.com/u/ronith_salian',
-    skills: ['Python', 'SQL'],
-  },
-  { icon: 'scallop', title: 'LeetCode 100 Days Badge', detail: 'Earned in 2025 and 2026' },
   { icon: 'starfish', title: 'BNP Paribas Innoversité 2026-27', detail: 'Hackathon: built UniBank MDM', href: '#project-unibank' },
   { icon: 'conch', title: 'Hackloop 2024', detail: 'Hackathon: built Study Buddy' },
 ]
 
 export const footer = {
-  blurb: `${profile.role} from ${profile.location}, building web apps and ${profile.focus} systems.`,
+  blurb: `${profile.role} building web apps, AI/ML models and GenAI systems.`,
   credit: 'Built with Next.js, Tailwind CSS and WebGL',
 }
 
