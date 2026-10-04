@@ -25,3 +25,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# agent notes from create-next-app
+AGENTS.md
+CLAUDE.md
